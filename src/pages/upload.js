@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import Layout from '@theme/Layout';
 import styles from './index.module.css';
 import Head from '@docusaurus/Head';
+import { useHistory } from '@docusaurus/router';
 
 export default function UploadDashboard() {
     const [file, setFile] = useState(null);
@@ -11,6 +12,7 @@ export default function UploadDashboard() {
     const [isDragging, setIsDragging] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
     const [markdownOutput, setMarkdownOutput] = useState('');
+    const history = useHistory();
 
     const handleChange = (e) => {
         const selectedFile = e.target.files[0];
@@ -67,8 +69,11 @@ export default function UploadDashboard() {
             const data = await response.json();
 
             if (response.ok) {
-                setMarkdownOutput(data.markdown);
-                setMessage({ text: 'Document converted to Markdown successfully!', type: 'success' });
+                // Redirect to markdown preview page with markdown and filename
+                history.push({
+                    pathname: '/markdownpreview',
+                    state: { markdown: data.markdown, filename: data.filename }
+                });
             } else {
                 setMessage({ text: data.error || 'Conversion failed', type: 'error' });
             }
@@ -126,13 +131,6 @@ export default function UploadDashboard() {
                             {isProcessing ? 'Processing...' : file ? 'Convert with AI →' : 'Select a file first'}
                         </button>
                     </form>
-
-                    {markdownOutput && (
-                        <div className={styles.markdownPreview}>
-                            <h3>Markdown Output</h3>
-                            <pre>{markdownOutput}</pre>
-                        </div>
-                    )}
 
                     <div className={styles.fileNote}>
                         <div className={styles.noteItem}>
