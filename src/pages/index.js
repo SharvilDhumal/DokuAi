@@ -17,7 +17,7 @@ export default function Home() {
         <div className={styles.heroContent}>
           <div className={styles.logoContainer}>
             <img
-              src="/img/dokuai-logo.svg"
+              src="/img/DokuAi_img.png"
               alt="DokuAI Logo"
               className={styles.logo}
             />
