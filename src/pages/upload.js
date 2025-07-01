@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import Layout from '@theme/Layout';
 import styles from './index.module.css';
 import Head from '@docusaurus/Head';
-import { useHistory } from '@docusaurus/router';
+import { useHistory } from 'react-router-dom';
 
 export default function UploadDashboard() {
     const [file, setFile] = useState(null);
@@ -126,24 +126,18 @@ export default function UploadDashboard() {
                 xhr.open('POST', `${API_URL}/api/convert`);
                 xhr.setRequestHeader('Accept', 'application/json');
                 xhr.send(formData);
-            }).then(data => {
-                // Process images correctly
-                const processedImages = data.images?.map(img => ({
-                    ...img,
-                    src: `data:${img.type};base64,${img.data}`
-                })) || [];
-
-                history.push({
-                    pathname: '/markdownpreview',
-                    state: {
+            })
+                .then(data => {
+                    // Navigate to markdownpreview page instead of downloading
+                    history.push('/markdownpreview', {
                         markdown: data.markdown,
                         filename: data.filename,
-                        images: processedImages  // Pass processed images
-                    }
+                        images: data.images
+                    });
+                })
+                .catch(error => {
+                    throw error;
                 });
-            }).catch(error => {
-                throw error;
-            });
 
         } catch (error) {
             console.error('Conversion error:', error);
@@ -180,8 +174,8 @@ export default function UploadDashboard() {
                     onDragOver={handleDragOver}
                     onDragLeave={handleDragLeave}
                     onDrop={handleDrop}>
-                    <h2 className={styles.uploadTitle}>Upload Documentation</h2>
-                    <p className={styles.uploadSubtitle}>Convert PDF/DOCX to structured Markdown with AI</p>
+                    <h2 className={styles.uploadTitle}>Document Conversion</h2>
+                    <p className={styles.uploadSubtitle}>Convert to Markdown with embedded images</p>
 
                     <form onSubmit={handleSubmit} className={styles.uploadForm}>
                         <div className={styles.dropZone}>
@@ -203,15 +197,6 @@ export default function UploadDashboard() {
                             </label>
                         </div>
 
-                        {isProcessing && (
-                            <div className={styles.progressBar}>
-                                <div
-                                    className={styles.progressFill}
-                                    style={{ width: `${uploadProgress}%` }}
-                                ></div>
-                            </div>
-                        )}
-
                         {message && (
                             <p className={`${styles.message} ${styles[message.type]}`}>
                                 {message.text}
@@ -223,23 +208,14 @@ export default function UploadDashboard() {
                             className={styles.uploadButton}
                             disabled={!file || isProcessing}
                         >
-                            {isProcessing ? (
-                                <>
-                                    <span className={styles.spinner}></span>
-                                    Processing...
-                                </>
-                            ) : file ? (
-                                'Convert with AI →'
-                            ) : (
-                                'Select a file first'
-                            )}
+                            {isProcessing ? 'Processing...' : 'Convert with AI'}
                         </button>
                     </form>
 
                     <div className={styles.fileNote}>
                         <div className={styles.noteItem}>
                             <span className={styles.noteIcon}>✅</span>
-                            <span>Supports PDF and DOCX formats</span>
+                            <span>Images will be embedded in the Markdown</span>
                         </div>
                         <div className={styles.noteItem}>
                             <span className={styles.noteIcon}>⚡</span>

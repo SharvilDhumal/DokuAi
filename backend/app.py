@@ -17,10 +17,18 @@ from PyPDF2 import PdfReader
 from pdf2image import convert_from_bytes
 import groq
 from dotenv import load_dotenv
+from supabase import create_client, Client
+from datetime import datetime
 
 # Load environment variables
 load_dotenv()
 groq.api_key = os.getenv("GROQ_API_KEY")
+
+# Supabase configuration
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+SUPABASE_BUCKET = "documents"  # Your bucket name
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # Setup logging
 log_formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]')
@@ -49,32 +57,37 @@ class ConversionResponse(BaseModel):
     filename: str
     images: List[ImageData] = []
 
-def extract_images_from_pdf(pdf_bytes: bytes) -> List[ImageData]:
+async def extract_images_from_pdf(pdf_bytes: bytes) -> List[ImageData]:
     images = []
     try:
-        # Extract images using pdf2image
         pil_images = convert_from_bytes(pdf_bytes, dpi=100)
         for idx, img in enumerate(pil_images):
-            with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as temp:
-                img.save(temp.name, format="JPEG", quality=70)
-                with open(temp.name, "rb") as f:
-                    image_bytes = f.read()
-                images.append(ImageData(
-                    data=base64.b64encode(image_bytes).decode("utf-8"),
-                    type="image/jpeg",
-                    description=f"Page {idx+1} Image"
-                ))
-            os.unlink(temp.name)
+            with io.BytesIO() as output:
+                img.save(output, format="JPEG", quality=70)
+                image_bytes = output.getvalue()
+            
+            # Upload to Supabase
+            url = await upload_image_to_supabase(
+                image_bytes,
+                f"page_{idx+1}.jpg",
+                "image/jpeg"
+            )
+            
+            images.append(ImageData(
+                data=url,  # Now storing URL instead of base64
+                type="image/jpeg",
+                description=f"Page {idx+1} Image"
+            ))
     except Exception as e:
         logging.error(f"Error extracting images from PDF: {str(e)}")
         logging.error(traceback.format_exc())
     return images
 
-def extract_images_from_docx(docx_path: str) -> List[ImageData]:
+async def extract_images_from_docx(docx_path: str) -> List[ImageData]:
     images = []
+    image_dir = tempfile.mkdtemp()
     try:
         # Extract images using docx2txt
-        image_dir = tempfile.mkdtemp()
         text = docx2txt.process(docx_path, image_dir)
         
         # Process extracted images
@@ -82,16 +95,28 @@ def extract_images_from_docx(docx_path: str) -> List[ImageData]:
             if img_file.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp')):
                 with open(os.path.join(image_dir, img_file), "rb") as f:
                     image_bytes = f.read()
+                
+                # Determine content type
+                ext = img_file.split('.')[-1].lower()
+                content_type = f"image/{ext}" if ext != 'jpg' else "image/jpeg"
+                
+                # Upload to Supabase
+                url = await upload_image_to_supabase(
+                    image_bytes,
+                    img_file,
+                    content_type
+                )
+                
                 images.append(ImageData(
-                    data=base64.b64encode(image_bytes).decode("utf-8"),
-                    type=f"image/{img_file.split('.')[-1].lower()}",
+                    data=url,
+                    type=content_type,
                     description=f"Document Image {idx+1}"
                 ))
     except Exception as e:
         logging.error(f"Error extracting images from DOCX: {str(e)}")
         logging.error(traceback.format_exc())
     finally:
-        # Cleanup temporary directory
+        # Cleanup
         for file in os.listdir(image_dir):
             os.remove(os.path.join(image_dir, file))
         os.rmdir(image_dir)
@@ -115,8 +140,9 @@ def process_document_with_groq(text: str, images: List[ImageData]) -> str:
     image_placeholders = {}
     for idx, img in enumerate(images):
         placeholder = f"{{{{IMAGE_{idx}}}}}"  # Use double curly braces
+        # Use the public URL directly
         image_placeholders[placeholder] = (
-            f"![{img.description}](data:{img.type};base64,{img.data})"
+            f"![{img.description}]({img.data})"
         )
     
     # Insert placeholders at the beginning to ensure they're preserved
@@ -164,6 +190,28 @@ Document content:
     
     return markdown_output
 
+async def upload_image_to_supabase(image_bytes: bytes, filename: str, content_type: str) -> str:
+    """Uploads an image to Supabase Storage and returns public URL"""
+    try:
+        # Generate unique filename
+        ext = content_type.split('/')[-1]
+        unique_filename = f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{uuid.uuid4().hex}.{ext}"
+        
+        # Upload file
+        res = supabase.storage.from_(SUPABASE_BUCKET).upload(
+            file=image_bytes,
+            path=unique_filename,
+            file_options={"content-type": content_type}
+        )
+        
+        # Get public URL
+        url = supabase.storage.from_(SUPABASE_BUCKET).get_public_url(unique_filename)
+        return url
+    except Exception as e:
+        logging.error(f"Error uploading to Supabase: {str(e)}")
+        logging.error(traceback.format_exc())
+        raise HTTPException(status_code=500, detail="Error uploading image")
+
 @app.post("/api/convert", response_model=ConversionResponse)
 async def convert_file(file: UploadFile):
     try:
@@ -178,27 +226,23 @@ async def convert_file(file: UploadFile):
         
         if filename.lower().endswith('.pdf'):
             text = extract_text_from_pdf(contents)
-            images = extract_images_from_pdf(contents)
+            images = await extract_images_from_pdf(contents)
         else:
-            # Save to temp file for docx processing
             with tempfile.NamedTemporaryFile(delete=False, suffix=".docx") as temp:
                 temp.write(contents)
                 temp_path = temp.name
             
             text = docx2txt.process(temp_path)
-            images = extract_images_from_docx(temp_path)
-            
-            # Cleanup
+            images = await extract_images_from_docx(temp_path)
             os.unlink(temp_path)
         
-        # Return early if no content was extracted
         if not text and not images:
             raise HTTPException(
                 status_code=400,
-                detail="Failed to extract content from document. The file might be corrupted or contain no extractable content."
+                detail="Failed to extract content from document."
             )
         
-        # Process the document
+        # Process document (no changes needed here as we already store URLs)
         markdown_output = process_document_with_groq(text, images)
         
         return ConversionResponse(

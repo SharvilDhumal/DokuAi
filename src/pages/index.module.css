@@ -571,12 +571,11 @@
 /* Add to index.module.css */
 .buttonGroup {
   display: flex;
+  justify-content: center;
   gap: 1rem;
   margin-top: 1.5rem;
-  justify-content: center;
 }
-
-.downloadButton {
+createClient .downloadButton {
   background: var(--accent);
   color: white;
   padding: 0.75rem 1.5rem;
@@ -590,4 +589,22 @@
 
 .downloadButton:hover {
   background: var(--primary);
+}
+
+/* Add to existing styles */
+.previewContainer {
+  background: var(--surface);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-top: 2rem;
+  max-height: 60vh;
+  overflow-y: auto;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.markdownContent {
+  font-family: monospace;
+  white-space: pre-wrap;
+  line-height: 1.6;
+  color: var(--text-secondary);
 }
