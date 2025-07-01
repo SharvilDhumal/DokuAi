@@ -5,7 +5,7 @@ import io
 import tempfile
 import traceback
 import logging
-import re  # Added for regex support
+import re
 from logging.handlers import RotatingFileHandler
 from fastapi import FastAPI, UploadFile, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -47,7 +47,7 @@ app.add_middleware(
 )
 
 class ImageData(BaseModel):
-    data: str  # base64 encoded image
+    data: str  # now contains Supabase URL
     type: str  # image/png, image/jpeg
     description: str = "Document image"
 
@@ -74,7 +74,7 @@ async def extract_images_from_pdf(pdf_bytes: bytes) -> List[ImageData]:
             )
             
             images.append(ImageData(
-                data=url,  # Now storing URL instead of base64
+                data=url,
                 type="image/jpeg",
                 description=f"Page {idx+1} Image"
             ))
@@ -87,36 +87,42 @@ async def extract_images_from_docx(docx_path: str) -> List[ImageData]:
     images = []
     image_dir = tempfile.mkdtemp()
     try:
-        # Extract images using docx2txt
         text = docx2txt.process(docx_path, image_dir)
         
-        # Process extracted images
+        # Create mapping between image names and positions
+        image_map = {}
         for idx, img_file in enumerate(os.listdir(image_dir)):
-            if img_file.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp')):
-                with open(os.path.join(image_dir, img_file), "rb") as f:
-                    image_bytes = f.read()
+            if img_file.lower().endswith(('.png', '.jpg', '.jpeg')):
+                image_map[img_file] = idx
                 
-                # Determine content type
-                ext = img_file.split('.')[-1].lower()
-                content_type = f"image/{ext}" if ext != 'jpg' else "image/jpeg"
-                
-                # Upload to Supabase
-                url = await upload_image_to_supabase(
-                    image_bytes,
-                    img_file,
-                    content_type
-                )
-                
-                images.append(ImageData(
-                    data=url,
-                    type=content_type,
-                    description=f"Document Image {idx+1}"
-                ))
+        # Replace image references in text with placeholders
+        for img_file, idx in image_map.items():
+            placeholder = f"[IMAGE: {img_file}]"
+            text = text.replace(f"[image: {img_file}]", placeholder)
+        
+        # Process images
+        for img_file, idx in image_map.items():
+            with open(os.path.join(image_dir, img_file), "rb") as f:
+                image_bytes = f.read()
+            
+            ext = img_file.split('.')[-1].lower()
+            content_type = f"image/{ext}" if ext != 'jpg' else "image/jpeg"
+            
+            url = await upload_image_to_supabase(
+                image_bytes,
+                img_file,
+                content_type
+            )
+            
+            images.append(ImageData(
+                data=url,
+                type=content_type,
+                description=f"Document Image {idx+1}"
+            ))
     except Exception as e:
         logging.error(f"Error extracting images from DOCX: {str(e)}")
         logging.error(traceback.format_exc())
     finally:
-        # Cleanup
         for file in os.listdir(image_dir):
             os.remove(os.path.join(image_dir, file))
         os.rmdir(image_dir)
@@ -135,23 +141,15 @@ def extract_text_from_pdf(pdf_bytes: bytes) -> str:
     return text
 
 def process_document_with_groq(text: str, images: List[ImageData]) -> str:
-    """Process document content using Groq in chunks"""
-    # Create unique image placeholders
-    image_placeholders = {}
+    """Process document content using Groq while preserving image positions"""
+    # Replace image placeholders with temporary tokens
     for idx, img in enumerate(images):
-        placeholder = f"{{{{IMAGE_{idx}}}}}"  # Use double curly braces
-        # Use the public URL directly
-        image_placeholders[placeholder] = (
-            f"![{img.description}]({img.data})"
-        )
+        placeholder = f"{{{{IMAGE_POSITION_{idx}}}}}"
+        # Replace both [IMAGE] and [IMAGE: filename] patterns
+        text = re.sub(r'\[IMAGE[^\]]*\]', placeholder, text, count=1)
     
-    # Insert placeholders at the beginning to ensure they're preserved
-    placeholder_text = "\n".join(image_placeholders.keys())
-    processed_text = placeholder_text + "\n\n" + text
-    
-    # Process text with Groq
     max_chars = 4000
-    text_chunks = [processed_text[i:i+max_chars] for i in range(0, len(processed_text), max_chars)]
+    text_chunks = [text[i:i+max_chars] for i in range(0, len(text), max_chars)]
     
     markdown_parts = []
     for chunk in text_chunks:
@@ -159,7 +157,13 @@ def process_document_with_groq(text: str, images: List[ImageData]) -> str:
 Convert this document part to well-structured Markdown. Preserve:
 - All original content including headings, lists, tables
 - Document structure and formatting
-- Image placeholders exactly as they appear: {{{{IMAGE_0}}}}, {{{{IMAGE_1}}}}, etc.
+- Image placeholders exactly as they appear: {{{{IMAGE_POSITION_0}}}}, {{{{IMAGE_POSITION_1}}}}, etc.
+
+Important: 
+1. DO NOT move image placeholders to the beginning. Keep them in their original positions.
+2. Maintain original numbering and bullet points
+3. Convert tables to Markdown table syntax
+4. Preserve code blocks with triple backticks
 
 Document content:
 {chunk}
@@ -170,7 +174,7 @@ Document content:
                 messages=[
                     {
                         "role": "system", 
-                        "content": "You are a helpful assistant that converts documents to well-structured Markdown. Preserve all image placeholders exactly as they appear."
+                        "content": "You are an expert document converter that preserves all structure and formatting"
                     },
                     {"role": "user", "content": prompt}
                 ],
@@ -184,10 +188,16 @@ Document content:
     
     markdown_output = "\n\n".join(markdown_parts)
     
-    # Replace placeholders with actual image tags
-    for placeholder, img_tag in image_placeholders.items():
-        markdown_output = markdown_output.replace(placeholder, img_tag)
+    # Replace temporary tokens with actual Markdown image syntax
+    for idx, img in enumerate(images):
+        placeholder = f"{{{{IMAGE_POSITION_{idx}}}}}"
+        markdown_output = markdown_output.replace(
+            placeholder, 
+            f"![{img.description}]({img.data})"
+        )
     
+    # Post-processing cleanup
+    markdown_output = re.sub(r'\n{3,}', '\n\n', markdown_output)  # Reduce excessive newlines
     return markdown_output
 
 async def upload_image_to_supabase(image_bytes: bytes, filename: str, content_type: str) -> str:
@@ -204,8 +214,13 @@ async def upload_image_to_supabase(image_bytes: bytes, filename: str, content_ty
             file_options={"content-type": content_type}
         )
         
-        # Get public URL
+        # Get public URL - ensure it's a full URL
         url = supabase.storage.from_(SUPABASE_BUCKET).get_public_url(unique_filename)
+        
+        # Ensure the URL has the correct format
+        if url and not url.startswith(('http://', 'https://')):
+            url = f"https://{url}"
+            
         return url
     except Exception as e:
         logging.error(f"Error uploading to Supabase: {str(e)}")
@@ -242,7 +257,6 @@ async def convert_file(file: UploadFile):
                 detail="Failed to extract content from document."
             )
         
-        # Process document (no changes needed here as we already store URLs)
         markdown_output = process_document_with_groq(text, images)
         
         return ConversionResponse(
@@ -261,13 +275,28 @@ async def convert_file(file: UploadFile):
 @app.get("/api/health")
 async def health_check():
     try:
-        # Test Groq connection
-        groq.models.list()  # This might need adjustment based on actual Groq API
-        logging.info("Health check: OK")
-        return {"status": "healthy", "groq": "connected"}
+        # Simple check that environment variables are loaded
+        if not groq.api_key:
+            raise Exception("Groq API key not configured")
+        if not SUPABASE_URL or not SUPABASE_KEY:
+            raise Exception("Supabase configuration missing")
+        return {
+            "status": "healthy",
+            "services": {
+                "groq": "connected",
+                "supabase": "configured"
+            }
+        }
     except Exception as e:
         logging.error(f"Health check failed: {str(e)}")
-        return {"status": "unhealthy", "error": str(e)}
+        return {
+            "status": "unhealthy",
+            "error": str(e),
+            "services": {
+                "groq": "error" if not groq.api_key else "connected",
+                "supabase": "error" if not SUPABASE_URL or not SUPABASE_KEY else "configured"
+            }
+        }
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):

@@ -608,3 +608,27 @@ createClient .downloadButton {
   line-height: 1.6;
   color: var(--text-secondary);
 }
+
+/* Add to index.module.css */
+.imageLoading {
+  color: var(--primary-light);
+  font-style: italic;
+  padding: 1rem;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.imageError {
+  color: var(--error);
+  padding: 1rem;
+  text-align: center;
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: 8px;
+}
+
+.imageUrl {
+  word-break: break-all;
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+}
