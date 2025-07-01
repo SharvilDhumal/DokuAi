@@ -5,6 +5,7 @@ import io
 import tempfile
 import traceback
 import logging
+import re  # Added for regex support
 from logging.handlers import RotatingFileHandler
 from fastapi import FastAPI, UploadFile, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -110,52 +111,41 @@ def extract_text_from_pdf(pdf_bytes: bytes) -> str:
 
 def process_document_with_groq(text: str, images: List[ImageData]) -> str:
     """Process document content using Groq in chunks"""
+    # Create unique image placeholders
     image_placeholders = {}
-    
-    # Create image placeholders with improved captions
     for idx, img in enumerate(images):
-        placeholder = f"{{{{IMAGE_{idx}}}}}"  # Use double curly braces for better preservation
-        caption = img.description
+        placeholder = f"{{{{IMAGE_{idx}}}}}"  # Use double curly braces
         image_placeholders[placeholder] = (
-            f"![{caption}](data:{img.type};base64,{img.data})"
+            f"![{img.description}](data:{img.type};base64,{img.data})"
         )
     
     # Insert placeholders at the beginning to ensure they're preserved
     placeholder_text = "\n".join(image_placeholders.keys())
-    text = placeholder_text + "\n\n" + text
-
-    # Split text into chunks
-    max_chars = 4000  # Increased for better context preservation
-    text_chunks = [text[i:i+max_chars] for i in range(0, len(text), max_chars)]
+    processed_text = placeholder_text + "\n\n" + text
+    
+    # Process text with Groq
+    max_chars = 4000
+    text_chunks = [processed_text[i:i+max_chars] for i in range(0, len(processed_text), max_chars)]
     
     markdown_parts = []
-    
-    # Process each text chunk
-    for i, chunk in enumerate(text_chunks):
-        logging.info(f"Processing chunk {i+1}/{len(text_chunks)}")
-        
+    for chunk in text_chunks:
         prompt = f"""
-Convert this document part ({i+1}/{len(text_chunks)}) into well-structured Markdown. Follow these guidelines:
-
-1. Preserve ALL original content including headings, lists, tables, and code blocks
-2. Maintain original document structure and formatting
-3. Format tables as proper Markdown tables
-4. Use code blocks for code snippets
-5. Keep image placeholders EXACTLY as they appear: {{{{IMAGE_0}}}}, {{{{IMAGE_1}}}}, etc.
-6. Do not modify or remove image placeholders
-7. Preserve all bullet points, numbered lists, and indentation
-8. Maintain original capitalization and special terms
+Convert this document part to well-structured Markdown. Preserve:
+- All original content including headings, lists, tables
+- Document structure and formatting
+- Image placeholders exactly as they appear: {{{{IMAGE_0}}}}, {{{{IMAGE_1}}}}, etc.
 
 Document content:
 {chunk}
-
-Return ONLY the Markdown content without any additional commentary.
 """
         try:
             response = groq.chat.completions.create(
                 model="llama3-70b-8192",
                 messages=[
-                    {"role": "system", "content": "You are a helpful assistant that converts documents to well-structured Markdown."},
+                    {
+                        "role": "system", 
+                        "content": "You are a helpful assistant that converts documents to well-structured Markdown. Preserve all image placeholders exactly as they appear."
+                    },
                     {"role": "user", "content": prompt}
                 ],
                 temperature=0.3,
@@ -163,17 +153,15 @@ Return ONLY the Markdown content without any additional commentary.
             )
             markdown_parts.append(response.choices[0].message.content)
         except Exception as e:
-            logging.error(f"Error processing chunk {i+1}: {str(e)}")
-            # Fallback to plain text if processing fails
-            markdown_parts.append(f"```\n{chunk}\n```")
-
-    # Combine all parts
+            logging.error(f"Error processing chunk: {str(e)}")
+            markdown_parts.append(chunk)
+    
     markdown_output = "\n\n".join(markdown_parts)
-
+    
     # Replace placeholders with actual image tags
     for placeholder, img_tag in image_placeholders.items():
         markdown_output = markdown_output.replace(placeholder, img_tag)
-
+    
     return markdown_output
 
 @app.post("/api/convert", response_model=ConversionResponse)

@@ -23,10 +23,25 @@ export default function MarkdownPreview() {
       });
   };
 
+  const handleDownload = () => {
+    const blob = new Blob([markdown], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${filename.replace(/\.[^/.]+$/, '')}.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   // Update the renderers and add error boundaries
   const renderers = {
     img: ({ src, alt }) => {
       if (!src) return null;
+
+      // Handle base64 images
+      const isBase64 = src.startsWith('data:image');
 
       return (
         <div className={styles.imageContainer}>
@@ -83,25 +98,6 @@ export default function MarkdownPreview() {
             AI-converted document: <span className={styles.highlight}>{filename}</span>
           </p>
 
-          {/* Display extracted images in a gallery */}
-          {images.length > 0 && (
-            <div className={styles.imageGallery}>
-              <h3>Extracted Images</h3>
-              <div className={styles.imagesContainer}>
-                {images.map((img, idx) => (
-                  <div key={idx} className={styles.imageWrapper}>
-                    <img
-                      src={`data:${img.type};base64,${img.data}`}
-                      alt={img.description}
-                      className={styles.extractedImage}
-                    />
-                    <p className={styles.imageCaption}>{img.description}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
           {/* Markdown content */}
           <div className={styles.markdownPreview}>
             <ReactMarkdown
@@ -113,9 +109,14 @@ export default function MarkdownPreview() {
             </ReactMarkdown>
           </div>
 
-          <button onClick={handleCopy} className={styles.copyButton}>
-            Copy Markdown
-          </button>
+          <div className={styles.buttonGroup}>
+            <button onClick={handleCopy} className={styles.copyButton}>
+              Copy Markdown
+            </button>
+            <button onClick={handleDownload} className={styles.downloadButton}>
+              Download Markdown
+            </button>
+          </div>
 
           <div className={styles.fileNote} style={{ marginTop: '2rem' }}>
             <div className={styles.noteItem}>
