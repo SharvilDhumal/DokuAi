@@ -75,16 +75,19 @@ def extract_images_from_docx(filepath):
         # Process docx and extract images
         text = docx2txt.process(filepath, temp_dir)
         
-        # Collect extracted images
+        # Collect extracted images with better descriptions
         for img_file in os.listdir(temp_dir):
             if img_file.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp')):
                 img_path = os.path.join(temp_dir, img_file)
                 with open(img_path, "rb") as img_file_obj:
                     img_base64 = base64.b64encode(img_file_obj.read()).decode('utf-8')
+                    
+                    # Create better description
+                    img_type = img_file.split('.')[-1].upper()
                     images.append({
                         "type": f"image/{img_file.split('.')[-1].lower()}",
                         "data": img_base64,
-                        "description": f"DOCX Image {len(images)+1}"
+                        "description": f"DOCX {img_type} Image"  # Improved description
                     })
                 os.remove(img_path)
         os.rmdir(temp_dir)
@@ -175,7 +178,7 @@ def convert_file():
                 "status": "success",
                 "markdown": markdown_output,
                 "filename": filename,
-                "images_count": len(images)
+                "images": images  # Changed from images_count to images
             })
 
         except Exception as e:
@@ -194,38 +197,42 @@ def convert_file():
 
 def process_document_with_ollama(text, images):
     """Process document content using Ollama in chunks"""
-    # Process images first to create placeholders
     image_placeholders = {}
+
+    # Create image placeholders with captions
     for idx, img in enumerate(images):
         placeholder = f"[IMAGE_{idx}]"
+        caption = img.get('description', f"Image {idx+1}")
         image_placeholders[placeholder] = (
-            f"![{img['description']}](data:{img['type']};base64,{img['data']})"
+            f"![{caption}](data:{img['type']};base64,{img['data']})"
         )
-    
+
+    # Ensure all image placeholders are present in the text
+    for placeholder in image_placeholders:
+        if placeholder not in text:
+            text += f"\n\n{placeholder}\n"
+
     # Split text into manageable chunks
-    max_chars = 2000  # Reduced chunk size for stability
+    max_chars = 2000
     text_chunks = [text[i:i+max_chars] for i in range(0, len(text), max_chars)]
-    
+
     markdown_parts = []
-    
+
     # Process each text chunk
     for i, chunk in enumerate(text_chunks):
         app.logger.info(f"Processing chunk {i+1}/{len(text_chunks)}")
-        
-        # Inject image placeholders into text
+
+        # DO NOT replace placeholders with image tags here!
         processed_chunk = chunk
-        for placeholder in image_placeholders:
-            if placeholder in chunk:
-                processed_chunk = processed_chunk.replace(placeholder, "")
-        
+
         prompt = f"""
 Convert this document part ({i+1}/{len(text_chunks)}) into well-structured Markdown. Follow these guidelines:
 
 1. Preserve all headings, lists, tables, and code blocks
-2. For images, use placeholders like [IMAGE_0] exactly as they appear
-3. Maintain original document structure
-4. Format tables as Markdown tables
-5. Use code blocks for code snippets
+2. Maintain original document structure
+3. Format tables as Markdown tables
+4. Use code blocks for code snippets
+5. **For images, leave placeholders like [IMAGE_0] exactly as they are. Do NOT remove or modify them.**
 
 Document content:
 {processed_chunk}
@@ -243,14 +250,14 @@ Return ONLY the Markdown content, no additional commentary.
             app.logger.error(f"Error processing chunk {i+1}: {str(e)}")
             # Fallback to plain text if processing fails
             markdown_parts.append(f"```\n{chunk}\n```")
-    
+
     # Combine all parts
     markdown_output = "\n\n".join(markdown_parts)
-    
-    # Replace image placeholders with actual images
+
+    # NOW replace placeholders with actual image tags
     for placeholder, img_tag in image_placeholders.items():
         markdown_output = markdown_output.replace(placeholder, img_tag)
-    
+
     return markdown_output
 
 if __name__ == '__main__':

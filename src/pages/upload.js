@@ -96,6 +96,7 @@ export default function UploadDashboard() {
 
             const data = await response.json();
 
+            // Process images correctly
             const processedImages = data.images?.map(img => ({
                 ...img,
                 src: `data:${img.type};base64,${img.data}`
@@ -106,7 +107,7 @@ export default function UploadDashboard() {
                 state: {
                     markdown: data.markdown,
                     filename: data.filename,
-                    images: processedImages
+                    images: processedImages  // Pass processed images
                 }
             });
         } catch (error) {

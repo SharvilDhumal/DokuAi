@@ -3,6 +3,8 @@ import Layout from '@theme/Layout';
 import Head from '@docusaurus/Head';
 import { useLocation } from '@docusaurus/router';
 import Link from '@docusaurus/Link';
+import ReactMarkdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
 import styles from './index.module.css';
 
 export default function MarkdownPreview() {
@@ -19,6 +21,37 @@ export default function MarkdownPreview() {
       .catch(err => {
         console.error('Failed to copy: ', err);
       });
+  };
+
+  // Custom renderers for Markdown components
+  const renderers = {
+    img: ({ src, alt }) => {
+      // Check if this is a base64 image from the document
+      if (src.startsWith('data:')) {
+        return (
+          <div className={styles.imageContainer}>
+            <img
+              src={src}
+              alt={alt}
+              className={styles.extractedImage}
+            />
+            {alt && <p className={styles.imageCaption}>{alt}</p>}
+          </div>
+        );
+      }
+      // Regular image handling
+      return (
+        <div className={styles.imageContainer}>
+          <img
+            src={src}
+            alt={alt}
+            className={styles.extractedImage}
+          />
+          {alt && <p className={styles.imageCaption}>{alt}</p>}
+        </div>
+      );
+    },
+    // Add other custom renderers as needed
   };
 
   return (
@@ -46,15 +79,15 @@ export default function MarkdownPreview() {
             AI-converted document: <span className={styles.highlight}>{filename}</span>
           </p>
 
-          {/* Display extracted images */}
+          {/* Display extracted images in a gallery */}
           {images.length > 0 && (
             <div className={styles.imageGallery}>
-              <h3>Extracted Images:</h3>
+              <h3>Extracted Images</h3>
               <div className={styles.imagesContainer}>
-                {images.map((img, index) => (
-                  <div key={index} className={styles.imageWrapper}>
+                {images.map((img, idx) => (
+                  <div key={idx} className={styles.imageWrapper}>
                     <img
-                      src={img.src}
+                      src={`data:${img.type};base64,${img.data}`}
                       alt={img.description}
                       className={styles.extractedImage}
                     />
@@ -65,8 +98,15 @@ export default function MarkdownPreview() {
             </div>
           )}
 
+          {/* Markdown content */}
           <div className={styles.markdownPreview}>
-            <pre>{markdown}</pre>
+            <ReactMarkdown
+              components={renderers}
+              rehypePlugins={[rehypeRaw]}
+              skipHtml={false}
+            >
+              {markdown}
+            </ReactMarkdown>
           </div>
 
           <button onClick={handleCopy} className={styles.copyButton}>

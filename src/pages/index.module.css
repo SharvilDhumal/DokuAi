@@ -467,3 +467,97 @@
   text-align: center;
   margin: 0;
 }
+
+/* Add to index.module.css */
+.markdownPreview img {
+  max-width: 100%;
+  display: block;
+  margin: 1rem auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.markdownPreview table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+}
+
+.markdownPreview th,
+.markdownPreview td {
+  padding: 0.75rem;
+  border: 1px solid var(--surface-light);
+  text-align: left;
+}
+
+.markdownPreview th {
+  background-color: var(--surface);
+}
+
+.markdownPreview pre {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 1.5rem;
+  border-radius: 12px;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+}
+
+.markdownPreview code {
+  font-family: monospace;
+  background: rgba(0, 0, 0, 0.1);
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+}
+
+/* Add to the end of the file */
+.markdownPreview img {
+  max-width: 100%;
+  display: block;
+  margin: 1rem auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.markdownPreview table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+}
+
+.markdownPreview th,
+.markdownPreview td {
+  padding: 0.75rem;
+  border: 1px solid var(--surface-light);
+  text-align: left;
+}
+
+.markdownPreview th {
+  background-color: var(--surface);
+}
+
+.markdownPreview pre {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 1.5rem;
+  border-radius: 12px;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+}
+
+.markdownPreview code {
+  font-family: monospace;
+  background: rgba(0, 0, 0, 0.1);
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+}
+
+/* Ensure images are displayed correctly */
+.markdownPreview .image-container {
+  text-align: center;
+  margin: 1.5rem 0;
+}
+
+.markdownPreview .image-caption {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
