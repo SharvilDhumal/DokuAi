@@ -1,16 +1,15 @@
 import React from 'react';
 import Layout from '@theme/Layout';
 import Head from '@docusaurus/Head';
-import { useLocation } from '@docusaurus/router'; // Changed from react-router-dom
+import { useLocation } from '@docusaurus/router';
 import Link from '@docusaurus/Link';
 import styles from './index.module.css';
 
-
-// Update the markdownpreview.js component
 export default function MarkdownPreview() {
   const location = useLocation();
   const markdown = location.state?.markdown || '';
   const filename = location.state?.filename || '';
+  const images = location.state?.images || [];
 
   const handleCopy = () => {
     navigator.clipboard.writeText(markdown)
@@ -46,6 +45,25 @@ export default function MarkdownPreview() {
           <p className={styles.subtitle}>
             AI-converted document: <span className={styles.highlight}>{filename}</span>
           </p>
+
+          {/* Display extracted images */}
+          {images.length > 0 && (
+            <div className={styles.imageGallery}>
+              <h3>Extracted Images:</h3>
+              <div className={styles.imagesContainer}>
+                {images.map((img, index) => (
+                  <div key={index} className={styles.imageWrapper}>
+                    <img
+                      src={img.src}
+                      alt={img.description}
+                      className={styles.extractedImage}
+                    />
+                    <p className={styles.imageCaption}>{img.description}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className={styles.markdownPreview}>
             <pre>{markdown}</pre>

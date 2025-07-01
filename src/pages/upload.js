@@ -14,6 +14,9 @@ export default function UploadDashboard() {
     const [markdownOutput, setMarkdownOutput] = useState('');
     const history = useHistory();
 
+    // Use environment variable for API URL with fallback to localhost
+    const API_URL = 'http://localhost:5000';
+
     const handleChange = (e) => {
         const selectedFile = e.target.files[0];
         validateFile(selectedFile);
@@ -55,30 +58,76 @@ export default function UploadDashboard() {
         }
 
         setIsProcessing(true);
-        setMessage({ text: 'Processing file with AI...', type: 'info' });
+        setMessage({ text: 'Checking server status...', type: 'info' });
 
         try {
+            // First check if backend is reachable
+            setMessage({ text: 'Checking server availability...', type: 'info' });
+            const healthCheck = await fetch(`${API_URL}/api/health`);
+
+            if (!healthCheck.ok) {
+                const healthData = await healthCheck.json().catch(() => ({}));
+                throw new Error(
+                    healthData.error || 'Backend service is unavailable. Please try again later.'
+                );
+            }
+
+            // Server is healthy, proceed with conversion
+            setMessage({ text: 'Starting conversion...', type: 'info' });
+
             const formData = new FormData();
             formData.append('file', file);
 
-            const response = await fetch('http://localhost:5000/api/convert', {
+            const response = await fetch(`${API_URL}/api/convert`, {
                 method: 'POST',
                 body: formData,
+                headers: {
+                    'Accept': 'application/json',
+                },
             });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(
+                    errorData.error ||
+                    `Conversion failed (${response.status} ${response.statusText})`
+                );
+            }
 
             const data = await response.json();
 
-            if (response.ok) {
-                // Redirect to markdown preview page with markdown and filename
-                history.push({
-                    pathname: '/markdownpreview',
-                    state: { markdown: data.markdown, filename: data.filename }
-                });
-            } else {
-                setMessage({ text: data.error || 'Conversion failed', type: 'error' });
-            }
+            const processedImages = data.images?.map(img => ({
+                ...img,
+                src: `data:${img.type};base64,${img.data}`
+            })) || [];
+
+            history.push({
+                pathname: '/markdownpreview',
+                state: {
+                    markdown: data.markdown,
+                    filename: data.filename,
+                    images: processedImages
+                }
+            });
         } catch (error) {
-            setMessage({ text: 'Error connecting to conversion service', type: 'error' });
+            console.error('Conversion error:', error);
+
+            let userMessage = error.message;
+
+            // Network error (backend not running)
+            if (error.message.includes('Failed to fetch') ||
+                error.message.includes('NetworkError')) {
+                userMessage = 'Cannot connect to conversion service. Please ensure the backend is running.';
+            }
+            // Backend service error
+            else if (error.message.includes('Backend service')) {
+                userMessage = error.message;
+            }
+
+            setMessage({
+                text: userMessage,
+                type: 'error'
+            });
         } finally {
             setIsProcessing(false);
         }
@@ -128,7 +177,16 @@ export default function UploadDashboard() {
                             className={styles.uploadButton}
                             disabled={!file || isProcessing}
                         >
-                            {isProcessing ? 'Processing...' : file ? 'Convert with AI →' : 'Select a file first'}
+                            {isProcessing ? (
+                                <>
+                                    <span className={styles.spinner}></span>
+                                    Processing...
+                                </>
+                            ) : file ? (
+                                'Convert with AI →'
+                            ) : (
+                                'Select a file first'
+                            )}
                         </button>
                     </form>
 
@@ -144,6 +202,10 @@ export default function UploadDashboard() {
                         <div className={styles.noteItem}>
                             <span className={styles.noteIcon}>🔒</span>
                             <span>Secure document processing</span>
+                        </div>
+                        <div className={styles.noteItem}>
+                            <span className={styles.noteIcon}>⚠️</span>
+                            <span>Backend must be running at {API_URL}</span>
                         </div>
                     </div>
                 </div>

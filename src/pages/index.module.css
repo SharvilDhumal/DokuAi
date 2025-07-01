@@ -422,3 +422,48 @@
 .copyButton:hover {
   background: var(--primary-dark);
 }
+
+/* Add to index.module.css */
+.imageGallery {
+  width: 100%;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: var(--surface-light);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.imageGallery h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+}
+
+.imagesContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.imageWrapper {
+  flex: 1 1 200px;
+  max-width: 300px;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.extractedImage {
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}
+
+.imageCaption {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  text-align: center;
+  margin: 0;
+}
