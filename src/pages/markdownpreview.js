@@ -7,12 +7,39 @@ import Link from '@docusaurus/Link';
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 
+const PROXY_URL = 'http://localhost:3001/image'; // Proxy server URL
+
 const MarkdownImage = ({ src, alt }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
 
-  // Ensure proper URL format
-  const fixedSrc = src && !src.startsWith('http') ? `https://${src}` : src;
+  const fixedSrc = React.useMemo(() => {
+    if (!src) return '';
+
+    // Extract image path from Supabase URL
+    const supabasePattern = /storage\/v1\/object\/public\/[^/]+\/(.+)/;
+    const match = src.match(supabasePattern);
+
+    if (match) {
+      return `${PROXY_URL}?path=${encodeURIComponent(match[1])}`;
+    }
+
+    return src;
+  }, [src]);
+
+  useEffect(() => {
+    if (!fixedSrc) {
+      setImageError(true);
+      return;
+    }
+    const img = new window.Image();
+    img.src = fixedSrc;
+    img.onload = () => setImageLoaded(true);
+    img.onerror = () => {
+      console.error('Failed to load image:', fixedSrc);
+      setImageError(true);
+    };
+  }, [fixedSrc]);
 
   return (
     <div className={styles.imageContainer}>
@@ -24,10 +51,18 @@ const MarkdownImage = ({ src, alt }) => {
             className={styles.extractedImage}
             style={{ display: imageLoaded ? 'block' : 'none' }}
             onLoad={() => setImageLoaded(true)}
-            onError={() => setImageError(true)}
+            onError={() => {
+              console.error('Image load error:', fixedSrc);
+              setImageError(true);
+            }}
           />
           {!imageLoaded && !imageError && (
-            <div className={styles.imageLoading}>Loading image...</div>
+            <div className={styles.imageLoading}>
+              <div className={styles.progressBar}>
+                <div className={styles.progressFill} style={{ width: '70%' }} />
+              </div>
+              Loading image...
+            </div>
           )}
         </>
       ) : (
@@ -36,6 +71,13 @@ const MarkdownImage = ({ src, alt }) => {
           {fixedSrc && (
             <div className={styles.imageUrl}>
               <small>URL: {fixedSrc}</small>
+              <button
+                onClick={() => window.open(fixedSrc, '_blank')}
+                className={styles.copyButton}
+                style={{ marginTop: '0.5rem' }}
+              >
+                Open Image in New Tab
+              </button>
             </div>
           )}
         </div>

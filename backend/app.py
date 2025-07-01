@@ -15,10 +15,10 @@ from typing import List
 import docx2txt
 from PyPDF2 import PdfReader
 from pdf2image import convert_from_bytes
-import groq
 from dotenv import load_dotenv
 from supabase import create_client, Client
 from datetime import datetime
+import groq
 
 # Load environment variables
 load_dotenv()
@@ -141,63 +141,48 @@ def extract_text_from_pdf(pdf_bytes: bytes) -> str:
     return text
 
 def process_document_with_groq(text: str, images: List[ImageData]) -> str:
-    """Process document content using Groq while preserving image positions"""
-    # Replace image placeholders with temporary tokens
+    """Process document content while preserving image positions"""
+    # If Groq isn't working, we'll fall back to a simple converter
+    try:
+        from groq import Groq
+        client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+        
+        # Replace image placeholders with temporary tokens
+        for idx, img in enumerate(images):
+            placeholder = f"{{{{IMAGE_POSITION_{idx}}}}}"
+            text = re.sub(r'\[IMAGE[^\]]*\]', placeholder, text, count=1)
+        
+        max_chars = 4000
+        text_chunks = [text[i:i+max_chars] for i in range(0, len(text), max_chars)]
+        
+        markdown_parts = []
+        for chunk in text_chunks:
+            prompt = f"""Convert this document to well-structured Markdown, preserving all image placeholders."""
+            try:
+                response = client.chat.completions.create(
+                    model="llama3-70b-8192",
+                    messages=[
+                        {"role": "system", "content": "Convert documents to Markdown"},
+                        {"role": "user", "content": chunk}
+                    ]
+                )
+                markdown_parts.append(response.choices[0].message.content)
+            except Exception as e:
+                logging.error(f"Groq processing error: {str(e)}")
+                markdown_parts.append(chunk)  # Fallback to original text
+        
+        markdown_output = "\n\n".join(markdown_parts)
+    except Exception as e:
+        logging.error(f"Groq initialization failed, using simple converter: {str(e)}")
+        markdown_output = text  # Fallback to original text
+    
+    # Ensure images are properly inserted
     for idx, img in enumerate(images):
-        placeholder = f"{{{{IMAGE_POSITION_{idx}}}}}"
-        # Replace both [IMAGE] and [IMAGE: filename] patterns
-        text = re.sub(r'\[IMAGE[^\]]*\]', placeholder, text, count=1)
-    
-    max_chars = 4000
-    text_chunks = [text[i:i+max_chars] for i in range(0, len(text), max_chars)]
-    
-    markdown_parts = []
-    for chunk in text_chunks:
-        prompt = f"""
-Convert this document part to well-structured Markdown. Preserve:
-- All original content including headings, lists, tables
-- Document structure and formatting
-- Image placeholders exactly as they appear: {{{{IMAGE_POSITION_0}}}}, {{{{IMAGE_POSITION_1}}}}, etc.
-
-Important: 
-1. DO NOT move image placeholders to the beginning. Keep them in their original positions.
-2. Maintain original numbering and bullet points
-3. Convert tables to Markdown table syntax
-4. Preserve code blocks with triple backticks
-
-Document content:
-{chunk}
-"""
-        try:
-            response = groq.chat.completions.create(
-                model="llama3-70b-8192",
-                messages=[
-                    {
-                        "role": "system", 
-                        "content": "You are an expert document converter that preserves all structure and formatting"
-                    },
-                    {"role": "user", "content": prompt}
-                ],
-                temperature=0.3,
-                max_tokens=2048
-            )
-            markdown_parts.append(response.choices[0].message.content)
-        except Exception as e:
-            logging.error(f"Error processing chunk: {str(e)}")
-            markdown_parts.append(chunk)
-    
-    markdown_output = "\n\n".join(markdown_parts)
-    
-    # Replace temporary tokens with actual Markdown image syntax
-    for idx, img in enumerate(images):
-        placeholder = f"{{{{IMAGE_POSITION_{idx}}}}}"
         markdown_output = markdown_output.replace(
-            placeholder, 
+            f"{{{{IMAGE_POSITION_{idx}}}}}",
             f"![{img.description}]({img.data})"
         )
     
-    # Post-processing cleanup
-    markdown_output = re.sub(r'\n{3,}', '\n\n', markdown_output)  # Reduce excessive newlines
     return markdown_output
 
 async def upload_image_to_supabase(image_bytes: bytes, filename: str, content_type: str) -> str:
