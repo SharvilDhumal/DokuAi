@@ -1,21 +1,25 @@
-from flask import Flask, request, jsonify
-from werkzeug.utils import secure_filename
 import os
-import tempfile
-import docx2txt
-import PyPDF2
-from pdf2image import convert_from_path
-from dotenv import load_dotenv
-from flask_cors import CORS
-import base64
 import uuid
-import ollama
+import base64
+import io
+import tempfile
 import traceback
 import logging
 from logging.handlers import RotatingFileHandler
+from fastapi import FastAPI, UploadFile, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
+from typing import List
+import docx2txt
+from PyPDF2 import PdfReader
+from pdf2image import convert_from_bytes
+import groq
+from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
+groq.api_key = os.getenv("GROQ_API_KEY")
 
 # Setup logging
 log_formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]')
@@ -23,243 +27,226 @@ log_handler = RotatingFileHandler('app.log', maxBytes=1000000, backupCount=3)
 log_handler.setFormatter(log_formatter)
 log_handler.setLevel(logging.INFO)
 
-app = Flask(__name__)
-app.logger.addHandler(log_handler)
-app.logger.setLevel(logging.INFO)
+app = FastAPI()
 
-CORS(app, resources={
-    r"/api/*": {
-        "origins": ["http://localhost:3000", "http://127.0.0.1:3000"],
-        "methods": ["GET", "POST", "OPTIONS"],
-        "allow_headers": ["Content-Type"]
-    }
-})
+# CORS configuration
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type"],
+)
 
-UPLOAD_FOLDER = tempfile.gettempdir()
-ALLOWED_EXTENSIONS = {'pdf', 'docx'}
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max upload size
+class ImageData(BaseModel):
+    data: str  # base64 encoded image
+    type: str  # image/png, image/jpeg
+    description: str = "Document image"
 
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+class ConversionResponse(BaseModel):
+    status: str = "success"
+    markdown: str
+    filename: str
+    images: List[ImageData] = []
 
-def extract_images_from_pdf(filepath):
+def extract_images_from_pdf(pdf_bytes: bytes) -> List[ImageData]:
     images = []
     try:
-        app.logger.info(f"Extracting images from PDF: {filepath}")
-        pdf_images = convert_from_path(filepath, dpi=100)  # Lower DPI for faster processing
-        for i, image in enumerate(pdf_images):
-            img_path = os.path.join(app.config['UPLOAD_FOLDER'], f"pdf_image_{i}.jpg")
-            image.save(img_path, 'JPEG', quality=70)  # Reduce quality for smaller size
-            
-            with open(img_path, "rb") as img_file:
-                img_base64 = base64.b64encode(img_file.read()).decode('utf-8')
-                images.append({
-                    "type": "image/jpeg",
-                    "data": img_base64,
-                    "description": f"PDF Page {i+1}"
-                })
-            os.remove(img_path)
+        # Extract images using pdf2image
+        pil_images = convert_from_bytes(pdf_bytes, dpi=100)
+        for idx, img in enumerate(pil_images):
+            with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as temp:
+                img.save(temp.name, format="JPEG", quality=70)
+                with open(temp.name, "rb") as f:
+                    image_bytes = f.read()
+                images.append(ImageData(
+                    data=base64.b64encode(image_bytes).decode("utf-8"),
+                    type="image/jpeg",
+                    description=f"Page {idx+1} Image"
+                ))
+            os.unlink(temp.name)
     except Exception as e:
-        app.logger.error(f"Error extracting PDF images: {str(e)}")
-        app.logger.error(traceback.format_exc())
+        logging.error(f"Error extracting images from PDF: {str(e)}")
+        logging.error(traceback.format_exc())
     return images
 
-def extract_images_from_docx(filepath):
+def extract_images_from_docx(docx_path: str) -> List[ImageData]:
     images = []
     try:
-        app.logger.info(f"Extracting images from DOCX: {filepath}")
-        temp_dir = os.path.join(app.config['UPLOAD_FOLDER'], str(uuid.uuid4()))
-        os.makedirs(temp_dir, exist_ok=True)
+        # Extract images using docx2txt
+        image_dir = tempfile.mkdtemp()
+        text = docx2txt.process(docx_path, image_dir)
         
-        # Process docx and extract images
-        text = docx2txt.process(filepath, temp_dir)
-        
-        # Collect extracted images with better descriptions
-        for img_file in os.listdir(temp_dir):
+        # Process extracted images
+        for idx, img_file in enumerate(os.listdir(image_dir)):
             if img_file.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp')):
-                img_path = os.path.join(temp_dir, img_file)
-                with open(img_path, "rb") as img_file_obj:
-                    img_base64 = base64.b64encode(img_file_obj.read()).decode('utf-8')
-                    
-                    # Create better description
-                    img_type = img_file.split('.')[-1].upper()
-                    images.append({
-                        "type": f"image/{img_file.split('.')[-1].lower()}",
-                        "data": img_base64,
-                        "description": f"DOCX {img_type} Image"  # Improved description
-                    })
-                os.remove(img_path)
-        os.rmdir(temp_dir)
+                with open(os.path.join(image_dir, img_file), "rb") as f:
+                    image_bytes = f.read()
+                images.append(ImageData(
+                    data=base64.b64encode(image_bytes).decode("utf-8"),
+                    type=f"image/{img_file.split('.')[-1].lower()}",
+                    description=f"Document Image {idx+1}"
+                ))
     except Exception as e:
-        app.logger.error(f"Error extracting DOCX images: {str(e)}")
-        app.logger.error(traceback.format_exc())
+        logging.error(f"Error extracting images from DOCX: {str(e)}")
+        logging.error(traceback.format_exc())
+    finally:
+        # Cleanup temporary directory
+        for file in os.listdir(image_dir):
+            os.remove(os.path.join(image_dir, file))
+        os.rmdir(image_dir)
     return images
 
-def extract_text_from_pdf(filepath):
+def extract_text_from_pdf(pdf_bytes: bytes) -> str:
     text = ""
     try:
-        app.logger.info(f"Extracting text from PDF: {filepath}")
-        with open(filepath, 'rb') as file:
-            reader = PyPDF2.PdfReader(file)
-            for page in reader.pages:
-                if page.extract_text():
-                    text += page.extract_text() + "\n"
+        reader = PdfReader(io.BytesIO(pdf_bytes))
+        for page in reader.pages:
+            if page.extract_text():
+                text += page.extract_text() + "\n"
     except Exception as e:
-        app.logger.error(f"Error extracting PDF text: {str(e)}")
-        app.logger.error(traceback.format_exc())
+        logging.error(f"Error extracting PDF text: {str(e)}")
+        logging.error(traceback.format_exc())
     return text
 
-def extract_text_from_docx(filepath):
-    text = ""
-    try:
-        app.logger.info(f"Extracting text from DOCX: {filepath}")
-        text = docx2txt.process(filepath)
-    except Exception as e:
-        app.logger.error(f"Error extracting DOCX text: {str(e)}")
-        app.logger.error(traceback.format_exc())
-    return text
-
-@app.route('/api/health', methods=['GET'])
-def health_check():
-    try:
-        ollama.list()  # Test connection to Ollama
-        app.logger.info("Health check: OK")
-        return jsonify({"status": "healthy", "ollama": "connected"})
-    except Exception as e:
-        app.logger.error(f"Health check failed: {str(e)}")
-        return jsonify({"status": "unhealthy", "error": str(e)}), 503
-
-@app.route('/api/convert', methods=['POST'])
-def convert_file():
-    app.logger.info("Received conversion request")
-    if 'file' not in request.files:
-        app.logger.warning("No file part in request")
-        return jsonify({"error": "No file part"}), 400
-
-    file = request.files['file']
-    if file.filename == '':
-        app.logger.warning("Empty filename")
-        return jsonify({"error": "No selected file"}), 400
-
-    if not file or not allowed_file(file.filename):
-        app.logger.warning(f"Invalid file type: {file.filename}")
-        return jsonify({"error": "Invalid file type. Only PDF and DOCX allowed."}), 400
-
-    try:
-        filename = secure_filename(file.filename)
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        app.logger.info(f"Saving file to temporary location: {filepath}")
-        file.save(filepath)
-
-        try:
-            app.logger.info("Starting document processing")
-            if filename.lower().endswith('.pdf'):
-                text = extract_text_from_pdf(filepath)
-                images = extract_images_from_pdf(filepath)
-            else:
-                text = extract_text_from_docx(filepath)
-                images = extract_images_from_docx(filepath)
-            
-            app.logger.info(f"Extracted text length: {len(text)}")
-            app.logger.info(f"Extracted images count: {len(images)}")
-
-            # Return early if no content was extracted
-            if not text and not images:
-                app.logger.error("Failed to extract any content from document")
-                return jsonify({
-                    "error": "Failed to extract content from document. The file might be corrupted or contain no extractable content."
-                }), 400
-            
-            # Process the document
-            markdown_output = process_document_with_ollama(text, images)
-            
-            return jsonify({
-                "status": "success",
-                "markdown": markdown_output,
-                "filename": filename,
-                "images": images  # Changed from images_count to images
-            })
-
-        except Exception as e:
-            app.logger.error(f"Document processing failed: {str(e)}")
-            app.logger.error(traceback.format_exc())
-            return jsonify({"error": f"Document processing failed: {str(e)}"}), 500
-        finally:
-            if os.path.exists(filepath):
-                os.remove(filepath)
-                app.logger.info(f"Temporary file removed: {filepath}")
-
-    except Exception as e:
-        app.logger.error(f"Server error: {str(e)}")
-        app.logger.error(traceback.format_exc())
-        return jsonify({"error": "Internal server error"}), 500
-
-def process_document_with_ollama(text, images):
-    """Process document content using Ollama in chunks"""
+def process_document_with_groq(text: str, images: List[ImageData]) -> str:
+    """Process document content using Groq in chunks"""
     image_placeholders = {}
-
-    # Create image placeholders with captions
+    
+    # Create image placeholders with improved captions
     for idx, img in enumerate(images):
-        placeholder = f"[IMAGE_{idx}]"
-        caption = img.get('description', f"Image {idx+1}")
+        placeholder = f"{{{{IMAGE_{idx}}}}}"  # Use double curly braces for better preservation
+        caption = img.description
         image_placeholders[placeholder] = (
-            f"![{caption}](data:{img['type']};base64,{img['data']})"
+            f"![{caption}](data:{img.type};base64,{img.data})"
         )
+    
+    # Insert placeholders at the beginning to ensure they're preserved
+    placeholder_text = "\n".join(image_placeholders.keys())
+    text = placeholder_text + "\n\n" + text
 
-    # Ensure all image placeholders are present in the text
-    for placeholder in image_placeholders:
-        if placeholder not in text:
-            text += f"\n\n{placeholder}\n"
-
-    # Split text into manageable chunks
-    max_chars = 2000
+    # Split text into chunks
+    max_chars = 4000  # Increased for better context preservation
     text_chunks = [text[i:i+max_chars] for i in range(0, len(text), max_chars)]
-
+    
     markdown_parts = []
-
+    
     # Process each text chunk
     for i, chunk in enumerate(text_chunks):
-        app.logger.info(f"Processing chunk {i+1}/{len(text_chunks)}")
-
-        # DO NOT replace placeholders with image tags here!
-        processed_chunk = chunk
-
+        logging.info(f"Processing chunk {i+1}/{len(text_chunks)}")
+        
         prompt = f"""
 Convert this document part ({i+1}/{len(text_chunks)}) into well-structured Markdown. Follow these guidelines:
 
-1. Preserve all headings, lists, tables, and code blocks
-2. Maintain original document structure
-3. Format tables as Markdown tables
+1. Preserve ALL original content including headings, lists, tables, and code blocks
+2. Maintain original document structure and formatting
+3. Format tables as proper Markdown tables
 4. Use code blocks for code snippets
-5. **For images, leave placeholders like [IMAGE_0] exactly as they are. Do NOT remove or modify them.**
+5. Keep image placeholders EXACTLY as they appear: {{{{IMAGE_0}}}}, {{{{IMAGE_1}}}}, etc.
+6. Do not modify or remove image placeholders
+7. Preserve all bullet points, numbered lists, and indentation
+8. Maintain original capitalization and special terms
 
 Document content:
-{processed_chunk}
+{chunk}
 
-Return ONLY the Markdown content, no additional commentary.
+Return ONLY the Markdown content without any additional commentary.
 """
         try:
-            response = ollama.generate(
-                model='llama3',
-                prompt=prompt,
-                options={'temperature': 0.3, 'num_ctx': 8192}
+            response = groq.chat.completions.create(
+                model="llama3-70b-8192",
+                messages=[
+                    {"role": "system", "content": "You are a helpful assistant that converts documents to well-structured Markdown."},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.3,
+                max_tokens=2048
             )
-            markdown_parts.append(response['response'])
+            markdown_parts.append(response.choices[0].message.content)
         except Exception as e:
-            app.logger.error(f"Error processing chunk {i+1}: {str(e)}")
+            logging.error(f"Error processing chunk {i+1}: {str(e)}")
             # Fallback to plain text if processing fails
             markdown_parts.append(f"```\n{chunk}\n```")
 
     # Combine all parts
     markdown_output = "\n\n".join(markdown_parts)
 
-    # NOW replace placeholders with actual image tags
+    # Replace placeholders with actual image tags
     for placeholder, img_tag in image_placeholders.items():
         markdown_output = markdown_output.replace(placeholder, img_tag)
 
     return markdown_output
 
+@app.post("/api/convert", response_model=ConversionResponse)
+async def convert_file(file: UploadFile):
+    try:
+        logging.info("Received conversion request")
+        filename = file.filename
+        if not filename.lower().endswith(('.pdf', '.docx')):
+            raise HTTPException(status_code=400, detail="Invalid file type. Only PDF and DOCX allowed.")
+
+        contents = await file.read()
+        images = []
+        text = ""
+        
+        if filename.lower().endswith('.pdf'):
+            text = extract_text_from_pdf(contents)
+            images = extract_images_from_pdf(contents)
+        else:
+            # Save to temp file for docx processing
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".docx") as temp:
+                temp.write(contents)
+                temp_path = temp.name
+            
+            text = docx2txt.process(temp_path)
+            images = extract_images_from_docx(temp_path)
+            
+            # Cleanup
+            os.unlink(temp_path)
+        
+        # Return early if no content was extracted
+        if not text and not images:
+            raise HTTPException(
+                status_code=400,
+                detail="Failed to extract content from document. The file might be corrupted or contain no extractable content."
+            )
+        
+        # Process the document
+        markdown_output = process_document_with_groq(text, images)
+        
+        return ConversionResponse(
+            markdown=markdown_output,
+            filename=filename,
+            images=images
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Server error: {str(e)}")
+        logging.error(traceback.format_exc())
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+@app.get("/api/health")
+async def health_check():
+    try:
+        # Test Groq connection
+        groq.models.list()  # This might need adjustment based on actual Groq API
+        logging.info("Health check: OK")
+        return {"status": "healthy", "groq": "connected"}
+    except Exception as e:
+        logging.error(f"Health check failed: {str(e)}")
+        return {"status": "unhealthy", "error": str(e)}
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logging.error(f"Unhandled exception: {str(exc)}")
+    logging.error(traceback.format_exc())
+    return JSONResponse(
+        status_code=500,
+        content={"error": "Internal server error"},
+    )
+
 if __name__ == '__main__':
-    app.logger.info("Starting application")
-    app.run(host='0.0.0.0', port=5000, debug=False)
+    import uvicorn
+    logging.info("Starting application")
+    uvicorn.run(app, host='0.0.0.0', port=5000)

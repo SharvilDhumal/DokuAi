@@ -12,6 +12,7 @@ export default function UploadDashboard() {
     const [isDragging, setIsDragging] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
     const [markdownOutput, setMarkdownOutput] = useState('');
+    const [uploadProgress, setUploadProgress] = useState(0);
     const history = useHistory();
 
     // Use environment variable for API URL with fallback to localhost
@@ -58,6 +59,7 @@ export default function UploadDashboard() {
         }
 
         setIsProcessing(true);
+        setUploadProgress(0);
         setMessage({ text: 'Checking server status...', type: 'info' });
 
         try {
@@ -75,41 +77,74 @@ export default function UploadDashboard() {
             // Server is healthy, proceed with conversion
             setMessage({ text: 'Starting conversion...', type: 'info' });
 
-            const formData = new FormData();
-            formData.append('file', file);
+            return new Promise((resolve, reject) => {
+                const formData = new FormData();
+                formData.append('file', file);
 
-            const response = await fetch(`${API_URL}/api/convert`, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'Accept': 'application/json',
-                },
+                const xhr = new XMLHttpRequest();
+
+                xhr.upload.addEventListener('progress', (e) => {
+                    if (e.lengthComputable) {
+                        const progress = Math.round((e.loaded / e.total) * 100);
+                        setUploadProgress(progress);
+                        setMessage({
+                            text: `Uploading... ${progress}%`,
+                            type: 'info'
+                        });
+                    }
+                });
+
+                xhr.onreadystatechange = () => {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            try {
+                                const data = JSON.parse(xhr.responseText);
+                                resolve(data);
+                            } catch (error) {
+                                reject(new Error('Failed to parse response'));
+                            }
+                        } else {
+                            try {
+                                const errorData = JSON.parse(xhr.responseText);
+                                reject(new Error(
+                                    errorData.error ||
+                                    `Conversion failed (${xhr.status} ${xhr.statusText})`
+                                ));
+                            } catch {
+                                reject(new Error(
+                                    `Conversion failed (${xhr.status} ${xhr.statusText})`
+                                ));
+                            }
+                        }
+                    }
+                };
+
+                xhr.onerror = () => {
+                    reject(new Error('Network error occurred'));
+                };
+
+                xhr.open('POST', `${API_URL}/api/convert`);
+                xhr.setRequestHeader('Accept', 'application/json');
+                xhr.send(formData);
+            }).then(data => {
+                // Process images correctly
+                const processedImages = data.images?.map(img => ({
+                    ...img,
+                    src: `data:${img.type};base64,${img.data}`
+                })) || [];
+
+                history.push({
+                    pathname: '/markdownpreview',
+                    state: {
+                        markdown: data.markdown,
+                        filename: data.filename,
+                        images: processedImages  // Pass processed images
+                    }
+                });
+            }).catch(error => {
+                throw error;
             });
 
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(
-                    errorData.error ||
-                    `Conversion failed (${response.status} ${response.statusText})`
-                );
-            }
-
-            const data = await response.json();
-
-            // Process images correctly
-            const processedImages = data.images?.map(img => ({
-                ...img,
-                src: `data:${img.type};base64,${img.data}`
-            })) || [];
-
-            history.push({
-                pathname: '/markdownpreview',
-                state: {
-                    markdown: data.markdown,
-                    filename: data.filename,
-                    images: processedImages  // Pass processed images
-                }
-            });
         } catch (error) {
             console.error('Conversion error:', error);
 
@@ -131,6 +166,7 @@ export default function UploadDashboard() {
             });
         } finally {
             setIsProcessing(false);
+            setUploadProgress(0);
         }
     };
 
@@ -166,6 +202,15 @@ export default function UploadDashboard() {
                                 )}
                             </label>
                         </div>
+
+                        {isProcessing && (
+                            <div className={styles.progressBar}>
+                                <div
+                                    className={styles.progressFill}
+                                    style={{ width: `${uploadProgress}%` }}
+                                ></div>
+                            </div>
+                        )}
 
                         {message && (
                             <p className={`${styles.message} ${styles[message.type]}`}>
@@ -207,6 +252,10 @@ export default function UploadDashboard() {
                         <div className={styles.noteItem}>
                             <span className={styles.noteIcon}>⚠️</span>
                             <span>Backend must be running at {API_URL}</span>
+                        </div>
+                        <div className={styles.noteItem}>
+                            <span className={styles.noteIcon}>ℹ️</span>
+                            <span>For best results, use documents with clear headings and images</span>
                         </div>
                     </div>
                 </div>

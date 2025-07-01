@@ -373,34 +373,13 @@
 .markdownPreview pre {
   white-space: pre-wrap;
   word-wrap: break-word;
-  background: rgba(0, 0, 0, 0.2);
-  padding: 1rem;
-  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.2) !important;
+  padding: 1.5rem !important;
+  border-radius: 12px !important;
+  overflow-x: auto !important;
+  margin: 1.5rem 0;
   color: var(--text-secondary);
   max-height: 300px;
-  overflow-y: auto;
-}
-
-/* Add these styles to index.module.css */
-.markdownPreview {
-  width: 100%;
-  max-width: 800px;
-  margin: 2rem auto;
-  padding: 2rem;
-  background: var(--surface-light);
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  text-align: left;
-}
-
-.markdownPreview pre {
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  background: rgba(0, 0, 0, 0.2);
-  padding: 1.5rem;
-  border-radius: 12px;
-  color: var(--text-secondary);
-  max-height: 60vh;
   overflow-y: auto;
   font-family: monospace;
   line-height: 1.6;
@@ -492,47 +471,7 @@
 
 .markdownPreview th {
   background-color: var(--surface);
-}
-
-.markdownPreview pre {
-  background: rgba(0, 0, 0, 0.2);
-  padding: 1.5rem;
-  border-radius: 12px;
-  overflow-x: auto;
-  margin: 1.5rem 0;
-}
-
-.markdownPreview code {
-  font-family: monospace;
-  background: rgba(0, 0, 0, 0.1);
-  padding: 0.2rem 0.4rem;
-  border-radius: 4px;
-}
-
-/* Add to the end of the file */
-.markdownPreview img {
-  max-width: 100%;
-  display: block;
-  margin: 1rem auto;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-.markdownPreview table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 1.5rem 0;
-}
-
-.markdownPreview th,
-.markdownPreview td {
-  padding: 0.75rem;
-  border: 1px solid var(--surface-light);
-  text-align: left;
-}
-
-.markdownPreview th {
-  background-color: var(--surface);
+  font-weight: 600;
 }
 
 .markdownPreview pre {
@@ -560,4 +499,71 @@
   color: var(--text-secondary);
   font-size: 0.9rem;
   margin-top: 0.5rem;
+  text-align: center;
+  font-style: italic;
+}
+
+/* Add these styles at the end */
+.imageContainer {
+  text-align: center;
+  margin: 2rem 0;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.extractedImage {
+  max-width: 100%;
+  max-height: 500px;
+  display: block;
+  margin: 0 auto;
+  border-radius: 6px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.imageCaption {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  text-align: center;
+  font-style: italic;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  margin: 2rem 0;
+  border-radius: 8px;
+  border: 1px solid var(--surface-light);
+}
+
+.markdownTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.markdownTable th,
+.markdownTable td {
+  padding: 0.75rem;
+  border: 1px solid var(--surface-light);
+}
+
+.markdownTable th {
+  background-color: var(--surface);
+  font-weight: 600;
+}
+
+/* Add to index.module.css */
+.progressBar {
+  width: 100%;
+  height: 8px;
+  background: var(--surface-light);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 1rem 0;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+  transition: width 0.3s ease;
 }
