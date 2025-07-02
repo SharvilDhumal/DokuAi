@@ -20,6 +20,7 @@ from datetime import datetime
 import groq
 from pocketbase import PocketBase
 from docx import Document
+from pocketbase.client import FileUpload
 
 # Load environment variables
 load_dotenv()
@@ -167,32 +168,46 @@ def process_document_with_groq(text: str, images: List[ImageData]) -> str:
     return markdown_output
 
 async def upload_image_to_pocketbase(image_bytes: bytes, filename: str, content_type: str) -> str:
-    """Uploads an image to PocketBase and returns public URL"""
     try:
-        # Create unique filename with original extension
         ext = filename.split('.')[-1].lower() if '.' in filename else content_type.split('/')[-1]
         unique_filename = f"{uuid.uuid4().hex}.{ext}"
 
-        # Create a temporary file instead of BytesIO
+        # Create a temporary file
         with tempfile.NamedTemporaryFile(delete=False, suffix=f".{ext}") as temp_file:
             temp_file.write(image_bytes)
             temp_file_path = temp_file.name
 
-        # Upload to PocketBase using the temporary file path
-        with open(temp_file_path, 'rb') as f:
-            record = pb.collection("images").create({
-                "image": f  # Only the file object!
-            })
-
-        # Clean up temporary file
-        os.unlink(temp_file_path)
-
-        # Return proper URL format
-        return f"{POCKETBASE_URL}/api/files/images/{record.id}/{unique_filename}"
+        try:
+            # Open the file in binary mode and upload
+            with open(temp_file_path, 'rb') as f:
+                # Create a file-like object with filename and content type
+                files = {
+                    'image': (unique_filename, f, content_type)
+                }
+                # Upload to PocketBase
+                record = pb.collection("images").create(
+                    body_params={},
+                    files=files
+                )
+                
+                # Get the URL of the uploaded image
+                if hasattr(record, 'image') and record.image:
+                    image_filename = record.image[0] if isinstance(record.image, list) else record.image
+                    return f"{POCKETBASE_URL}/api/files/images/{record.id}/{image_filename}"
+                else:
+                    raise HTTPException(status_code=500, detail="No image URL returned from PocketBase")
+                    
+        finally:
+            # Ensure the temp file is always deleted
+            try:
+                os.unlink(temp_file_path)
+            except Exception as e:
+                logging.warning(f"Failed to delete temp file: {e}")
+                
     except Exception as e:
         logging.error(f"PocketBase upload error: {str(e)}")
         logging.error(traceback.format_exc())
-        raise HTTPException(status_code=500, detail="Image upload failed")
+        raise HTTPException(status_code=500, detail=f"Image upload failed: {str(e)}")
 
 @app.post("/api/convert", response_model=ConversionResponse)
 async def convert_file(file: UploadFile):

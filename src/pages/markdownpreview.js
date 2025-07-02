@@ -31,9 +31,12 @@ export default function MarkdownPreview() {
       if (src.startsWith('http')) {
         return src;
       }
-      // For PocketBase URLs, ensure they're complete and not already prefixed
+      // For PocketBase URLs, ensure they're complete and clean
       if (src.startsWith('/api/files') && !src.startsWith(POCKETBASE_URL)) {
-        return `${POCKETBASE_URL}${src}`;
+        // Clean up any malformed URL parts
+        let cleanUrl = `${POCKETBASE_URL}${src}`;
+        cleanUrl = cleanUrl.replace(/\[|\]|'|"/g, ''); // Remove brackets and quotes
+        return cleanUrl;
       }
       return src;
     }, [src, POCKETBASE_URL]);
@@ -134,6 +137,37 @@ export default function MarkdownPreview() {
     URL.revokeObjectURL(url);
   };
 
+  const processMarkdownContent = (content) => {
+    if (!content || !images?.length) return content;
+    
+    // Create a map of image filenames to their full URLs for quick lookup
+    const imageMap = {};
+    images.forEach(img => {
+      if (img.name && img.data) {
+        // Clean up the image name by removing any path segments
+        const cleanName = img.name.split('/').pop().split('\\').pop();
+        imageMap[cleanName] = img.data;
+      }
+    });
+
+    // Replace markdown image references with the correct image URLs
+    return content.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, src) => {
+      // Extract just the filename from the path
+      const filename = src.split('/').pop().split('\\').pop();
+      const imageUrl = imageMap[filename];
+      
+      if (imageUrl) {
+        // Replace with the correct image URL
+        return `![${alt}](${imageUrl})`;
+      }
+      
+      // Return the original if no match found
+      return match;
+    });
+  };
+
+  const processedMarkdown = processMarkdownContent(markdown);
+
   const renderers = {
     img: (props) => <MarkdownImage {...props} />,
     code: ({ node, inline, className, children, ...props }) => {
@@ -181,8 +215,20 @@ export default function MarkdownPreview() {
               components={renderers}
               rehypePlugins={[rehypeRaw]}
               skipHtml={false}
+              transformImageUri={(uri) => {
+                // Handle relative paths
+                if (uri.startsWith('./') || uri.startsWith('../')) {
+                  const baseUrl = window.location.origin;
+                  return new URL(uri, baseUrl).toString();
+                }
+                // Handle absolute paths
+                if (uri.startsWith('/')) {
+                  return window.location.origin + uri;
+                }
+                return uri;
+              }}
             >
-              {markdown}
+              {processedMarkdown}
             </ReactMarkdown>
           </div>
 
