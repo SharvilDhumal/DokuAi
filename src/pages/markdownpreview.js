@@ -3,186 +3,150 @@ import styles from './index.module.css';
 import React, { useState, useEffect } from 'react';
 import Layout from '@theme/Layout';
 import Head from '@docusaurus/Head';
-import Link from '@docusaurus/Link';
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 
+// In markdownpreview.js, update the getImageUrl function
+const getImageUrl = (url, BACKEND_URL) => {
+  if (!url) return '';
+  
+  // If it's already a full URL, return as is
+  if (url.startsWith('http')) {
+    return url;
+  }
+  
+  // Remove any leading slashes or uploads/ to prevent duplication
+  const cleanPath = url.replace(/^\/+/, '').replace(/^uploads\//, '');
+  return `${BACKEND_URL}/uploads/${cleanPath}`;
+};
+
+const MarkdownImage = ({ src, alt }) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
+  const { siteConfig } = useDocusaurusContext();
+  const BACKEND_URL = siteConfig.customFields?.BACKEND_URL || 'http://localhost:5000';
+  
+  // Process the image URL
+  const processImageUrl = (url) => {
+    if (!url) return '';
+    
+    // If it's already a full URL, use it as is
+    if (url.startsWith('http')) {
+      return url;
+    }
+    
+    // Remove leading slashes and uploads/ to prevent duplication
+    const cleanPath = url.replace(/^\/+/, '').replace(/^uploads\//, '');
+    return `${BACKEND_URL}/uploads/${cleanPath}`;
+  };
+  
+  const imageUrl = processImageUrl(src);
+  
+  return (
+    <div className={styles.imageWrapper}>
+      {!imageError ? (
+        <img
+          src={imageUrl}
+          alt={alt || 'Document image'}
+          className={`${styles.markdownImage} ${imageLoaded ? styles.loaded : ''}`}
+          onLoad={() => {
+            console.log('Image loaded successfully:', imageUrl);
+            setImageLoaded(true);
+          }}
+          onError={(e) => {
+            console.error('Error loading image:', imageUrl, e);
+            setImageError(true);
+          }}
+          loading="lazy"
+        />
+      ) : (
+        <div className={styles.imageError}>
+          [Image: {alt || 'Document image'}]
+        </div>
+      )}
+      {!imageLoaded && !imageError && (
+        <div className={styles.imageLoading}>
+          Loading image...
+        </div>
+      )}
+    </div>
+  );
+};
+
 export default function MarkdownPreview() {
   const { siteConfig } = useDocusaurusContext();
-  const PROXY_URL = siteConfig.customFields?.PROXY_URL || 'http://localhost:3001/image';
-
   const location = useLocation();
-  const markdown = location.state?.markdown || '';
-  const filename = location.state?.filename || '';
-  const images = location.state?.images || [];
-
-  const MarkdownImage = ({ src, alt }) => {
-    const [imageLoaded, setImageLoaded] = useState(false);
-    const [imageError, setImageError] = useState(false);
-
-    // Get PocketBase URL from config or fallback
-    const { siteConfig } = useDocusaurusContext();
-    const POCKETBASE_URL = siteConfig.customFields?.POCKETBASE_URL || 'http://localhost:8090';
-
-    const fixedSrc = React.useMemo(() => {
-      if (!src) return '';
-      // If it's already a full URL
-      if (src.startsWith('http')) {
-        return src;
-      }
-      // For PocketBase URLs, ensure they're complete and clean
-      if (src.startsWith('/api/files') && !src.startsWith(POCKETBASE_URL)) {
-        // Clean up any malformed URL parts
-        let cleanUrl = `${POCKETBASE_URL}${src}`;
-        cleanUrl = cleanUrl.replace(/\[|\]|'|"/g, ''); // Remove brackets and quotes
-        return cleanUrl;
-      }
-      return src;
-    }, [src, POCKETBASE_URL]);
-
-    useEffect(() => {
-      if (!fixedSrc) {
-        setImageError(true);
-        return;
-      }
-      const img = new window.Image();
-      img.src = fixedSrc;
-      img.onload = () => setImageLoaded(true);
-      img.onerror = () => {
-        console.error('Failed to load image:', fixedSrc);
-        setImageError(true);
-      };
-    }, [fixedSrc]);
-
-    return (
-      <div className={styles.imageContainer}>
-        {!imageError ? (
-          <>
-            <img
-              src={fixedSrc}
-              alt={alt || 'Document image'}
-              className={styles.extractedImage}
-              style={{ display: imageLoaded ? 'block' : 'none' }}
-              onLoad={() => setImageLoaded(true)}
-              onError={() => {
-                console.error('Image load error:', fixedSrc);
-                setImageError(true);
-              }}
-            />
-            {!imageLoaded && !imageError && (
-              <div className={styles.imageLoading}>
-                <div className={styles.progressBar}>
-                  <div className={styles.progressFill} style={{ width: '70%' }} />
-                </div>
-                Loading image...
-              </div>
-            )}
-          </>
-        ) : (
-          <div className={styles.imageError}>
-            Failed to load image
-            {fixedSrc && (
-              <div className={styles.imageUrl}>
-                <small>URL: {fixedSrc}</small>
-                <button
-                  onClick={() => window.open(fixedSrc, '_blank')}
-                  className={styles.copyButton}
-                  style={{ marginTop: '0.5rem' }}
-                >
-                  Open Image in New Tab
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-        {alt && <p className={styles.imageCaption}>{alt}</p>}
-      </div>
-    );
-  };
+  const [markdown, setMarkdown] = useState('');
+  const [filename, setFilename] = useState('');
+  const [images, setImages] = useState([]);
+  const BACKEND_URL = siteConfig.customFields?.BACKEND_URL || 'http://localhost:5000';
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (images && images.length > 0) {
-      console.log('Received images:', images);
-      images.forEach(img => {
-        console.log('Image URL:', img.data);
-        // Test loading the image
-        const testImg = new window.Image();
-        testImg.src = img.data;
-        testImg.onload = () => console.log(`Image loaded: ${img.data}`);
-        testImg.onerror = () => console.error(`Failed to load image: ${img.data}`);
-      });
-    }
-  }, [images]);
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(markdown)
-      .then(() => {
-        alert('Markdown copied to clipboard!');
-      })
-      .catch(err => {
-        console.error('Failed to copy: ', err);
-      });
-  };
-
-  const handleDownload = () => {
-    const blob = new Blob([markdown], { type: 'text/markdown' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${filename.replace(/\.[^/.]+$/, '')}.md`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
-
-  const processMarkdownContent = (content) => {
-    if (!content || !images?.length) return content;
+    console.log('Location state:', location.state); // Debug log
     
-    // Create a map of image filenames to their full URLs for quick lookup
-    const imageMap = {};
-    images.forEach(img => {
-      if (img.name && img.data) {
-        // Clean up the image name by removing any path segments
-        const cleanName = img.name.split('/').pop().split('\\').pop();
-        imageMap[cleanName] = img.data;
-      }
-    });
-
-    // Replace markdown image references with the correct image URLs
-    return content.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, src) => {
-      // Extract just the filename from the path
-      const filename = src.split('/').pop().split('\\').pop();
-      const imageUrl = imageMap[filename];
+    if (location.state) {
+      console.log('Markdown content:', location.state.markdown ? 'exists' : 'missing');
+      console.log('Filename:', location.state.filename || 'not provided');
+      console.log('Images:', location.state.images?.length || 0, 'images');
       
-      if (imageUrl) {
-        // Replace with the correct image URL
-        return `![${alt}](${imageUrl})`;
-      }
-      
-      // Return the original if no match found
-      return match;
-    });
-  };
+      setMarkdown(location.state.markdown || '');
+      setFilename(location.state.filename || '');
+      setImages(location.state.images || []);
+    } else {
+      console.log('No location state provided');
+    }
+    
+    setIsLoading(false);
+  }, [location.state]);
 
-  const processedMarkdown = processMarkdownContent(markdown);
-
-  const renderers = {
-    img: (props) => <MarkdownImage {...props} />,
-    code: ({ node, inline, className, children, ...props }) => {
-      return (
-        <code className={className} {...props}>
-          {children}
-        </code>
+  // Process markdown to handle images
+  const processMarkdown = (content, imageList) => {
+    if (!content) return '';
+    
+    // Replace image placeholders with proper markdown image syntax
+    let processed = content;
+    imageList.forEach((img, idx) => {
+      const imageUrl = getImageUrl(img.data, BACKEND_URL);
+      processed = processed.replace(
+        new RegExp(`\\[IMAGE_PLACEHOLDER_${idx}\\]`, 'g'),
+        `![Image ${idx}](${imageUrl})`
       );
-    },
-    table: ({ children }) => (
-      <div className={styles.tableWrapper}>
-        <table className={styles.markdownTable}>{children}</table>
-      </div>
-    ),
+    });
+    
+    return processed;
   };
+
+  const processedMarkdown = processMarkdown(markdown, images);
+
+  if (isLoading) {
+    return (
+      <Layout title="Loading..." description="Loading document preview">
+        <div className={styles.heroContainer}>
+          <div className={styles.heroContent}>
+            <p>Loading document preview...</p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (!markdown) {
+    return (
+      <Layout title="No Content" description="No document content available">
+        <div className={styles.heroContainer}>
+          <div className={styles.heroContent}>
+            <h1>No Document Content</h1>
+            <p>Unable to load the document content. Please try converting the document again.</p>
+            <a href="/" className={styles.primaryButton}>
+              Back to Home
+            </a>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout
@@ -210,22 +174,18 @@ export default function MarkdownPreview() {
           </p>
 
           {/* Markdown content */}
-          <div className={styles.markdownPreview}>
-            <ReactMarkdown
-              components={renderers}
+          <div className={styles.markdownContent}>
+            <ReactMarkdown 
               rehypePlugins={[rehypeRaw]}
-              skipHtml={false}
-              transformImageUri={(uri) => {
-                // Handle relative paths
-                if (uri.startsWith('./') || uri.startsWith('../')) {
-                  const baseUrl = window.location.origin;
-                  return new URL(uri, baseUrl).toString();
+              components={{
+                img: (props) => <MarkdownImage {...props} />,
+                p: ({ node, ...props }) => {
+                  // Check if the paragraph only contains an image
+                  if (node.children.length === 1 && node.children[0].tagName === 'img') {
+                    return <div {...props} />;
+                  }
+                  return <p {...props} />;
                 }
-                // Handle absolute paths
-                if (uri.startsWith('/')) {
-                  return window.location.origin + uri;
-                }
-                return uri;
               }}
             >
               {processedMarkdown}
@@ -233,10 +193,28 @@ export default function MarkdownPreview() {
           </div>
 
           <div className={styles.buttonGroup}>
-            <button onClick={handleCopy} className={styles.copyButton}>
+            <button onClick={() => {
+              navigator.clipboard.writeText(processedMarkdown)
+                .then(() => {
+                  alert('Markdown copied to clipboard!');
+                })
+                .catch(err => {
+                  console.error('Failed to copy: ', err);
+                });
+            }} className={styles.primaryButton}>
               Copy Markdown
             </button>
-            <button onClick={handleDownload} className={styles.downloadButton}>
+            <button onClick={() => {
+              const blob = new Blob([processedMarkdown], { type: 'text/markdown;charset=utf-8' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = `${filename.replace(/\.[^/.]+$/, '')}.md`;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              URL.revokeObjectURL(url);
+            }} className={styles.secondaryButton}>
               Download Markdown
             </button>
           </div>
@@ -244,9 +222,9 @@ export default function MarkdownPreview() {
           <div className={styles.fileNote} style={{ marginTop: '2rem' }}>
             <div className={styles.noteItem}>
               <span className={styles.noteIcon}>↩️</span>
-              <Link to="/upload" className={styles.noteLink}>
+              <a href="/upload" className={styles.noteLink}>
                 Upload another document
-              </Link>
+              </a>
             </div>
           </div>
         </div>

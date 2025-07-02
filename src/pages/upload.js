@@ -128,11 +128,33 @@ export default function UploadDashboard() {
                 xhr.send(formData);
             })
                 .then(data => {
-                    // Navigate to markdownpreview page instead of downloading
-                    history.push('/markdownpreview', {
-                        markdown: data.markdown,
-                        filename: data.filename,
-                        images: data.images
+                    console.log('API Response:', data);
+                    
+                    // Check if we have valid content to display
+                    const hasContent = data.markdown && data.markdown.trim().length > 0;
+                    const hasImages = data.images && data.images.length > 0;
+                    
+                    if (!hasContent && !hasImages) {
+                        throw new Error('The document appears to be empty or could not be processed.');
+                    }
+                    
+                    // If we have images but no markdown, create a basic markdown with just the images
+                    let markdownContent = data.markdown || '';
+                    if (!hasContent && hasImages) {
+                        markdownContent = "# Document with Images\n\n";
+                        data.images.forEach((img, idx) => {
+                            markdownContent += `![Image ${idx}](${img.data})\n\n`;
+                        });
+                    }
+                    
+                    // Navigate to markdownpreview page with the data
+                    history.push({
+                        pathname: '/markdownpreview',
+                        state: {
+                            markdown: markdownContent,
+                            filename: data.filename,
+                            images: data.images || []
+                        }
                     });
                 })
                 .catch(error => {

@@ -107,12 +107,15 @@ const config = {
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} DokuAI. Built with Docusaurus.`,
+      copyright: `Copyright ${new Date().getFullYear()} DokuAI. Built with Docusaurus.`,
     },
     prism: {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
     },
+  },
+  customFields: {
+    BACKEND_URL: process.env.BACKEND_URL || 'http://localhost:5000',
   },
 };
 

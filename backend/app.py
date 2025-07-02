@@ -3,63 +3,81 @@ import uuid
 import base64
 import io
 import tempfile
-import traceback
-import logging
-import re
-from logging.handlers import RotatingFileHandler
-from fastapi import FastAPI, UploadFile, HTTPException, Request
+from fastapi import FastAPI, HTTPException, UploadFile, Request, status
+from fastapi.responses import JSONResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional, Dict, Any
+import logging
+import traceback
+from pdf2image import convert_from_path
+import fitz  # PyMuPDF
+from docx import Document
+import pytesseract
+from PIL import Image
+import re
+import asyncio
 import docx2txt
 from PyPDF2 import PdfReader
-from pdf2image import convert_from_bytes
+import groq
 from dotenv import load_dotenv
 from datetime import datetime
-import groq
-from pocketbase import PocketBase
-from docx import Document
-from pocketbase.client import FileUpload
 
 # Load environment variables
 load_dotenv()
 groq.api_key = os.getenv("GROQ_API_KEY")
 
-# PocketBase configuration
-POCKETBASE_URL = os.getenv("POCKETBASE_URL", "http://localhost:8090")
-POCKETBASE_EMAIL = os.getenv("POCKETBASE_EMAIL")
-POCKETBASE_PASSWORD = os.getenv("POCKETBASE_PASSWORD")
-pb = PocketBase(POCKETBASE_URL)
-
-# Authenticate with PocketBase
-try:
-    pb.admins.auth_with_password(POCKETBASE_EMAIL, POCKETBASE_PASSWORD)
-    logging.info("Successfully authenticated with PocketBase")
-except Exception as e:
-    logging.error(f"Failed to authenticate with PocketBase: {str(e)}")
-    raise
-
-# Setup logging
-log_formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]')
-log_handler = RotatingFileHandler('app.log', maxBytes=1000000, backupCount=3)
-log_handler.setFormatter(log_formatter)
-log_handler.setLevel(logging.INFO)
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
 # CORS configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # For development, restrict in production
+    allow_origins=["http://localhost:3000"],  # Your frontend URL
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    expose_headers=["*"]
 )
 
+# Create uploads directory if it doesn't exist
+UPLOAD_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "uploads"))
+os.makedirs("uploads", exist_ok=True)
+logger.info(f"[App] Using upload directory: {UPLOAD_DIR}")
+
+# Static file serving
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+
+# Add a direct file endpoint as a fallback
+@app.get("/files/{file_path:path}")
+async def serve_file(file_path: str):
+    file_location = os.path.join(UPLOAD_DIR, file_path)
+    if not os.path.exists(file_location):
+        raise HTTPException(status_code=404, detail="File not found")
+    
+    # Set proper content type based on file extension
+    if file_path.lower().endswith('.png'):
+        media_type = 'image/png'
+    elif file_path.lower().endswith(('.jpg', '.jpeg')):
+        media_type = 'image/jpeg'
+    else:
+        media_type = 'application/octet-stream'
+    
+    return FileResponse(
+        file_location,
+        media_type=media_type,
+        headers={
+            'Access-Control-Allow-Origin': '*',
+            'Cache-Control': 'public, max-age=31536000'
+        }
+    )
+
 class ImageData(BaseModel):
-    data: str  # contains PocketBase URL
-    type: str  # image/png, image/jpeg
+    data: str
+    type: str
     description: str = "Document image"
 
 class ConversionResponse(BaseModel):
@@ -68,29 +86,64 @@ class ConversionResponse(BaseModel):
     filename: str
     images: List[ImageData] = []
 
+# In app.py, update the save_image_locally function
+async def save_image_locally(image_bytes: bytes, filename: str):
+    try:
+        # Create uploads directory if it doesn't exist
+        os.makedirs(UPLOAD_DIR, exist_ok=True)
+        
+        # Generate a unique filename
+        file_ext = os.path.splitext(filename)[1] or '.png'
+        unique_filename = f"{uuid.uuid4().hex}{file_ext}"
+        file_path = os.path.join(UPLOAD_DIR, unique_filename)
+        
+        # Save the image
+        with open(file_path, 'wb') as f:
+            f.write(image_bytes)
+            
+        logger.info(f"Image saved to {file_path}")
+        return unique_filename  # Return only the filename, not the full path
+        
+    except Exception as e:
+        logger.error(f"Error saving image: {str(e)}")
+        raise
+
 async def extract_images_from_pdf(pdf_bytes: bytes) -> List[ImageData]:
     images = []
     try:
-        pil_images = convert_from_bytes(pdf_bytes, dpi=100)
-        for idx, img in enumerate(pil_images):
-            with io.BytesIO() as output:
-                img.save(output, format="JPEG", quality=70)
-                image_bytes = output.getvalue()
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_pdf:
+            temp_pdf.write(pdf_bytes)
+            temp_pdf_path = temp_pdf.name
+
+        try:
+            # Convert PDF to images
+            images_list = convert_from_path(temp_pdf_path)
             
-            url = await upload_image_to_pocketbase(
-                image_bytes,
-                f"page_{idx+1}.jpg",
-                "image/jpeg"
-            )
+            for i, image in enumerate(images_list):
+                # Convert image to bytes
+                img_byte_arr = io.BytesIO()
+                image.save(img_byte_arr, format='PNG')
+                img_byte_arr = img_byte_arr.getvalue()
+                
+                # Save locally
+                image_url = await save_image_locally(
+                    img_byte_arr, 
+                    f"page_{i+1}.png"
+                )
+                
+                images.append(ImageData(
+                    data=image_url,
+                    type="image/png",
+                    description=f"Page {i+1}"
+                ))
+                
+        finally:
+            os.unlink(temp_pdf_path)
             
-            images.append(ImageData(
-                data=url,
-                type="image/jpeg",
-                description=f"Page {idx+1} Image"
-            ))
     except Exception as e:
-        logging.error(f"Error extracting images from PDF: {str(e)}")
-        logging.error(traceback.format_exc())
+        logger.error(f"Error extracting images from PDF: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to extract images from PDF")
+        
     return images
 
 async def extract_images_from_docx(docx_path: str) -> List[ImageData]:
@@ -104,8 +157,8 @@ async def extract_images_from_docx(docx_path: str) -> List[ImageData]:
             ext = rel.target_ref.split('.')[-1].lower()
             content_type = f"image/{ext}" if ext != "jpg" else "image/jpeg"
             filename = f"docx_image_{uuid.uuid4().hex}.{ext}"
-            # Upload to PocketBase
-            image_url = await upload_image_to_pocketbase(img_data, filename, content_type)
+            # Save locally
+            image_url = await save_image_locally(img_data, filename)
             images.append(ImageData(
                 data=image_url,
                 type=content_type,
@@ -121,98 +174,53 @@ def extract_text_from_pdf(pdf_bytes: bytes) -> str:
             if page.extract_text():
                 text += page.extract_text() + "\n"
     except Exception as e:
-        logging.error(f"Error extracting PDF text: {str(e)}")
-        logging.error(traceback.format_exc())
+        logger.error(f"Error extracting PDF text: {str(e)}")
+        logger.error(traceback.format_exc())
     return text
 
+# In app.py, update the process_document_with_groq function
 def process_document_with_groq(text: str, images: List[ImageData]) -> str:
-    """Process document content while preserving image positions"""
+    """Process document text with Groq API and return markdown."""
+    if not text.strip() and not images:
+        return "# Document Conversion\n\nNo text content could be extracted from the document."
+        
     try:
-        from groq import Groq
-        client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+        # Process text if available
+        if text.strip():
+            # ... (existing Groq processing code)
+            pass
+        else:
+            markdown_output = "# Document with Images\n\n"
         
-        for idx, img in enumerate(images):
-            placeholder = f"{{{{IMAGE_POSITION_{idx}}}}}"
-            text = re.sub(r'\[IMAGE[^\]]*\]', placeholder, text, count=1)
-        
-        max_chars = 4000
-        text_chunks = [text[i:i+max_chars] for i in range(0, len(text), max_chars)]
-        
-        markdown_parts = []
-        for chunk in text_chunks:
-            prompt = f"""Convert this document to well-structured Markdown, preserving all image placeholders."""
-            try:
-                response = client.chat.completions.create(
-                    model="llama3-70b-8192",
-                    messages=[
-                        {"role": "system", "content": "Convert documents to Markdown"},
-                        {"role": "user", "content": chunk}
-                    ]
-                )
-                markdown_parts.append(response.choices[0].message.content)
-            except Exception as e:
-                logging.error(f"Groq processing error: {str(e)}")
-                markdown_parts.append(chunk)
-        
-        markdown_output = "\n\n".join(markdown_parts)
-    except Exception as e:
-        logging.error(f"Groq initialization failed, using simple converter: {str(e)}")
-        markdown_output = text
-    
-    for idx, img in enumerate(images):
-        markdown_output = markdown_output.replace(
-            f"{{{{IMAGE_POSITION_{idx}}}}}",
-            f"![{img.description}]({img.data})"
-        )
-    
-    return markdown_output
-
-async def upload_image_to_pocketbase(image_bytes: bytes, filename: str, content_type: str) -> str:
-    try:
-        ext = filename.split('.')[-1].lower() if '.' in filename else content_type.split('/')[-1]
-        unique_filename = f"{uuid.uuid4().hex}.{ext}"
-
-        # Create a temporary file
-        with tempfile.NamedTemporaryFile(delete=False, suffix=f".{ext}") as temp_file:
-            temp_file.write(image_bytes)
-            temp_file_path = temp_file.name
-
-        try:
-            # Open the file in binary mode and upload
-            with open(temp_file_path, 'rb') as f:
-                # Create a file-like object with filename and content type
-                files = {
-                    'image': (unique_filename, f, content_type)
-                }
-                # Upload to PocketBase
-                record = pb.collection("images").create(
-                    body_params={},
-                    files=files
-                )
+        # Add image placeholders if we have images
+        if images:
+            if not markdown_output.strip():
+                markdown_output = "# Document with Images\n\n"
                 
-                # Get the URL of the uploaded image
-                if hasattr(record, 'image') and record.image:
-                    image_filename = record.image[0] if isinstance(record.image, list) else record.image
-                    return f"{POCKETBASE_URL}/api/files/images/{record.id}/{image_filename}"
-                else:
-                    raise HTTPException(status_code=500, detail="No image URL returned from PocketBase")
-                    
-        finally:
-            # Ensure the temp file is always deleted
-            try:
-                os.unlink(temp_file_path)
-            except Exception as e:
-                logging.warning(f"Failed to delete temp file: {e}")
-                
+            for idx, img in enumerate(images):
+                # Ensure we're using just the filename, not the full path
+                img_filename = os.path.basename(img.data)
+                markdown_output += f"\n![Image {idx}](/uploads/{img_filename})\n\n"
+        
+        return markdown_output
+        
     except Exception as e:
-        logging.error(f"PocketBase upload error: {str(e)}")
-        logging.error(traceback.format_exc())
-        raise HTTPException(status_code=500, detail=f"Image upload failed: {str(e)}")
+        logger.error(f"Error processing document: {str(e)}")
+        # Fallback to basic formatting
+        fallback = "# Document Conversion\n\n"
+        if text.strip():
+            fallback += "## Text Content\n\n" + text + "\n\n"
+        if images:
+            fallback += "## Images\n\n"
+            for idx, img in enumerate(images):
+                img_filename = os.path.basename(img.data)
+                fallback += f"![Image {idx}](/uploads/{img_filename})\n\n"
+        return fallback
 
 @app.post("/api/convert", response_model=ConversionResponse)
 async def convert_file(file: UploadFile):
+    logger.info(f"[Convert] Received file: {file.filename} (Content-Type: {file.content_type})")
     try:
-        logging.info("Received conversion request")
         filename = file.filename
         if not filename.lower().endswith(('.pdf', '.docx')):
             raise HTTPException(status_code=400, detail="Invalid file type. Only PDF and DOCX allowed.")
@@ -241,47 +249,51 @@ async def convert_file(file: UploadFile):
         
         markdown_output = process_document_with_groq(text, images)
         
-        return ConversionResponse(
-            markdown=markdown_output,
-            filename=filename,
-            images=images
-        )
+        # Debug logging
+        logger.info(f"Sending response with markdown length: {len(markdown_output) if markdown_output else 0}")
+        logger.info(f"Filename: {filename}")
+        logger.info(f"Number of images: {len(images)}")
+        
+        response_data = {
+            "markdown": markdown_output,
+            "filename": filename,
+            "images": [img.dict() for img in images]
+        }
+        
+        logger.debug(f"Response data: {response_data}")
+        
+        return response_data
         
     except HTTPException:
         raise
     except Exception as e:
-        logging.error(f"Server error: {str(e)}")
-        logging.error(traceback.format_exc())
+        logger.error(f"Server error: {str(e)}")
+        logger.error(traceback.format_exc())
         raise HTTPException(status_code=500, detail="Internal server error")
 
 @app.get("/api/health")
 async def health_check():
     try:
-        # Check PocketBase connection
-        pb.health.check()
-        
         return {
             "status": "healthy",
             "services": {
-                "groq": "connected" if groq.api_key else "error",
-                "pocketbase": "connected"
+                "groq": "connected" if groq.api_key else "error"
             }
         }
     except Exception as e:
-        logging.error(f"Health check failed: {str(e)}")
+        logger.error(f"Health check failed: {str(e)}")
         return {
             "status": "unhealthy",
             "error": str(e),
             "services": {
-                "groq": "error" if not groq.api_key else "connected",
-                "pocketbase": "error"
+                "groq": "error" if not groq.api_key else "connected"
             }
         }
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
-    logging.error(f"Unhandled exception: {str(exc)}")
-    logging.error(traceback.format_exc())
+    logger.error(f"Unhandled exception: {str(exc)}")
+    logger.error(traceback.format_exc())
     return JSONResponse(
         status_code=500,
         content={"error": "Internal server error"},

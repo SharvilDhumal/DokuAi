@@ -575,7 +575,7 @@
   gap: 1rem;
   margin-top: 1.5rem;
 }
-createClient .downloadButton {
+.createClient .downloadButton {
   background: var(--accent);
   color: white;
   padding: 0.75rem 1.5rem;
@@ -631,4 +631,290 @@ createClient .downloadButton {
   word-break: break-all;
   font-size: 0.8rem;
   margin-top: 0.5rem;
+}
+
+.markdownContent {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.imageWrapper {
+  margin: 1.5rem 0;
+  text-align: center;
+}
+
+.markdownImage {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Add some spacing around images in the markdown */
+.markdownContent p + .imageWrapper,
+.markdownContent h2 + .imageWrapper {
+  margin-top: 2rem;
+}
+
+/* Markdown Content Styles */
+.markdownContent {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.markdownContent p {
+  margin: 1em 0;
+}
+
+.markdownContent h1,
+.markdownContent h2,
+.markdownContent h3,
+.markdownContent h4,
+.markdownContent h5,
+.markdownContent h6 {
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  color: var(--text-primary);
+}
+
+/* Image Wrapper */
+.imageWrapper {
+  margin: 1.5rem 0;
+  text-align: center;
+  position: relative;
+  min-height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--surface-light);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Markdown Image */
+.markdownImage {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.markdownImage.loaded {
+  opacity: 1;
+  position: relative;
+  z-index: 2;
+}
+
+/* Loading State */
+.imageLoading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--primary-light);
+  font-size: 0.9rem;
+  z-index: 1;
+}
+
+/* Error State */
+.imageError {
+  padding: 1rem;
+  color: var(--error);
+  background-color: var(--error);
+  border-radius: 4px;
+  text-align: center;
+}
+
+/* Spacing around images */
+.markdownContent p + .imageWrapper,
+.markdownContent h2 + .imageWrapper,
+.markdownContent h3 + .imageWrapper {
+  margin-top: 2rem;
+}
+
+/* Tables */
+.markdownContent table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: 0.9em;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.markdownContent th,
+.markdownContent td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid var(--surface-light);
+}
+
+.markdownContent th {
+  background-color: var(--surface);
+  font-weight: bold;
+}
+
+.markdownContent tr:hover {
+  background-color: var(--surface-light);
+}
+
+/* Code blocks */
+.markdownContent pre {
+  background-color: var(--surface-light);
+  border-radius: 6px;
+  padding: 1rem;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+}
+
+.markdownContent code {
+  font-family: monospace;
+  font-size: 0.9em;
+}
+
+/* Blockquotes */
+.markdownContent blockquote {
+  border-left: 4px solid var(--primary);
+  margin: 1.5rem 0;
+  padding: 0.5rem 0 0.5rem 1rem;
+  color: var(--text-secondary);
+  background-color: var(--surface-light);
+  border-radius: 0 4px 4px 0;
+}
+
+.markdownContent blockquote p {
+  margin: 0;
+}
+
+/* Lists */
+.markdownContent ul,
+.markdownContent ol {
+  padding-left: 1.5rem;
+  margin: 1rem 0;
+}
+
+.markdownContent li {
+  margin: 0.5rem 0;
+}
+
+/* Links */
+.markdownContent a {
+  color: var(--primary);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.markdownContent a:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .markdownContent {
+    padding: 1rem;
+  }
+  
+  .markdownContent table {
+    display: block;
+    overflow-x: auto;
+  }
+  
+  .imageWrapper {
+    margin: 1rem 0;
+  }
+}
+
+/* Markdown Content */
+.markdownContent {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: var(--ifm-background-surface-color);
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Image Wrapper */
+.imageWrapper {
+  position: relative;
+  margin: 1.5rem 0;
+  text-align: center;
+  background: var(--ifm-color-emphasis-100);
+  border-radius: 4px;
+  overflow: hidden;
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Markdown Image */
+.markdownImage {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.markdownImage.loaded {
+  opacity: 1;
+}
+
+/* Image Loading State */
+.imageLoading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--ifm-color-emphasis-600);
+  font-size: 0.9rem;
+}
+
+/* Image Error State */
+.imageError {
+  padding: 2rem;
+  color: var(--ifm-color-danger);
+  background: var(--ifm-color-danger-lightest);
+  border: 1px solid var(--ifm-color-danger-light);
+  border-radius: 4px;
+  width: 100%;
+  text-align: center;
+}
+
+/* Fix for images in paragraphs */
+.markdownContent p:has(> img) {
+  margin: 0;
+  padding: 0;
+  background: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .markdownContent {
+    padding: 1rem;
+    margin: 0 -1rem;
+    border-radius: 0;
+  }
+  
+  .imageWrapper {
+    margin: 1rem -1rem;
+    border-radius: 0;
+  }
 }
