@@ -86,7 +86,6 @@ class ConversionResponse(BaseModel):
     filename: str
     images: List[ImageData] = []
 
-# In app.py, update the save_image_locally function
 async def save_image_locally(image_bytes: bytes, filename: str):
     try:
         # Create uploads directory if it doesn't exist
@@ -178,29 +177,61 @@ def extract_text_from_pdf(pdf_bytes: bytes) -> str:
         logger.error(traceback.format_exc())
     return text
 
-# In app.py, update the process_document_with_groq function
 def process_document_with_groq(text: str, images: List[ImageData]) -> str:
     """Process document text with Groq API and return markdown."""
     if not text.strip() and not images:
         return "# Document Conversion\n\nNo text content could be extracted from the document."
         
     try:
-        # Process text if available
-        if text.strip():
-            # ... (existing Groq processing code)
-            pass
-        else:
-            markdown_output = "# Document with Images\n\n"
+        client = groq.Client()
+        
+        # Enhanced prompt for better formatting
+        prompt = f"""Convert the following document text into well-structured Markdown format. 
+        Follow these guidelines:
+        
+        1. Preserve all important information
+        2. Use appropriate heading levels (#, ##, ###) for document structure
+        3. Format lists (both ordered and unordered) properly
+        4. Convert tables to Markdown table syntax
+        5. Keep code blocks and technical terms intact
+        6. Add spacing between sections for better readability
+        7. Format notes, warnings, and important information as blockquotes
+        8. For images, use the format: ![description](/uploads/filename)
+        
+        Here's the document content to convert:
+        {text}
+        
+        Return ONLY the formatted Markdown content, no additional commentary.
+        """
+        
+        chat_completion = client.chat.completions.create(
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a technical documentation expert that converts documents to perfectly formatted Markdown."
+                },
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+            model="mixtral-8x7b-32768",
+            temperature=0.3,
+            max_tokens=4000
+        )
+        
+        markdown_output = chat_completion.choices[0].message.content
         
         # Add image placeholders if we have images
         if images:
             if not markdown_output.strip():
                 markdown_output = "# Document with Images\n\n"
+            else:
+                markdown_output += "\n\n## Images\n\n"
                 
             for idx, img in enumerate(images):
-                # Ensure we're using just the filename, not the full path
                 img_filename = os.path.basename(img.data)
-                markdown_output += f"\n![Image {idx}](/uploads/{img_filename})\n\n"
+                markdown_output += f"\n![Image {idx + 1}](/uploads/{img_filename})\n"
         
         return markdown_output
         
@@ -209,12 +240,12 @@ def process_document_with_groq(text: str, images: List[ImageData]) -> str:
         # Fallback to basic formatting
         fallback = "# Document Conversion\n\n"
         if text.strip():
-            fallback += "## Text Content\n\n" + text + "\n\n"
+            fallback += text + "\n\n"
         if images:
             fallback += "## Images\n\n"
             for idx, img in enumerate(images):
                 img_filename = os.path.basename(img.data)
-                fallback += f"![Image {idx}](/uploads/{img_filename})\n\n"
+                fallback += f"![Image {idx + 1}](/uploads/{img_filename})\n\n"
         return fallback
 
 @app.post("/api/convert", response_model=ConversionResponse)

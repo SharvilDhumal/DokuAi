@@ -13,6 +13,7 @@
   --error: #ef4444;
 }
 
+/* Base styles */
 .heroContainer {
   display: flex;
   flex-direction: column;
@@ -31,6 +32,7 @@
   margin-top: 2rem;
 }
 
+/* Logo styles */
 .logoContainer {
   display: flex;
   align-items: center;
@@ -52,6 +54,7 @@
   color: transparent;
 }
 
+/* Typography */
 .title {
   font-size: 3.5rem;
   font-weight: 800;
@@ -83,6 +86,7 @@
   font-weight: 500;
 }
 
+/* Buttons */
 .ctaButton {
   background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
   color: white;
@@ -124,6 +128,7 @@
   left: 100%;
 }
 
+/* Features section */
 .features {
   width: 100%;
   margin-top: 6rem;
@@ -168,43 +173,7 @@
   margin-bottom: 1rem;
 }
 
-.featureCard h3 {
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-  color: var(--text-primary);
-}
-
-.featureCard p {
-  color: var(--text-secondary);
-  line-height: 1.6;
-}
-
-@media (max-width: 768px) {
-  .title {
-    font-size: 2.5rem;
-  }
-
-  .subtitle {
-    font-size: 1.25rem;
-  }
-
-  .featureGrid {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 480px) {
-  .title {
-    font-size: 2rem;
-  }
-
-  .logoContainer {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-}
-
-/* Add to index.module.css */
+/* Upload section */
 .uploadContainer {
   display: flex;
   justify-content: center;
@@ -334,6 +303,7 @@
   font-size: 1.2rem;
 }
 
+/* Messages */
 .message {
   padding: 0.75rem 1rem;
   border-radius: 8px;
@@ -356,6 +326,7 @@
   color: var(--primary-light);
 }
 
+/* Markdown preview */
 .markdownPreview {
   margin-top: 2rem;
   padding: 1.5rem;
@@ -385,6 +356,7 @@
   line-height: 1.6;
 }
 
+/* Buttons */
 .copyButton {
   background: var(--primary);
   color: white;
@@ -402,133 +374,23 @@
   background: var(--primary-dark);
 }
 
-/* Add to index.module.css */
-.imageGallery {
-  width: 100%;
-  margin-bottom: 2rem;
-  padding: 1.5rem;
-  background: var(--surface-light);
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.imageGallery h3 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  color: var(--text-primary);
-}
-
-.imagesContainer {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
-.imageWrapper {
-  flex: 1 1 200px;
-  max-width: 300px;
-  background: rgba(0, 0, 0, 0.2);
-  padding: 1rem;
+.downloadButton {
+  background: var(--accent);
+  color: white;
+  padding: 0.75rem 1.5rem;
   border-radius: 8px;
-}
-
-.extractedImage {
-  width: 100%;
-  height: auto;
-  border-radius: 4px;
-  margin-bottom: 0.5rem;
-}
-
-.imageCaption {
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-  text-align: center;
-  margin: 0;
-}
-
-/* Add to index.module.css */
-.markdownPreview img {
-  max-width: 100%;
-  display: block;
-  margin: 1rem auto;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-.markdownPreview table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 1.5rem 0;
-}
-
-.markdownPreview th,
-.markdownPreview td {
-  padding: 0.75rem;
-  border: 1px solid var(--surface-light);
-  text-align: left;
-}
-
-.markdownPreview th {
-  background-color: var(--surface);
+  font-size: 1rem;
   font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-.markdownPreview pre {
-  background: rgba(0, 0, 0, 0.2);
-  padding: 1.5rem;
-  border-radius: 12px;
-  overflow-x: auto;
-  margin: 1.5rem 0;
+.downloadButton:hover {
+  background: var(--primary);
 }
 
-.markdownPreview code {
-  font-family: monospace;
-  background: rgba(0, 0, 0, 0.1);
-  padding: 0.2rem 0.4rem;
-  border-radius: 4px;
-}
-
-/* Ensure images are displayed correctly */
-.markdownPreview .image-container {
-  text-align: center;
-  margin: 1.5rem 0;
-}
-
-.markdownPreview .image-caption {
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-  margin-top: 0.5rem;
-  text-align: center;
-  font-style: italic;
-}
-
-/* Add these styles at the end */
-.imageContainer {
-  text-align: center;
-  margin: 2rem 0;
-  padding: 1rem;
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-}
-
-.extractedImage {
-  max-width: 100%;
-  max-height: 500px;
-  display: block;
-  margin: 0 auto;
-  border-radius: 6px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-}
-
-.imageCaption {
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-  margin-top: 0.5rem;
-  text-align: center;
-  font-style: italic;
-}
-
+/* Tables */
 .tableWrapper {
   overflow-x: auto;
   margin: 2rem 0;
@@ -552,7 +414,7 @@
   font-weight: 600;
 }
 
-/* Add to index.module.css */
+/* Progress bar */
 .progressBar {
   width: 100%;
   height: 8px;
@@ -568,30 +430,15 @@
   transition: width 0.3s ease;
 }
 
-/* Add to index.module.css */
+/* Button groups */
 .buttonGroup {
   display: flex;
   justify-content: center;
   gap: 1rem;
   margin-top: 1.5rem;
 }
-.createClient .downloadButton {
-  background: var(--accent);
-  color: white;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
 
-.downloadButton:hover {
-  background: var(--primary);
-}
-
-/* Add to existing styles */
+/* Preview containers */
 .previewContainer {
   background: var(--surface);
   border-radius: 16px;
@@ -603,13 +450,12 @@
 }
 
 .markdownContent {
-  font-family: monospace;
-  white-space: pre-wrap;
-  line-height: 1.6;
-  color: var(--text-secondary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+  color: var(--text-primary);
 }
 
-/* Add to index.module.css */
+/* Image states */
 .imageLoading {
   color: var(--primary-light);
   font-style: italic;
@@ -633,32 +479,7 @@
   margin-top: 0.5rem;
 }
 
-.markdownContent {
-  width: 100%;
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 2rem;
-}
-
-.imageWrapper {
-  margin: 1.5rem 0;
-  text-align: center;
-}
-
-.markdownImage {
-  max-width: 100%;
-  height: auto;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-/* Add some spacing around images in the markdown */
-.markdownContent p + .imageWrapper,
-.markdownContent h2 + .imageWrapper {
-  margin-top: 2rem;
-}
-
-/* Markdown Content Styles */
+/* Markdown content */
 .markdownContent {
   width: 100%;
   max-width: 800px;
@@ -683,238 +504,94 @@
   color: var(--text-primary);
 }
 
-/* Image Wrapper */
-.imageWrapper {
-  margin: 1.5rem 0;
-  text-align: center;
-  position: relative;
-  min-height: 100px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: var(--surface-light);
-  border-radius: 8px;
-  overflow: hidden;
+/* Improved heading styles */
+.markdownContent h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 2rem 0 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--surface-light);
 }
 
-/* Markdown Image */
-.markdownImage {
-  max-width: 100%;
-  height: auto;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  opacity: 0;
-  transition: opacity 0.3s ease;
+.markdownContent h2 {
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin: 1.8rem 0 1.2rem;
 }
 
-.markdownImage.loaded {
-  opacity: 1;
-  position: relative;
-  z-index: 2;
+.markdownContent h3 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin: 1.5rem 0 1rem;
 }
 
-/* Loading State */
-.imageLoading {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: var(--primary-light);
-  font-size: 0.9rem;
-  z-index: 1;
+.markdownContent h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 1.2rem 0 0.8rem;
 }
 
-/* Error State */
-.imageError {
-  padding: 1rem;
-  color: var(--error);
-  background-color: var(--error);
-  border-radius: 4px;
-  text-align: center;
-}
-
-/* Spacing around images */
-.markdownContent p + .imageWrapper,
-.markdownContent h2 + .imageWrapper,
-.markdownContent h3 + .imageWrapper {
-  margin-top: 2rem;
-}
-
-/* Tables */
+/* Improved table styling */
 .markdownContent table {
   width: 100%;
   border-collapse: collapse;
   margin: 1.5rem 0;
-  font-size: 0.9em;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
-  border-radius: 8px;
-  overflow: hidden;
+  font-size: 0.95em;
 }
 
 .markdownContent th,
 .markdownContent td {
-  padding: 12px 15px;
+  padding: 0.75rem;
+  border: 1px solid var(--surface-light);
   text-align: left;
-  border-bottom: 1px solid var(--surface-light);
 }
 
 .markdownContent th {
   background-color: var(--surface);
-  font-weight: bold;
+  font-weight: 600;
 }
 
-.markdownContent tr:hover {
-  background-color: var(--surface-light);
+.markdownContent tr:nth-child(even) {
+  background-color: rgba(15, 23, 42, 0.2);
 }
 
-/* Code blocks */
-.markdownContent pre {
-  background-color: var(--surface-light);
-  border-radius: 6px;
-  padding: 1rem;
+/* Code block */
+.codeBlock {
+  background: rgba(15, 23, 42, 0.8);
+  padding: 1.5em;
+  border-radius: 8px;
   overflow-x: auto;
-  margin: 1.5rem 0;
+  margin: 1.5em 0;
+  font-family: "Fira Code", monospace;
+  font-size: 0.9em;
+  line-height: 1.6;
 }
 
-.markdownContent code {
-  font-family: monospace;
+.inlineCode {
+  background: rgba(15, 23, 42, 0.5);
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+  font-family: "Fira Code", monospace;
   font-size: 0.9em;
 }
 
-/* Blockquotes */
-.markdownContent blockquote {
-  border-left: 4px solid var(--primary);
-  margin: 1.5rem 0;
-  padding: 0.5rem 0 0.5rem 1rem;
-  color: var(--text-secondary);
-  background-color: var(--surface-light);
-  border-radius: 0 4px 4px 0;
-}
+/* Remove these image-related styles by deleting or commenting them out */
 
-.markdownContent blockquote p {
-  margin: 0;
+/*
+.imageGallery,
+.imagesContainer,
+.imageWrapper,
+.extractedImage,
+.imageCaption,
+.imageContainer,
+.markdownImage,
+.imageLoading,
+.imageError,
+.imageUrl,
+.image-container,
+.image-caption {
+  display: none !important;
 }
+*/
 
-/* Lists */
-.markdownContent ul,
-.markdownContent ol {
-  padding-left: 1.5rem;
-  margin: 1rem 0;
-}
-
-.markdownContent li {
-  margin: 0.5rem 0;
-}
-
-/* Links */
-.markdownContent a {
-  color: var(--primary);
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
-
-.markdownContent a:hover {
-  color: var(--accent);
-  text-decoration: underline;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .markdownContent {
-    padding: 1rem;
-  }
-  
-  .markdownContent table {
-    display: block;
-    overflow-x: auto;
-  }
-  
-  .imageWrapper {
-    margin: 1rem 0;
-  }
-}
-
-/* Markdown Content */
-.markdownContent {
-  width: 100%;
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 2rem;
-  background: var(--ifm-background-surface-color);
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-/* Image Wrapper */
-.imageWrapper {
-  position: relative;
-  margin: 1.5rem 0;
-  text-align: center;
-  background: var(--ifm-color-emphasis-100);
-  border-radius: 4px;
-  overflow: hidden;
-  min-height: 100px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Markdown Image */
-.markdownImage {
-  max-width: 100%;
-  height: auto;
-  display: block;
-  margin: 0 auto;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.markdownImage.loaded {
-  opacity: 1;
-}
-
-/* Image Loading State */
-.imageLoading {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: var(--ifm-color-emphasis-600);
-  font-size: 0.9rem;
-}
-
-/* Image Error State */
-.imageError {
-  padding: 2rem;
-  color: var(--ifm-color-danger);
-  background: var(--ifm-color-danger-lightest);
-  border: 1px solid var(--ifm-color-danger-light);
-  border-radius: 4px;
-  width: 100%;
-  text-align: center;
-}
-
-/* Fix for images in paragraphs */
-.markdownContent p:has(> img) {
-  margin: 0;
-  padding: 0;
-  background: none;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .markdownContent {
-    padding: 1rem;
-    margin: 0 -1rem;
-    border-radius: 0;
-  }
-  
-  .imageWrapper {
-    margin: 1rem -1rem;
-    border-radius: 0;
-  }
-}
+/* You can safely delete the above block from your CSS file */
