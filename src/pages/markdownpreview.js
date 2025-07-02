@@ -6,92 +6,97 @@ import Head from '@docusaurus/Head';
 import Link from '@docusaurus/Link';
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
-
-const PROXY_URL = 'http://localhost:3001/image'; // Proxy server URL
-
-const MarkdownImage = ({ src, alt }) => {
-  const [imageLoaded, setImageLoaded] = useState(false);
-  const [imageError, setImageError] = useState(false);
-
-  const fixedSrc = React.useMemo(() => {
-    if (!src) return '';
-
-    // Extract image path from Supabase URL
-    const supabasePattern = /storage\/v1\/object\/public\/[^/]+\/(.+)/;
-    const match = src.match(supabasePattern);
-
-    if (match) {
-      return `${PROXY_URL}?path=${encodeURIComponent(match[1])}`;
-    }
-
-    return src;
-  }, [src]);
-
-  useEffect(() => {
-    if (!fixedSrc) {
-      setImageError(true);
-      return;
-    }
-    const img = new window.Image();
-    img.src = fixedSrc;
-    img.onload = () => setImageLoaded(true);
-    img.onerror = () => {
-      console.error('Failed to load image:', fixedSrc);
-      setImageError(true);
-    };
-  }, [fixedSrc]);
-
-  return (
-    <div className={styles.imageContainer}>
-      {!imageError ? (
-        <>
-          <img
-            src={fixedSrc}
-            alt={alt || 'Document image'}
-            className={styles.extractedImage}
-            style={{ display: imageLoaded ? 'block' : 'none' }}
-            onLoad={() => setImageLoaded(true)}
-            onError={() => {
-              console.error('Image load error:', fixedSrc);
-              setImageError(true);
-            }}
-          />
-          {!imageLoaded && !imageError && (
-            <div className={styles.imageLoading}>
-              <div className={styles.progressBar}>
-                <div className={styles.progressFill} style={{ width: '70%' }} />
-              </div>
-              Loading image...
-            </div>
-          )}
-        </>
-      ) : (
-        <div className={styles.imageError}>
-          Failed to load image
-          {fixedSrc && (
-            <div className={styles.imageUrl}>
-              <small>URL: {fixedSrc}</small>
-              <button
-                onClick={() => window.open(fixedSrc, '_blank')}
-                className={styles.copyButton}
-                style={{ marginTop: '0.5rem' }}
-              >
-                Open Image in New Tab
-              </button>
-            </div>
-          )}
-        </div>
-      )}
-      {alt && <p className={styles.imageCaption}>{alt}</p>}
-    </div>
-  );
-};
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 
 export default function MarkdownPreview() {
+  const { siteConfig } = useDocusaurusContext();
+  const PROXY_URL = siteConfig.customFields?.PROXY_URL || 'http://localhost:3001/image';
+
   const location = useLocation();
   const markdown = location.state?.markdown || '';
   const filename = location.state?.filename || '';
   const images = location.state?.images || [];
+
+  const MarkdownImage = ({ src, alt }) => {
+    const [imageLoaded, setImageLoaded] = useState(false);
+    const [imageError, setImageError] = useState(false);
+
+    // Get PocketBase URL from config or fallback
+    const { siteConfig } = useDocusaurusContext();
+    const POCKETBASE_URL = siteConfig.customFields?.POCKETBASE_URL || 'http://localhost:8090';
+
+    const fixedSrc = React.useMemo(() => {
+      if (!src) return '';
+      // If it's already a full URL
+      if (src.startsWith('http')) {
+        return src;
+      }
+      // For PocketBase URLs, ensure they're complete and not already prefixed
+      if (src.startsWith('/api/files') && !src.startsWith(POCKETBASE_URL)) {
+        return `${POCKETBASE_URL}${src}`;
+      }
+      return src;
+    }, [src, POCKETBASE_URL]);
+
+    useEffect(() => {
+      if (!fixedSrc) {
+        setImageError(true);
+        return;
+      }
+      const img = new window.Image();
+      img.src = fixedSrc;
+      img.onload = () => setImageLoaded(true);
+      img.onerror = () => {
+        console.error('Failed to load image:', fixedSrc);
+        setImageError(true);
+      };
+    }, [fixedSrc]);
+
+    return (
+      <div className={styles.imageContainer}>
+        {!imageError ? (
+          <>
+            <img
+              src={fixedSrc}
+              alt={alt || 'Document image'}
+              className={styles.extractedImage}
+              style={{ display: imageLoaded ? 'block' : 'none' }}
+              onLoad={() => setImageLoaded(true)}
+              onError={() => {
+                console.error('Image load error:', fixedSrc);
+                setImageError(true);
+              }}
+            />
+            {!imageLoaded && !imageError && (
+              <div className={styles.imageLoading}>
+                <div className={styles.progressBar}>
+                  <div className={styles.progressFill} style={{ width: '70%' }} />
+                </div>
+                Loading image...
+              </div>
+            )}
+          </>
+        ) : (
+          <div className={styles.imageError}>
+            Failed to load image
+            {fixedSrc && (
+              <div className={styles.imageUrl}>
+                <small>URL: {fixedSrc}</small>
+                <button
+                  onClick={() => window.open(fixedSrc, '_blank')}
+                  className={styles.copyButton}
+                  style={{ marginTop: '0.5rem' }}
+                >
+                  Open Image in New Tab
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+        {alt && <p className={styles.imageCaption}>{alt}</p>}
+      </div>
+    );
+  };
 
   useEffect(() => {
     if (images && images.length > 0) {
