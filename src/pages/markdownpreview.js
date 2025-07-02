@@ -3,19 +3,31 @@ import React, { useState, useEffect } from 'react';
 import Layout from '@theme/Layout';
 import Head from '@docusaurus/Head';
 import Link from '@docusaurus/Link';
-import { FaCopy, FaDownload, FaChevronDown, FaChevronUp, FaImage } from 'react-icons/fa';
+import { FaCopy, FaDownload } from 'react-icons/fa';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import styles from './index.module.css';
 
+
+// Utility to remove lines like "Image 1", "Image 2", etc.
+function removeImageTextLines(md) {
+  return md
+    .split('\n')
+    // Remove lines like "Image 1", "Image 2", etc.
+    .filter(line => !/^Image\s+\d+\s*$/.test(line.trim()))
+    // Remove lines like "Images" or "## Images"
+    .filter(line => !/^#+\s*Images\s*$/.test(line.trim()) && line.trim() !== "Images")
+    // Remove markdown image lines ![...](...)
+    .filter(line => !/^!\[.*\]\(.*\)$/.test(line.trim()))
+    .join('\n');
+}
+
 export default function MarkdownPreview() {
   const location = useLocation();
   const [markdown, setMarkdown] = useState('');
   const [filename, setFilename] = useState('');
-  const [images, setImages] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [showImages, setShowImages] = useState(false);
   const [copyStatus, setCopyStatus] = useState('Copy Markdown');
   const [downloadStatus, setDownloadStatus] = useState('Download Markdown');
 
@@ -23,7 +35,6 @@ export default function MarkdownPreview() {
     if (location.state) {
       setMarkdown(location.state.markdown || '');
       setFilename(location.state.filename || 'Untitled Document.md');
-      setImages(location.state.images || []);
     }
     setIsLoading(false);
   }, [location.state]);
@@ -66,6 +77,9 @@ export default function MarkdownPreview() {
     );
   }
 
+  // Clean the markdown before rendering
+  const cleanedMarkdown = removeImageTextLines(markdown);
+
   return (
     <Layout
       title={`Markdown Preview - ${filename}`}
@@ -102,41 +116,7 @@ export default function MarkdownPreview() {
               <FaDownload className={styles.buttonIcon} />
               {downloadStatus}
             </button>
-            {images.length > 0 && (
-              <button
-                onClick={() => setShowImages(!showImages)}
-                className={`${styles.actionButton} ${styles.imagesButton}`}
-              >
-                <FaImage className={styles.buttonIcon} />
-                {showImages ? 'Hide Images' : 'Show Images'}
-              </button>
-            )}
           </div>
-
-          {/* Images section */}
-          {showImages && images.length > 0 && (
-            <div className={styles.imageGallery}>
-              <h3>Extracted Images</h3>
-              <div className={styles.imagesContainer}>
-                {images.map((img, idx) => (
-                  <div key={idx} className={styles.imageWrapper}>
-                    <img
-                      src={img.data}
-                      alt={img.description || `Image ${idx + 1}`}
-                      className={styles.extractedImage}
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = '/img/image-placeholder.png';
-                      }}
-                    />
-                    <p className={styles.imageCaption}>
-                      {img.description || `Image ${idx + 1}`}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
 
           {/* Markdown preview */}
           <div className={styles.previewContent}>
@@ -145,14 +125,6 @@ export default function MarkdownPreview() {
                 remarkPlugins={[remarkGfm]}
                 rehypePlugins={[rehypeRaw]}
                 components={{
-                  img: ({ node, ...props }) => (
-                    <div className={styles.imageContainer}>
-                      <img {...props} className={styles.markdownImage} />
-                      {props.alt && (
-                        <p className={styles.imageCaption}>{props.alt}</p>
-                      )}
-                    </div>
-                  ),
                   table: ({ node, ...props }) => (
                     <div className={styles.tableWrapper}>
                       <table {...props} className={styles.markdownTable} />
@@ -174,7 +146,7 @@ export default function MarkdownPreview() {
                   }
                 }}
               >
-                {markdown}
+                {cleanedMarkdown}
               </ReactMarkdown>
             </div>
           </div>
