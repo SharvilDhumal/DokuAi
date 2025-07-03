@@ -13,26 +13,27 @@ import clsx from 'clsx';
 import styles from './index.module.css';
 
 function cleanMarkdownContent(md) {
-  return md
-    .split('\n')
-    // Remove image-related lines
+  let lines = md.split('\n');
+  let cleaned = [];
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i];
+    // Convert ○ or o to -
+    line = line.replace(/^[○o]\s*/, '- ');
+    // If this line is a bullet and previous line is not empty and not a bullet, insert a blank line
+    if (/^-\s+/.test(line) && i > 0 && lines[i - 1].trim() !== '' && !/^(\d+\.\s+|-|\*|\+)\s+/.test(lines[i - 1])) {
+      cleaned.push('');
+    }
+    cleaned.push(line);
+  }
+  return cleaned
     .filter(line => !/^Image\s+\d+\s*$/.test(line.trim()))
     .filter(line => !/^#+\s*Images\s*$/.test(line.trim()))
     .filter(line => !/^!\[.*\]\(.*\)$/.test(line.trim()))
-    // Clean up bullet points
-    .map(line => line.replace(/^[○o]\s*/, '- '))
-    // Fix numbered lists
-    .map(line => line.replace(/^(\d+)\.\s*/, '$1. '))
-    // Remove extra empty lines
     .filter(line => line.trim() !== '' || line === '\n')
-    // Join with single newlines
     .join('\n')
-    // Normalize note formatting
     .replace(/NOTE\s*:/g, '> **Note:**')
     .replace(/(> \*\*Note:\*\*[^\n]*)\n([^\n>])/g, '$1\n> $2')
-    // Remove redundant spaces
     .replace(/  +/g, ' ')
-    // Ensure proper line breaks
     .replace(/\n{3,}/g, '\n\n');
 }
 
