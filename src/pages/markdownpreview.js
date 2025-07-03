@@ -12,17 +12,28 @@ import Link from '@docusaurus/Link';
 import clsx from 'clsx';
 import styles from './index.module.css';
 
-// Utility to remove lines like "Image 1", "Image 2", etc.
-function removeImageTextLines(md) {
+function cleanMarkdownContent(md) {
   return md
     .split('\n')
-    // Remove lines like "Image 1", "Image 2", etc.
+    // Remove image-related lines
     .filter(line => !/^Image\s+\d+\s*$/.test(line.trim()))
-    // Remove lines like "Images" or "## Images"
-    .filter(line => !/^#+\s*Images\s*$/.test(line.trim()) && line.trim() !== "Images")
-    // Remove markdown image lines ![...](...)
+    .filter(line => !/^#+\s*Images\s*$/.test(line.trim()))
     .filter(line => !/^!\[.*\]\(.*\)$/.test(line.trim()))
-    .join('\n');
+    // Clean up bullet points
+    .map(line => line.replace(/^[○o]\s*/, '- '))
+    // Fix numbered lists
+    .map(line => line.replace(/^(\d+)\.\s*/, '$1. '))
+    // Remove extra empty lines
+    .filter(line => line.trim() !== '' || line === '\n')
+    // Join with single newlines
+    .join('\n')
+    // Normalize note formatting
+    .replace(/NOTE\s*:/g, '> **Note:**')
+    .replace(/(> \*\*Note:\*\*[^\n]*)\n([^\n>])/g, '$1\n> $2')
+    // Remove redundant spaces
+    .replace(/  +/g, ' ')
+    // Ensure proper line breaks
+    .replace(/\n{3,}/g, '\n\n');
 }
 
 const ImageGuide = () => {
@@ -81,7 +92,7 @@ export default function MarkdownPreview() {
   }, [location.state]);
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(removeImageTextLines(markdown))
+    navigator.clipboard.writeText(cleanMarkdownContent(markdown))
       .then(() => {
         setCopyStatus('Copied!');
         setTimeout(() => setCopyStatus('Copy Markdown'), 2000);
@@ -93,7 +104,7 @@ export default function MarkdownPreview() {
   };
 
   const handleDownload = () => {
-    const blob = new Blob([removeImageTextLines(markdown)], { type: 'text/markdown;charset=utf-8' });
+    const blob = new Blob([cleanMarkdownContent(markdown)], { type: 'text/markdown;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -117,7 +128,7 @@ export default function MarkdownPreview() {
     );
   }
 
-  const cleanedMarkdown = removeImageTextLines(markdown);
+  const cleanedMarkdown = cleanMarkdownContent(markdown);
 
   return (
     <Layout
@@ -174,16 +185,19 @@ export default function MarkdownPreview() {
             remarkPlugins={[remarkGfm]}
             rehypePlugins={[rehypeRaw]}
             components={{
-              h1: ({ node, ...props }) => <h1 className={styles.markdownH1} {...props} />,
-              h2: ({ node, ...props }) => <h2 className={styles.markdownH2} {...props} />,
-              h3: ({ node, ...props }) => <h3 className={styles.markdownH3} {...props} />,
-              h4: ({ node, ...props }) => <h4 className={styles.markdownH4} {...props} />,
-              p: ({ node, ...props }) => <p className={styles.markdownP} {...props} />,
+              blockquote: ({ node, ...props }) => (
+                <blockquote className={styles.markdownBlockquote} {...props} />
+              ),
               ul: ({ node, ...props }) => <ul className={styles.markdownUl} {...props} />,
               ol: ({ node, ...props }) => <ol className={styles.markdownOl} {...props} />,
               li: ({ node, ordered, ...props }) => (
                 <li className={ordered ? styles.markdownLiOrdered : styles.markdownLi} {...props} />
               ),
+              h1: ({ node, ...props }) => <h1 className={styles.markdownH1} {...props} />,
+              h2: ({ node, ...props }) => <h2 className={styles.markdownH2} {...props} />,
+              h3: ({ node, ...props }) => <h3 className={styles.markdownH3} {...props} />,
+              h4: ({ node, ...props }) => <h4 className={styles.markdownH4} {...props} />,
+              p: ({ node, ...props }) => <p className={styles.markdownP} {...props} />,
               code: ({ node, inline, className, children, ...props }) => {
                 const match = /language-(\w+)/.exec(className || '');
                 return !inline ? (
@@ -223,9 +237,6 @@ export default function MarkdownPreview() {
               ),
               th: ({ node, ...props }) => <th className={styles.markdownTh} {...props} />,
               td: ({ node, ...props }) => <td className={styles.markdownTd} {...props} />,
-              blockquote: ({ node, ...props }) => (
-                <blockquote className={styles.markdownBlockquote} {...props} />
-              ),
               hr: ({ node, ...props }) => <hr className={styles.markdownHr} {...props} />,
               a: ({ node, ...props }) => <a className={styles.markdownLink} {...props} />,
               img: () => null,
