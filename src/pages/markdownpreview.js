@@ -128,135 +128,113 @@ export default function MarkdownPreview() {
       <Head>
         <html data-theme="dark" />
       </Head>
-      <main className={styles.previewContainer}>
-        <div className={styles.previewWrapper}>
-          <div className={styles.headerContainer}>
-            <Link to="/upload" className={styles.backButton}>
-              <FaArrowLeft className={styles.backIcon} /> Back to Upload
-            </Link>
-            
-            <div className={styles.headerContent}>
-              <h1 className={styles.title}>
-                <span className={styles.titleHighlight}>Markdown Preview</span>
-              </h1>
-              <p className={styles.filename}>
-                <span className={styles.filenameLabel}>Document:</span>
-                <span className={styles.filenameText}>{filename}</span>
-              </p>
-            </div>
-
-            <div className={styles.buttonGroup}>
-              <button
-                onClick={handleCopy}
-                className={clsx(styles.actionButton, styles.copyButton, {
-                  [styles.success]: copyStatus === 'Copied!'
-                })}
-                disabled={copyStatus === 'Copied!'}
-              >
-                {copyStatus === 'Copied!' ? (
-                  <FaCheck className={styles.buttonIcon} />
-                ) : (
-                  <FaCopy className={styles.buttonIcon} />
-                )}
-                {copyStatus}
-              </button>
-              <button
-                onClick={handleDownload}
-                className={clsx(styles.actionButton, styles.downloadButton, {
-                  [styles.success]: downloadStatus === 'Downloaded!'
-                })}
-                disabled={downloadStatus === 'Downloaded!'}
-              >
-                <FaDownload className={styles.buttonIcon} />
-                {downloadStatus}
-              </button>
-            </div>
+      <div className={styles.previewWrapper}>
+        <div className={styles.headerContainer}>
+          <Link to="/upload" className={styles.backButton}>
+            <FaArrowLeft className={styles.backIcon} /> Back to Upload
+          </Link>
+          <div className={styles.headerContent}>
+            <h1 className={styles.title}>
+              <span className={styles.titleHighlight}>Markdown Preview</span>
+            </h1>
+            <p className={styles.filename}>
+              <span className={styles.filenameLabel}>Document:</span>
+              <span className={styles.filenameText}>{filename}</span>
+            </p>
           </div>
-
-          <div className={styles.markdownCard}>
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm]}
-              rehypePlugins={[rehypeRaw]}
-              components={{
-                // Headings
-                h1: ({ node, ...props }) => <h1 className={styles.markdownH1} {...props} />,
-                h2: ({ node, ...props }) => <h2 className={styles.markdownH2} {...props} />,
-                h3: ({ node, ...props }) => <h3 className={styles.markdownH3} {...props} />,
-                h4: ({ node, ...props }) => <h4 className={styles.markdownH4} {...props} />,
-                
-                // Paragraphs
-                p: ({ node, ...props }) => <p className={styles.markdownP} {...props} />,
-                
-                // Lists
-                ul: ({ node, ...props }) => <ul className={styles.markdownUl} {...props} />,
-                ol: ({ node, ...props }) => <ol className={styles.markdownOl} {...props} />,
-                li: ({ node, ordered, ...props }) => (
-                  <li className={ordered ? styles.markdownLiOrdered : styles.markdownLi} {...props} />
-                ),
-                
-                // Code blocks
-                code: ({ node, inline, className, children, ...props }) => {
-                  const match = /language-(\w+)/.exec(className || '');
-                  return !inline ? (
-                    <div className={styles.codeBlockWrapper}>
-                      <SyntaxHighlighter
-                        style={vscDarkPlus}
-                        language={match ? match[1] : 'text'}
-                        showLineNumbers={true}
-                        wrapLines={true}
-                        customStyle={{
-                          margin: 0,
-                          borderRadius: '0.5rem',
-                          fontSize: '0.9em',
-                          lineHeight: '1.6',
-                          background: 'rgba(0, 0, 0, 0.4)'
-                        }}
-                        codeTagProps={{
-                          style: {
-                            fontFamily: '"Fira Code", monospace',
-                            fontSize: '0.9em',
-                          },
-                        }}
-                      >
-                        {String(children).replace(/\n$/, '')}
-                      </SyntaxHighlighter>
-                    </div>
-                  ) : (
-                    <code className={styles.inlineCode} {...props}>
-                      {children}
-                    </code>
-                  );
-                },
-                
-                // Tables
-                table: ({ node, ...props }) => (
-                  <div className={styles.tableWrapper}>
-                    <table className={styles.markdownTable} {...props} />
-                  </div>
-                ),
-                th: ({ node, ...props }) => <th className={styles.markdownTh} {...props} />,
-                td: ({ node, ...props }) => <td className={styles.markdownTd} {...props} />,
-                
-                // Blockquotes
-                blockquote: ({ node, ...props }) => (
-                  <blockquote className={styles.markdownBlockquote} {...props} />
-                ),
-                
-                // Horizontal rule
-                hr: ({ node, ...props }) => <hr className={styles.markdownHr} {...props} />,
-                
-                // Links
-                a: ({ node, ...props }) => <a className={styles.markdownLink} {...props} />,
-                
-                // Images (minimal styling since we're removing image features)
-                img: () => null,
-              }}
+          <div className={styles.buttonGroup}>
+            <button
+              onClick={handleCopy}
+              className={clsx(styles.actionButton, styles.copyButton, {
+                [styles.success]: copyStatus === 'Copied!'
+              })}
+              disabled={copyStatus === 'Copied!'}
             >
-              {cleanedMarkdown}
-            </ReactMarkdown>
+              {copyStatus === 'Copied!' ? (
+                <FaCheck className={styles.buttonIcon} />
+              ) : (
+                <FaCopy className={styles.buttonIcon} />
+              )}
+              {copyStatus}
+            </button>
+            <button
+              onClick={handleDownload}
+              className={clsx(styles.actionButton, styles.downloadButton, {
+                [styles.success]: downloadStatus === 'Downloaded!'
+              })}
+              disabled={downloadStatus === 'Downloaded!'}
+            >
+              <FaDownload className={styles.buttonIcon} />
+              {downloadStatus}
+            </button>
           </div>
         </div>
-      </main>
+        <div className={styles.markdownCard}>
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            rehypePlugins={[rehypeRaw]}
+            components={{
+              h1: ({ node, ...props }) => <h1 className={styles.markdownH1} {...props} />,
+              h2: ({ node, ...props }) => <h2 className={styles.markdownH2} {...props} />,
+              h3: ({ node, ...props }) => <h3 className={styles.markdownH3} {...props} />,
+              h4: ({ node, ...props }) => <h4 className={styles.markdownH4} {...props} />,
+              p: ({ node, ...props }) => <p className={styles.markdownP} {...props} />,
+              ul: ({ node, ...props }) => <ul className={styles.markdownUl} {...props} />,
+              ol: ({ node, ...props }) => <ol className={styles.markdownOl} {...props} />,
+              li: ({ node, ordered, ...props }) => (
+                <li className={ordered ? styles.markdownLiOrdered : styles.markdownLi} {...props} />
+              ),
+              code: ({ node, inline, className, children, ...props }) => {
+                const match = /language-(\w+)/.exec(className || '');
+                return !inline ? (
+                  <div className={styles.codeBlockWrapper}>
+                    <SyntaxHighlighter
+                      style={vscDarkPlus}
+                      language={match ? match[1] : 'text'}
+                      showLineNumbers={true}
+                      wrapLines={true}
+                      customStyle={{
+                        margin: 0,
+                        borderRadius: '0.5rem',
+                        fontSize: '0.9em',
+                        lineHeight: '1.6',
+                        background: 'rgba(0, 0, 0, 0.4)'
+                      }}
+                      codeTagProps={{
+                        style: {
+                          fontFamily: '"Fira Code", monospace',
+                          fontSize: '0.9em',
+                        },
+                      }}
+                    >
+                      {String(children).replace(/\n$/, '')}
+                    </SyntaxHighlighter>
+                  </div>
+                ) : (
+                  <code className={styles.inlineCode} {...props}>
+                    {children}
+                  </code>
+                );
+              },
+              table: ({ node, ...props }) => (
+                <div className={styles.tableWrapper}>
+                  <table className={styles.markdownTable} {...props} />
+                </div>
+              ),
+              th: ({ node, ...props }) => <th className={styles.markdownTh} {...props} />,
+              td: ({ node, ...props }) => <td className={styles.markdownTd} {...props} />,
+              blockquote: ({ node, ...props }) => (
+                <blockquote className={styles.markdownBlockquote} {...props} />
+              ),
+              hr: ({ node, ...props }) => <hr className={styles.markdownHr} {...props} />,
+              a: ({ node, ...props }) => <a className={styles.markdownLink} {...props} />,
+              img: () => null,
+            }}
+          >
+            {cleanedMarkdown}
+          </ReactMarkdown>
+        </div>
+      </div>
     </Layout>
   );
 }

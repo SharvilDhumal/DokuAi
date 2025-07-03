@@ -488,7 +488,7 @@
   max-width: 900px; /* Increase width (default was 800px or less) */
   min-width: 350px;
   min-height: 80vh; /* Use viewport height for minimum height */
-  height: 80vh; /* Always 80% of viewport height */
+  height: 120vh; /* Always 80% of viewport height */
   margin: 2rem auto;
   background: rgba(30, 41, 59, 0.7);
   border-radius: 16px;
