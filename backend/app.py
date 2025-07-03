@@ -115,51 +115,35 @@ async def extract_images_from_pdf(pdf_bytes: bytes) -> List[ImageData]:
             temp_pdf_path = temp_pdf.name
 
         try:
-            # Convert PDF to images
             images_list = convert_from_path(temp_pdf_path)
-            
             for i, image in enumerate(images_list):
-                # Convert image to bytes
                 img_byte_arr = io.BytesIO()
                 image.save(img_byte_arr, format='PNG')
-                img_byte_arr = img_byte_arr.getvalue()
-                
-                # Save locally
-                image_url = await save_image_locally(
-                    img_byte_arr, 
-                    f"page_{i+1}.png"
-                )
-                
+                img_bytes = img_byte_arr.getvalue()
+                img_b64 = base64.b64encode(img_bytes).decode('utf-8')
                 images.append(ImageData(
-                    data=image_url,
+                    data=f"data:image/png;base64,{img_b64}",
                     type="image/png",
                     description=f"Page {i+1}"
                 ))
-                
         finally:
             os.unlink(temp_pdf_path)
-            
     except Exception as e:
         logger.error(f"Error extracting images from PDF: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to extract images from PDF")
-        
     return images
 
 async def extract_images_from_docx(docx_path: str) -> List[ImageData]:
     images = []
     doc = Document(docx_path)
-    
     for rel in doc.part.rels.values():
         if "image" in rel.target_ref:
             img_data = rel.target_part.blob
-            # Guess extension and content type
             ext = rel.target_ref.split('.')[-1].lower()
             content_type = f"image/{ext}" if ext != "jpg" else "image/jpeg"
-            filename = f"docx_image_{uuid.uuid4().hex}.{ext}"
-            # Save locally
-            image_url = await save_image_locally(img_data, filename)
+            img_b64 = base64.b64encode(img_data).decode('utf-8')
             images.append(ImageData(
-                data=image_url,
+                data=f"data:{content_type};base64,{img_b64}",
                 type=content_type,
                 description="Document image"
             ))
