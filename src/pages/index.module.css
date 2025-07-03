@@ -772,3 +772,174 @@ img,
     font-size: 1.25rem;
   }
 }
+
+/* Add these styles to your existing CSS */
+.markdownPreview {
+  max-width: 1000px;
+  width: 90%;
+  min-height: 70vh;
+  margin: 2rem auto;
+  padding: 3rem;
+  background: var(--surface);
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+  overflow-y: auto;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  font-size: 1.05rem;
+}
+
+/* Typography */
+.markdownPreview h1,
+.markdownPreview h2,
+.markdownPreview h3,
+.markdownPreview h4,
+.markdownPreview h5,
+.markdownPreview h6 {
+  color: var(--text-primary);
+  font-weight: 600;
+  margin-top: 1.5em;
+  margin-bottom: 0.8em;
+}
+
+.markdownPreview h1 {
+  font-size: 2.5rem;
+  padding-bottom: 0.5em;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.markdownPreview h2 {
+  font-size: 1.8rem;
+}
+
+.markdownPreview h3 {
+  font-size: 1.4rem;
+}
+
+.markdownPreview p {
+  margin: 1.2em 0;
+}
+
+/* Lists */
+.markdownPreview ul,
+.markdownPreview ol {
+  margin: 1.2em 0;
+  padding-left: 2.5em;
+}
+
+.markdownPreview li {
+  margin: 0.6em 0;
+}
+
+.markdownPreview ul li::before {
+  content: "•";
+  color: var(--primary);
+  margin-right: 0.5em;
+}
+
+/* Blockquotes */
+.markdownPreview blockquote {
+  border-left: 3px solid var(--primary);
+  background: rgba(59, 130, 246, 0.05);
+  padding: 1em 1.5em;
+  margin: 1.5em 0;
+  border-radius: 0 8px 8px 0;
+}
+
+/* Code Blocks */
+.markdownPreview code {
+  font-family: "Fira Code", monospace;
+  background: rgba(59, 130, 246, 0.15);
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+.markdownPreview pre {
+  padding: 1.5rem !important;
+  border-radius: 12px !important;
+  margin: 2em 0 !important;
+  background: rgba(15, 23, 42, 0.9) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow-x: auto;
+}
+
+/* Tables */
+.markdownPreview table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 2em 0;
+}
+
+.markdownPreview th {
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--primary-light);
+  font-weight: 600;
+  padding: 1rem;
+  border-bottom: 2px solid rgba(59, 130, 246, 0.2);
+}
+
+.markdownPreview td {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.markdownPreview tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* Add these styles to enhance the Markdown preview */
+.markdownPreview {
+  /* ... existing styles ... */
+}
+
+/* Enhanced list styling */
+.markdownPreview ul {
+  list-style-type: none;
+  padding-left: 1.5em;
+}
+
+.markdownPreview ul li {
+  position: relative;
+  margin: 0.5em 0;
+}
+
+.markdownPreview ul li:before {
+  content: "•";
+  color: var(--primary);
+  font-weight: bold;
+  position: absolute;
+  left: -1.25em;
+}
+
+/* Enhanced note blocks */
+.markdownPreview blockquote {
+  border-left: 4px solid var(--primary);
+  background: rgba(59, 130, 246, 0.08);
+  padding: 1em 1.5em;
+  margin: 1.5em 0;
+  border-radius: 8px;
+  color: var(--text-primary);
+}
+
+.markdownPreview blockquote > p {
+  margin: 0.5em 0;
+}
+
+/* Highlight note headers */
+.markdownPreview blockquote strong:first-child {
+  color: var(--primary);
+}
+
+/* Make bullet points stand out */
+.markdownPreview ul li strong:first-child {
+  color: var(--accent);
+  font-size: 1.1em;
+}
+
+/* Remove image-related styles completely */
+.markdownPreview img,
+.markdownPreview .image-container {
+  display: none !important;
+}

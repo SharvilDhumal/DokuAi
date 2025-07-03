@@ -24,13 +24,14 @@ import groq
 from dotenv import load_dotenv
 from datetime import datetime
 
-# Load environment variables
-load_dotenv()
-groq.api_key = os.getenv("GROQ_API_KEY")
-
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+
+# Load environment variables
+load_dotenv()
+logger.info(f"GROQ_API_KEY loaded: {os.getenv('GROQ_API_KEY')}")
+groq.api_key = os.getenv("GROQ_API_KEY")
 
 app = FastAPI()
 
@@ -154,47 +155,110 @@ def extract_text_from_pdf(pdf_bytes: bytes) -> str:
     try:
         reader = PdfReader(io.BytesIO(pdf_bytes))
         for page in reader.pages:
-            if page.extract_text():
-                text += page.extract_text() + "\n"
+            page_text = page.extract_text()
+            if page_text:
+                # Clean up common PDF artifacts
+                page_text = re.sub(r'\s+', ' ', page_text)  # Normalize whitespace
+                page_text = re.sub(r'(\w)-\s+(\w)', r'\1\2', page_text)  # Fix hyphenated words
+                text += page_text + "\n\n"
     except Exception as e:
         logger.error(f"Error extracting PDF text: {str(e)}")
-        logger.error(traceback.format_exc())
-    return text
+    return text.strip()
 
-def process_document_with_groq(text: str, images: List[ImageData]) -> str:
+# def process_document_with_groq(text: str, images: List[ImageData]) -> str:
+#     """Process document text with Groq API and return markdown."""
+#     if not text.strip() and not images:
+#         return "# Document Conversion\n\nNo text content could be extracted from the document."
+        
+#     try:
+#         client = groq.Client()
+        
+#         # Enhanced prompt for better formatting
+#         # Update the prompt in process_document_with_groq()
+#         prompt = f"""Convert the following document text into well-structured Markdown format. 
+#         Follow these guidelines:
+
+#         1. Preserve all important information
+#         2. Use appropriate heading levels (#, ##, ###) for document structure
+#         3. Format lists (both ordered and unordered) properly
+#         4. Convert tables to Markdown table syntax
+#         5. Keep code blocks and technical terms intact
+#         6. Add spacing between sections for better readability
+#         7. Format notes, warnings, and important information as blockquotes using: > **Note:** 
+#         8. For images, use the format: ![description](/uploads/filename)
+#         9. Never duplicate note sections or content
+
+#         Here's the document content to convert:
+#         {text}
+
+#         Return ONLY the formatted Markdown content, no additional commentary.
+#         """
+        
+#         chat_completion = client.chat.completions.create(
+#             messages=[
+#                 {
+#                     "role": "system",
+#                     "content": "You are a technical documentation expert that converts documents to perfectly formatted Markdown."
+#                 },
+#                 {
+#                     "role": "user",
+#                     "content": prompt
+#                 }
+#             ],
+#             model="mixtral-8x7b-32768",
+#             temperature=0.3,
+#             max_tokens=4000
+#         )
+        
+#         markdown_output = chat_completion.choices[0].message.content
+        
+#         # Add image placeholders if we have images
+#         if images:
+#             if not markdown_output.strip():
+#                 markdown_output = "# Document with Images\n\n"
+#             else:
+#                 markdown_output += "\n\n## Images\n\n"
+                
+#             for idx, img in enumerate(images):
+#                 img_filename = os.path.basename(img.data)
+#                 markdown_output += f"\n![Image {idx + 1}](/uploads/{img_filename})\n"
+        
+#         return markdown_output
+        
+#     except Exception as e:
+#         logger.error(f"Error processing document: {str(e)}")
+#         # Fallback to basic formatting
+#         fallback = "# Document Conversion\n\n"
+#         if text.strip():
+#             fallback += text + "\n\n"
+#         if images:
+#             fallback += "## Images\n\n"
+#             for idx, img in enumerate(images):
+#                 img_filename = os.path.basename(img.data)
+#                 fallback += f"![Image {idx + 1}](/uploads/{img_filename})\n\n"
+#         return fallback
+
+def process_document_with_groq(text: str) -> str:
     """Process document text with Groq API and return markdown."""
-    if not text.strip() and not images:
+    if not text.strip():
         return "# Document Conversion\n\nNo text content could be extracted from the document."
         
     try:
         client = groq.Client()
         
-        # Enhanced prompt for better formatting
-        # Update the prompt in process_document_with_groq()
-        prompt = f"""Convert the following document text into well-structured Markdown format. 
-        Follow these guidelines:
+        prompt = f"""
+Convert the following document text into well-structured Markdown. Use Markdown syntax for headings (#, ##, ###), lists (-, *), bold (**bold**), italics (*italic*), code blocks (```), and tables. Do not explain or describe—just output the converted Markdown. Do not wrap the entire output in a code block. Do not summarize or paraphrase, but you may reformat for Markdown structure.
 
-        1. Preserve all important information
-        2. Use appropriate heading levels (#, ##, ###) for document structure
-        3. Format lists (both ordered and unordered) properly
-        4. Convert tables to Markdown table syntax
-        5. Keep code blocks and technical terms intact
-        6. Add spacing between sections for better readability
-        7. Format notes, warnings, and important information as blockquotes using: > **Note:** 
-        8. For images, use the format: ![description](/uploads/filename)
-        9. Never duplicate note sections or content
+Document content:
+{text}
 
-        Here's the document content to convert:
-        {text}
-
-        Return ONLY the formatted Markdown content, no additional commentary.
-        """
-        
+Return ONLY the Markdown content without any additional commentary.
+"""
         chat_completion = client.chat.completions.create(
             messages=[
                 {
                     "role": "system",
-                    "content": "You are a technical documentation expert that converts documents to perfectly formatted Markdown."
+                    "content": "You are a technical documentation expert. Convert documents to Markdown using proper Markdown syntax."
                 },
                 {
                     "role": "user",
@@ -202,38 +266,24 @@ def process_document_with_groq(text: str, images: List[ImageData]) -> str:
                 }
             ],
             model="mixtral-8x7b-32768",
-            temperature=0.3,
-            max_tokens=4000
+            temperature=0.2,
+            max_tokens=8000
         )
         
         markdown_output = chat_completion.choices[0].message.content
         
-        # Add image placeholders if we have images
-        if images:
-            if not markdown_output.strip():
-                markdown_output = "# Document with Images\n\n"
-            else:
-                markdown_output += "\n\n## Images\n\n"
-                
-            for idx, img in enumerate(images):
-                img_filename = os.path.basename(img.data)
-                markdown_output += f"\n![Image {idx + 1}](/uploads/{img_filename})\n"
-        
+        # Validation check
+        if len(markdown_output.split()) < len(text.split()) * 0.7:
+            raise ValueError("Significant content loss detected in conversion")
+            
         return markdown_output
         
     except Exception as e:
         logger.error(f"Error processing document: {str(e)}")
-        # Fallback to basic formatting
-        fallback = "# Document Conversion\n\n"
-        if text.strip():
-            fallback += text + "\n\n"
-        if images:
-            fallback += "## Images\n\n"
-            for idx, img in enumerate(images):
-                img_filename = os.path.basename(img.data)
-                fallback += f"![Image {idx + 1}](/uploads/{img_filename})\n\n"
+        fallback = "# Original Document Content\n\n" + text
         return fallback
-
+    
+    
 @app.post("/api/convert", response_model=ConversionResponse)
 async def convert_file(file: UploadFile):
     logger.info(f"[Convert] Received file: {file.filename} (Content-Type: {file.content_type})")
@@ -264,7 +314,7 @@ async def convert_file(file: UploadFile):
                 detail="Failed to extract content from document."
             )
         
-        markdown_output = process_document_with_groq(text, images)
+        markdown_output = process_document_with_groq(text)
         
         # Debug logging
         logger.info(f"Sending response with markdown length: {len(markdown_output) if markdown_output else 0}")

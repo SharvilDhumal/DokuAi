@@ -127,43 +127,71 @@ export default function UploadDashboard() {
                 xhr.setRequestHeader('Accept', 'application/json');
                 xhr.send(formData);
             })
+                // .then(data => {
+                //     console.log('API Response:', data);
+
+                //     // Check if we have valid content to display
+                //     const hasContent = data.markdown && data.markdown.trim().length > 0;
+                //     const hasImages = data.images && data.images.length > 0;
+
+                //     if (!hasContent && !hasImages) {
+                //         throw new Error('The document appears to be empty or could not be processed.');
+                //     }
+
+                //     // If we have images but no markdown, create a basic markdown with just the images
+                //     let markdownContent = data.markdown || '';
+                //     if (!hasContent && hasImages) {
+                //         markdownContent = "# Document with Images\n\n";
+                //         data.images.forEach((img, idx) => {
+                //             markdownContent += `![Image ${idx}](${img.data})\n\n`;
+                //         });
+                //     }
+
+                //     // Navigate to markdownpreview page with the data
+                //     history.push({
+                //         pathname: '/markdownpreview',
+                //         state: {
+                //             markdown: markdownContent,
+                //             filename: data.filename,
+                //             images: data.images || []
+                //         }
+                //     });
+                // })
+                // .catch(error => {
+                //     throw error;
+                // });
+
+                // In the handleSubmit function, modify the response handling:
                 .then(data => {
                     console.log('API Response:', data);
-                    
-                    // Check if we have valid content to display
-                    const hasContent = data.markdown && data.markdown.trim().length > 0;
-                    const hasImages = data.images && data.images.length > 0;
-                    
-                    if (!hasContent && !hasImages) {
-                        throw new Error('The document appears to be empty or could not be processed.');
-                    }
-                    
-                    // If we have images but no markdown, create a basic markdown with just the images
+
+                    // Remove any image references from the markdown
                     let markdownContent = data.markdown || '';
-                    if (!hasContent && hasImages) {
-                        markdownContent = "# Document with Images\n\n";
-                        data.images.forEach((img, idx) => {
-                            markdownContent += `![Image ${idx}](${img.data})\n\n`;
-                        });
+                    markdownContent = markdownContent.replace(/!\[.*\]\(.*\)/g, '');
+                    markdownContent = markdownContent.replace(/^#+\s*Images?\s*$/gmi, '');
+
+                    if (!markdownContent.trim()) {
+                        markdownContent = "# Document Conversion\n\nNo text content could be extracted from the document.";
                     }
-                    
+
                     // Navigate to markdownpreview page with the data
                     history.push({
                         pathname: '/markdownpreview',
                         state: {
                             markdown: markdownContent,
                             filename: data.filename,
-                            images: data.images || []
+                            images: [] // Empty array since we're not showing images
                         }
                     });
                 })
-                .catch(error => {
-                    throw error;
-                });
 
         } catch (error) {
             console.error('Conversion error:', error);
-
+            // Show backend error message if available, otherwise generic error
+            setMessage({
+                text: error?.message || 'An error occurred during conversion. Please try again.',
+                type: 'error'
+            });
             let userMessage = error.message;
 
             // Network error (backend not running)

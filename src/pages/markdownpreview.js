@@ -17,53 +17,117 @@ marked.setOptions({
   smartypants: true,
 });
 
+// function cleanMarkdownContent(md) {
+//   if (!md) return '';
+
+//   let lines = md.split('\n');
+//   let cleaned = [];
+//   let inNoteBlock = false;
+
+//   for (let i = 0; i < lines.length; i++) {
+//     let line = lines[i];
+
+//     // Convert ○ or o to -
+//     //     line = line.replace(/^[○o]\s*/, '- ');
+
+//     // Handle note blocks: Only the first line after Note: is included in the blockquote
+//     if (/^Note:/i.test(line.trim())) {
+//       cleaned.push('> **Note:** ' + line.replace(/^Note:/i, '').trim());
+//       inNoteBlock = true;
+//       continue;
+//     } else if (inNoteBlock && line.trim() !== '') {
+//       // If the next line is a list or blank, end the note block
+//       if (/^(\d+\.\s+|-|\*|\+)\s+/.test(line) || line.trim() === '') {
+//         inNoteBlock = false;
+//         cleaned.push(line);
+//       } else {
+//         // Otherwise, treat as normal text (not part of the note)
+//         inNoteBlock = false;
+//         cleaned.push(line);
+//       }
+//       continue;
+//     }
+
+//     // If this line is a bullet and previous line is not empty and not a bullet, insert a blank line
+//     if (/^-\s+/.test(line) && i > 0 && lines[i - 1].trim() !== '' && !/^(\d+\.\s+|-|\*|\+)\s+/.test(lines[i - 1])) {
+//       cleaned.push('');
+//     }
+
+//     cleaned.push(line);
+//   }
+
+//   return cleaned
+//     .filter(line => !/^Image\s+\d+\s*$/.test(line.trim()))
+//     .filter(line => !/^#+\s*Images\s*$/.test(line.trim()))
+//     .filter(line => !/^!\[.*\]\(.*\)$/.test(line.trim()))
+//     .filter(line => line.trim() !== '' || line === '\n')
+//     .join('\n')
+//     .replace(/  +/g, ' ')
+//     .replace(/\n{3,}/g, '\n\n');
+// }
+
 function cleanMarkdownContent(md) {
   if (!md) return '';
 
   let lines = md.split('\n');
   let cleaned = [];
+  let inCodeBlock = false;
   let inNoteBlock = false;
 
   for (let i = 0; i < lines.length; i++) {
     let line = lines[i];
 
-    // Convert ○ or o to -
-    //     line = line.replace(/^[○o]\s*/, '- ');
+    // Skip empty lines at start of document
+    if (cleaned.length === 0 && line.trim() === '') continue;
 
-    // Handle note blocks: Only the first line after Note: is included in the blockquote
-    if (/^Note:/i.test(line.trim())) {
-      cleaned.push('> **Note:** ' + line.replace(/^Note:/i, '').trim());
-      inNoteBlock = true;
-      continue;
-    } else if (inNoteBlock && line.trim() !== '') {
-      // If the next line is a list or blank, end the note block
-      if (/^(\d+\.\s+|-|\*|\+)\s+/.test(line) || line.trim() === '') {
-        inNoteBlock = false;
-        cleaned.push(line);
-      } else {
-        // Otherwise, treat as normal text (not part of the note)
-        inNoteBlock = false;
-        cleaned.push(line);
-      }
+    // Handle code blocks
+    if (line.trim().startsWith('```')) {
+      inCodeBlock = !inCodeBlock;
+      cleaned.push(line);
       continue;
     }
 
-    // If this line is a bullet and previous line is not empty and not a bullet, insert a blank line
-    if (/^-\s+/.test(line) && i > 0 && lines[i - 1].trim() !== '' && !/^(\d+\.\s+|-|\*|\+)\s+/.test(lines[i - 1])) {
+    // Skip processing inside code blocks
+    if (inCodeBlock) {
+      cleaned.push(line);
+      continue;
+    }
+
+    // Handle note blocks with enhanced formatting
+    if (/^> \*\*Note:\*\*/.test(line.trim())) {
+      cleaned.push(`> **Note:** ${line.replace(/^> \*\*Note:\*\*/, '').trim()}`);
+      inNoteBlock = true;
+      continue;
+    } else if (inNoteBlock && line.trim().startsWith('>')) {
+      cleaned.push(line);
+      continue;
+    } else {
+      inNoteBlock = false;
+    }
+
+    // Only normalize non-standard bullets (○, o, •) to '- ', but DO NOT touch standard Markdown bullets or headings!
+    line = line.replace(/^([○o•])\s+/, '- ');
+
+    // Ensure proper spacing before headings
+    if (line.startsWith('#') && i > 0 && lines[i - 1].trim() !== '') {
       cleaned.push('');
+    }
+
+    // Remove any image-related lines
+    if (/^!\[.*\]\(.*\)$/.test(line.trim()) ||
+      /^#+\s*Images?\s*$/i.test(line.trim())) {
+      continue;
+    }
+
+    // Remove duplicate empty lines
+    if (line.trim() === '' && cleaned.length > 0 && cleaned[cleaned.length - 1].trim() === '') {
+      continue;
     }
 
     cleaned.push(line);
   }
 
-  return cleaned
-    .filter(line => !/^Image\s+\d+\s*$/.test(line.trim()))
-    .filter(line => !/^#+\s*Images\s*$/.test(line.trim()))
-    .filter(line => !/^!\[.*\]\(.*\)$/.test(line.trim()))
-    .filter(line => line.trim() !== '' || line === '\n')
-    .join('\n')
-    .replace(/  +/g, ' ')
-    .replace(/\n{3,}/g, '\n\n');
+  return cleaned.join('\n');
 }
 
 export default function MarkdownPreview() {
