@@ -186,21 +186,23 @@ def process_document_with_groq(text: str, images: List[ImageData]) -> str:
         client = groq.Client()
         
         # Enhanced prompt for better formatting
+        # Update the prompt in process_document_with_groq()
         prompt = f"""Convert the following document text into well-structured Markdown format. 
         Follow these guidelines:
-        
+
         1. Preserve all important information
         2. Use appropriate heading levels (#, ##, ###) for document structure
         3. Format lists (both ordered and unordered) properly
         4. Convert tables to Markdown table syntax
         5. Keep code blocks and technical terms intact
         6. Add spacing between sections for better readability
-        7. Format notes, warnings, and important information as blockquotes
+        7. Format notes, warnings, and important information as blockquotes using: > **Note:** 
         8. For images, use the format: ![description](/uploads/filename)
-        
+        9. Never duplicate note sections or content
+
         Here's the document content to convert:
         {text}
-        
+
         Return ONLY the formatted Markdown content, no additional commentary.
         """
         

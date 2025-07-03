@@ -1,80 +1,70 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from '@docusaurus/router';
 import { FaCopy, FaDownload, FaCheck, FaArrowLeft } from 'react-icons/fa';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import rehypeRaw from 'rehype-raw';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 import Layout from '@theme/Layout';
 import Head from '@docusaurus/Head';
 import Link from '@docusaurus/Link';
 import clsx from 'clsx';
 import styles from './index.module.css';
+import { marked } from 'marked';
+import DOMPurify from 'dompurify';
+
+// Configure marked
+marked.setOptions({
+  breaks: true,
+  gfm: true,
+  smartLists: true,
+  smartypants: true,
+});
 
 function cleanMarkdownContent(md) {
+  if (!md) return '';
+
   let lines = md.split('\n');
   let cleaned = [];
+  let inNoteBlock = false;
+
   for (let i = 0; i < lines.length; i++) {
     let line = lines[i];
+
     // Convert ○ or o to -
-    line = line.replace(/^[○o]\s*/, '- ');
+    //     line = line.replace(/^[○o]\s*/, '- ');
+
+    // Handle note blocks: Only the first line after Note: is included in the blockquote
+    if (/^Note:/i.test(line.trim())) {
+      cleaned.push('> **Note:** ' + line.replace(/^Note:/i, '').trim());
+      inNoteBlock = true;
+      continue;
+    } else if (inNoteBlock && line.trim() !== '') {
+      // If the next line is a list or blank, end the note block
+      if (/^(\d+\.\s+|-|\*|\+)\s+/.test(line) || line.trim() === '') {
+        inNoteBlock = false;
+        cleaned.push(line);
+      } else {
+        // Otherwise, treat as normal text (not part of the note)
+        inNoteBlock = false;
+        cleaned.push(line);
+      }
+      continue;
+    }
+
     // If this line is a bullet and previous line is not empty and not a bullet, insert a blank line
     if (/^-\s+/.test(line) && i > 0 && lines[i - 1].trim() !== '' && !/^(\d+\.\s+|-|\*|\+)\s+/.test(lines[i - 1])) {
       cleaned.push('');
     }
+
     cleaned.push(line);
   }
+
   return cleaned
     .filter(line => !/^Image\s+\d+\s*$/.test(line.trim()))
     .filter(line => !/^#+\s*Images\s*$/.test(line.trim()))
     .filter(line => !/^!\[.*\]\(.*\)$/.test(line.trim()))
     .filter(line => line.trim() !== '' || line === '\n')
     .join('\n')
-    .replace(/NOTE\s*:/g, '> **Note:**')
-    .replace(/(> \*\*Note:\*\*[^\n]*)\n([^\n>])/g, '$1\n> $2')
     .replace(/  +/g, ' ')
     .replace(/\n{3,}/g, '\n\n');
 }
-
-const ImageGuide = () => {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="mt-8 w-full max-w-2xl mx-auto">
-      <button
-        className="w-full flex items-center justify-between px-4 py-2 bg-blue-50 dark:bg-blue-900 rounded-t-lg border border-b-0 border-blue-200 dark:border-blue-700 text-blue-700 dark:text-blue-200 font-semibold focus:outline-none"
-        onClick={() => setOpen(o => !o)}
-        aria-expanded={open}
-      >
-        <span>How to include images in your markdown</span>
-        <span>{open ? '▲' : '▼'}</span>
-      </button>
-      {open && (
-        <div className="border border-blue-200 dark:border-blue-700 rounded-b-lg bg-white dark:bg-slate-800 px-6 py-4 text-sm text-slate-700 dark:text-slate-200">
-          <p>
-            You can include images in your markdown using the following syntax:
-          </p>
-          <pre className="bg-slate-100 dark:bg-slate-900 rounded p-2 my-2 overflow-x-auto">
-            <code>![Alt text](image-url)</code>
-          </pre>
-          <p>For example:</p>
-          <pre className="bg-slate-100 dark:bg-slate-900 rounded p-2 my-2 overflow-x-auto">
-            <code>![Example Logo](https://example.com/logo.png)</code>
-          </pre>
-          <p>Or for local images (relative to your markdown file):</p>
-          <pre className="bg-slate-100 dark:bg-slate-900 rounded p-2 my-2 overflow-x-auto">
-            <code>![Local Image](./images/example.jpg)</code>
-          </pre>
-          <p>
-            <b>Supported image formats:</b> JPG, PNG, GIF, SVG, WebP
-            <br />
-            <b>Note:</b> Images are not displayed in this preview. You can add or edit image links in your markdown file as needed.
-          </p>
-        </div>
-      )}
-    </div>
-  );
-};
 
 export default function MarkdownPreview() {
   const location = useLocation();
@@ -119,6 +109,12 @@ export default function MarkdownPreview() {
     setTimeout(() => setDownloadStatus('Download Markdown'), 2000);
   };
 
+  const renderMarkdown = () => {
+    const cleaned = cleanMarkdownContent(markdown);
+    const html = marked(cleaned);
+    return DOMPurify.sanitize(html);
+  };
+
   if (isLoading) {
     return (
       <Layout title="Loading..." description="Loading document preview">
@@ -128,8 +124,6 @@ export default function MarkdownPreview() {
       </Layout>
     );
   }
-
-  const cleanedMarkdown = cleanMarkdownContent(markdown);
 
   return (
     <Layout
@@ -181,71 +175,10 @@ export default function MarkdownPreview() {
             </button>
           </div>
         </div>
-        <div className={styles.markdownCard}>
-          <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
-            rehypePlugins={[rehypeRaw]}
-            components={{
-              blockquote: ({ node, ...props }) => (
-                <blockquote className={styles.markdownBlockquote} {...props} />
-              ),
-              ul: ({ node, ...props }) => <ul className={styles.markdownUl} {...props} />,
-              ol: ({ node, ...props }) => <ol className={styles.markdownOl} {...props} />,
-              li: ({ node, ordered, ...props }) => (
-                <li className={ordered ? styles.markdownLiOrdered : styles.markdownLi} {...props} />
-              ),
-              h1: ({ node, ...props }) => <h1 className={styles.markdownH1} {...props} />,
-              h2: ({ node, ...props }) => <h2 className={styles.markdownH2} {...props} />,
-              h3: ({ node, ...props }) => <h3 className={styles.markdownH3} {...props} />,
-              h4: ({ node, ...props }) => <h4 className={styles.markdownH4} {...props} />,
-              p: ({ node, ...props }) => <p className={styles.markdownP} {...props} />,
-              code: ({ node, inline, className, children, ...props }) => {
-                const match = /language-(\w+)/.exec(className || '');
-                return !inline ? (
-                  <div className={styles.codeBlockWrapper}>
-                    <SyntaxHighlighter
-                      style={vscDarkPlus}
-                      language={match ? match[1] : 'text'}
-                      showLineNumbers={true}
-                      wrapLines={true}
-                      customStyle={{
-                        margin: 0,
-                        borderRadius: '0.5rem',
-                        fontSize: '0.9em',
-                        lineHeight: '1.6',
-                        background: 'rgba(0, 0, 0, 0.4)'
-                      }}
-                      codeTagProps={{
-                        style: {
-                          fontFamily: '"Fira Code", monospace',
-                          fontSize: '0.9em',
-                        },
-                      }}
-                    >
-                      {String(children).replace(/\n$/, '')}
-                    </SyntaxHighlighter>
-                  </div>
-                ) : (
-                  <code className={styles.inlineCode} {...props}>
-                    {children}
-                  </code>
-                );
-              },
-              table: ({ node, ...props }) => (
-                <div className={styles.tableWrapper}>
-                  <table className={styles.markdownTable} {...props} />
-                </div>
-              ),
-              th: ({ node, ...props }) => <th className={styles.markdownTh} {...props} />,
-              td: ({ node, ...props }) => <td className={styles.markdownTd} {...props} />,
-              hr: ({ node, ...props }) => <hr className={styles.markdownHr} {...props} />,
-              a: ({ node, ...props }) => <a className={styles.markdownLink} {...props} />,
-              img: () => null,
-            }}
-          >
-            {cleanedMarkdown}
-          </ReactMarkdown>
-        </div>
+        <div
+          className={styles.markdownPreview}
+          dangerouslySetInnerHTML={{ __html: renderMarkdown() }}
+        />
       </div>
     </Layout>
   );

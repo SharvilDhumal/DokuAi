@@ -743,3 +743,139 @@ img,
 .image-caption {
   display: none !important;
 }
+
+/* Add these styles to your existing index.module.css */
+
+.markdownPreview {
+  max-width: 900px;
+  min-width: 350px;
+  min-height: 80vh;
+  margin: 2rem auto;
+  padding: 2.5rem;
+  background: rgba(30, 41, 59, 0.7);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow-y: auto;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.markdownPreview h1,
+.markdownPreview h2,
+.markdownPreview h3,
+.markdownPreview h4,
+.markdownPreview h5,
+.markdownPreview h6 {
+  color: var(--text-primary);
+  margin: 1.5em 0 0.8em;
+  font-weight: 600;
+}
+
+.markdownPreview h1 {
+  font-size: 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 0.3em;
+}
+
+.markdownPreview h2 {
+  font-size: 1.5rem;
+}
+
+.markdownPreview h3 {
+  font-size: 1.25rem;
+}
+
+.markdownPreview p {
+  margin: 1em 0;
+}
+
+.markdownPreview ul,
+.markdownPreview ol {
+  margin: 1em 0;
+  padding-left: 2em;
+}
+
+.markdownPreview li {
+  margin: 0.5em 0;
+}
+
+.markdownPreview blockquote {
+  border-left: 3px solid var(--primary);
+  background: rgba(59, 130, 246, 0.05);
+  padding: 0.75em 1em;
+  margin: 1em 0;
+  border-radius: 0 4px 4px 0;
+}
+
+.markdownPreview code {
+  font-family: "Fira Code", monospace;
+  background: rgba(59, 130, 246, 0.15);
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+.markdownPreview pre {
+  background: rgba(15, 23, 42, 0.8) !important;
+  padding: 1.25em !important;
+  border-radius: 0.5rem !important;
+  overflow-x: auto;
+  margin: 1.5em 0;
+}
+
+.markdownPreview table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5em 0;
+}
+
+.markdownPreview th {
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--primary-light);
+  font-weight: 600;
+  padding: 0.75rem 1rem;
+  border-bottom: 2px solid rgba(59, 130, 246, 0.2);
+}
+
+.markdownPreview td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.markdownPreview a {
+  color: var(--primary);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.markdownPreview a:hover {
+  color: var(--primary-light);
+  border-bottom-color: var(--primary);
+}
+
+.markdownPreview hr {
+  border: none;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 2em 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .markdownPreview {
+    padding: 1.5rem;
+  }
+
+  .markdownPreview h1 {
+    font-size: 1.75rem;
+  }
+
+  .markdownPreview h2 {
+    font-size: 1.5rem;
+  }
+
+  .markdownPreview h3 {
+    font-size: 1.25rem;
+  }
+}
