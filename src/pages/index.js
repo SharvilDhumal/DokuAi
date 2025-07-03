@@ -4,6 +4,8 @@ import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
 import styles from './index.module.css';
 import Head from '@docusaurus/Head';
+// At the top of index.js
+import DokuAILogo from '@site/static/img/DokuAI_img.png';
 
 export default function Home() {
   return (
@@ -17,7 +19,7 @@ export default function Home() {
         <div className={styles.heroContent}>
           <div className={styles.logoContainer}>
             <img
-              src="/img/DokuAi_img.png"
+              src="/img/DokuAI_img.png"
               alt="DokuAI Logo"
               className={styles.logo}
             />

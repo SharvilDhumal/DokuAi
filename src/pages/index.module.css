@@ -56,14 +56,14 @@
 
 /* Typography */
 .title {
-  font-size: 3.5rem;
+  font-size: 3rem; /* or any size you prefer */
   font-weight: 800;
-  margin-bottom: 1.5rem;
-  line-height: 1.2;
-  background: linear-gradient(90deg, #ffffff 0%, #e2e8f0 100%);
+  margin: 0 0 0.5rem;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  line-height: 1.2;
 }
 
 .titleHighlight {

@@ -186,13 +186,6 @@ export default function MarkdownPreview() {
           dangerouslySetInnerHTML={{ __html: renderMarkdown() }}
         />
       </div>
-      <button
-        className={styles.themeToggle}
-        onClick={toggleTheme}
-        aria-label="Toggle dark mode"
-      >
-        {darkMode ? <FaSun /> : <FaMoon />}
-      </button>
     </Layout>
   );
 }
