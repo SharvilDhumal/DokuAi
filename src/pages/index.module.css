@@ -340,6 +340,13 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 1rem;
+  background: var(--surface);
+  border-radius: 16px;
+  min-height: 200vh; /* Increased from 150vh/80vh to 200vh */
+  height: 200vh; /* Increased from 150vh/85vh to 200vh */
+  max-height: 300vh; /* Increased from 255vh/95vh to 300vh */
+  overflow-y: auto;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .previewWrapper {
@@ -406,7 +413,7 @@
 }
 
 .filenameText {
-  font-family: 'Fira Code', monospace;
+  font-family: "Fira Code", monospace;
   background: rgba(59, 130, 246, 0.15);
   padding: 0.25rem 0.75rem;
   border-radius: 6px;
@@ -478,15 +485,17 @@
 
 /* Markdown Card */
 .markdownCard {
-  background: var(--surface);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  max-width: 900px; /* Increase width (default was 800px or less) */
+  min-width: 350px;
+  min-height: 80vh; /* Use viewport height for minimum height */
+  height: 80vh; /* Always 80% of viewport height */
+  margin: 2rem auto;
+  background: rgba(30, 41, 59, 0.7);
   border-radius: 16px;
-  padding: 2.5rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-  margin: 0 auto;
-  width: 100%;
-  max-width: 900px;
-  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 2.5rem 2rem;
+  overflow-y: auto;
 }
 
 /* Typography */
@@ -547,7 +556,7 @@
 }
 
 .markdownLi::before {
-  content: '•';
+  content: "•";
   color: var(--primary);
   font-weight: bold;
   position: absolute;
@@ -567,7 +576,7 @@
 }
 
 .markdownLiOrdered::before {
-  content: counter(item) '.';
+  content: counter(item) ".";
   color: var(--primary);
   font-weight: bold;
   position: absolute;
@@ -581,11 +590,12 @@
   margin: 1.5em 0;
   border-radius: 0.5rem;
   overflow: hidden;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .codeBlock {
-  font-family: 'Fira Code', monospace;
+  font-family: "Fira Code", monospace;
   font-size: 0.9em;
   line-height: 1.6;
   margin: 0 !important;
@@ -596,7 +606,7 @@
 }
 
 .inlineCode {
-  font-family: 'Fira Code', monospace;
+  font-family: "Fira Code", monospace;
   background: rgba(59, 130, 246, 0.15);
   color: var(--primary-light);
   padding: 0.2em 0.4em;
@@ -686,28 +696,28 @@
   .previewContainer {
     padding: 1rem;
   }
-  
+
   .markdownCard {
     padding: 1.5rem;
     border-radius: 12px;
   }
-  
+
   .title {
     font-size: 1.75rem;
   }
-  
+
   .markdownH1 {
     font-size: 1.75rem;
   }
-  
+
   .markdownH2 {
     font-size: 1.5rem;
   }
-  
+
   .markdownH3 {
     font-size: 1.25rem;
   }
-  
+
   .actionButton {
     width: 100%;
     justify-content: center;
@@ -802,7 +812,9 @@
   border-radius: 16px;
   padding: 2rem;
   margin-top: 2rem;
-  max-height: 60vh;
+  min-height: 80vh; /* Add this line for minimum height */
+  height: 85vh; /* Add this line for fixed height */
+  max-height: 95vh; /* Optional: limit max height */
   overflow-y: auto;
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -934,8 +946,18 @@
 }
 
 /* Remove all image-related styles */
-img, .imageGallery, .imagesContainer, .imageWrapper, .extractedImage, 
-.imageCaption, .imageContainer, .markdownImage, .imageLoading, 
-.imageError, .imageUrl, .image-container, .image-caption {
+img,
+.imageGallery,
+.imagesContainer,
+.imageWrapper,
+.extractedImage,
+.imageCaption,
+.imageContainer,
+.markdownImage,
+.imageLoading,
+.imageError,
+.imageUrl,
+.image-container,
+.image-caption {
   display: none !important;
 }
