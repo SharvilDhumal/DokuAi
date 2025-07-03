@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from '@docusaurus/router';
-import { FaCopy, FaDownload, FaCheck, FaArrowLeft } from 'react-icons/fa';
+import { FaCopy, FaDownload, FaCheck, FaArrowLeft, FaSun, FaMoon } from 'react-icons/fa'; // updated import
 import Layout from '@theme/Layout';
 import Head from '@docusaurus/Head';
 import Link from '@docusaurus/Link';
@@ -73,6 +73,12 @@ export default function MarkdownPreview() {
   const [isLoading, setIsLoading] = useState(true);
   const [copyStatus, setCopyStatus] = useState('Copy Markdown');
   const [downloadStatus, setDownloadStatus] = useState('Download Markdown');
+  const [darkMode, setDarkMode] = useState(true); // theme state
+
+  const toggleTheme = () => {
+    setDarkMode(!darkMode);
+    document.documentElement.setAttribute('data-theme', darkMode ? 'light' : 'dark');
+  };
 
   useEffect(() => {
     if (location.state) {
@@ -180,6 +186,13 @@ export default function MarkdownPreview() {
           dangerouslySetInnerHTML={{ __html: renderMarkdown() }}
         />
       </div>
+      <button
+        className={styles.themeToggle}
+        onClick={toggleTheme}
+        aria-label="Toggle dark mode"
+      >
+        {darkMode ? <FaSun /> : <FaMoon />}
+      </button>
     </Layout>
   );
 }
