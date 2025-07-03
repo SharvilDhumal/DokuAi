@@ -109,3 +109,48 @@
 2025-07-01 13:53:59,591 INFO: Processing chunk 1/1 [in C:\Users\sharv\Intern_project\backend\app.py:225]
 2025-07-01 13:54:04,142 ERROR: Error processing chunk 1: Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}} [in C:\Users\sharv\Intern_project\backend\app.py:256]
 2025-07-01 13:54:04,149 INFO: Temporary file removed: C:\Users\sharv\AppData\Local\Temp\Business_Case.docx [in C:\Users\sharv\Intern_project\backend\app.py:193]
+2025-07-03 23:52:12,408 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-03 23:52:16,846 - __main__ - INFO - Received file: Business Case.docx
+2025-07-03 23:52:16,863 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\32b9be23ba8a42808d5d48ca4c288f8d.jpeg
+2025-07-03 23:52:16,863 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\56023fd41e11434596dd3a6376c13afb.png
+2025-07-03 23:52:16,864 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\0eaffb9e34dd41da9906e3eb9f1a9911.jpeg
+2025-07-03 23:52:16,865 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\8544a1738761422fad6a6b511092e764.jpeg
+2025-07-03 23:52:17,364 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 400 Bad Request"
+2025-07-03 23:52:17,365 - __main__ - ERROR - Error processing document: Error code: 400 - {'error': {'message': 'The model `mixtral-8x7b-32768` has been decommissioned and is no longer supported. Please refer to https://console.groq.com/docs/deprecations for a recommendation on which model to use instead.', 'type': 'invalid_request_error', 'code': 'model_decommissioned'}}
+2025-07-03 23:52:17,381 - __main__ - INFO - Received file: Business Case.docx
+2025-07-03 23:52:17,395 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\aa35a999f1a0472ea8caeb9951d0aac6.jpeg
+2025-07-03 23:52:17,397 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\5da838fd15124798863dcf4599ebb926.png
+2025-07-03 23:52:17,399 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\0fb3ecb66ba54963b3ca4abe38688674.jpeg
+2025-07-03 23:52:17,402 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\7de8d930fd2f414fbf136ce208bb2d08.jpeg
+2025-07-03 23:52:17,709 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 400 Bad Request"
+2025-07-03 23:52:17,710 - __main__ - ERROR - Error processing document: Error code: 400 - {'error': {'message': 'The model `mixtral-8x7b-32768` has been decommissioned and is no longer supported. Please refer to https://console.groq.com/docs/deprecations for a recommendation on which model to use instead.', 'type': 'invalid_request_error', 'code': 'model_decommissioned'}}
+2025-07-03 23:54:12,538 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-03 23:55:13,461 - __main__ - INFO - Received file: Business Case.docx
+2025-07-03 23:55:13,493 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\cf6ebd02c7354d66a62d618229f422eb.jpeg
+2025-07-03 23:55:13,494 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\02aa05e11afe482cab813d346b06b6ce.png
+2025-07-03 23:55:13,497 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\1fa2a5e815ae4d43b3b35b10498e5453.jpeg
+2025-07-03 23:55:13,501 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\b4a2d9db5dfd43f8807b0c6a31a57d81.jpeg
+2025-07-03 23:55:14,639 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 400 Bad Request"
+2025-07-03 23:55:14,641 - __main__ - ERROR - Error processing document: Error code: 400 - {'error': {'message': 'The model `mixtral-8x7b-32768` has been decommissioned and is no longer supported. Please refer to https://console.groq.com/docs/deprecations for a recommendation on which model to use instead.', 'type': 'invalid_request_error', 'code': 'model_decommissioned'}}
+2025-07-03 23:57:47,709 - __main__ - INFO - Received file: Business Case.docx
+2025-07-03 23:57:47,720 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\70312a06cf834e588d8eb68a9074c43f.jpeg
+2025-07-03 23:57:47,721 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\081873990170482a8668bed66a711bbd.png
+2025-07-03 23:57:47,723 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\8c86b98243c9406abbd947594f618198.jpeg
+2025-07-03 23:57:47,726 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\64f9b687c7934f68946c943a8e52bcea.jpeg
+2025-07-03 23:57:48,065 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 400 Bad Request"
+2025-07-03 23:57:48,065 - __main__ - ERROR - Error processing document: Error code: 400 - {'error': {'message': 'The model `mixtral-8x7b-32768` has been decommissioned and is no longer supported. Please refer to https://console.groq.com/docs/deprecations for a recommendation on which model to use instead.', 'type': 'invalid_request_error', 'code': 'model_decommissioned'}}
+2025-07-03 23:58:25,721 - __main__ - INFO - Received file: Business Case.docx
+2025-07-03 23:58:25,729 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\53ef5ade3b16444391f7a3c0deb29f10.jpeg
+2025-07-03 23:58:25,730 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\00636125867f4d4eb7c752f0467a7571.png
+2025-07-03 23:58:25,731 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\46852af1b6184ffa8ebdc7679346498c.jpeg
+2025-07-03 23:58:25,733 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\f57561375e0c421f86d04e2e76359b72.jpeg
+2025-07-03 23:58:26,017 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 400 Bad Request"
+2025-07-03 23:58:26,019 - __main__ - ERROR - Error processing document: Error code: 400 - {'error': {'message': 'The model `mixtral-8x7b-32768` has been decommissioned and is no longer supported. Please refer to https://console.groq.com/docs/deprecations for a recommendation on which model to use instead.', 'type': 'invalid_request_error', 'code': 'model_decommissioned'}}
+2025-07-04 00:04:22,145 - __main__ - INFO - Received file: Business Case.docx
+2025-07-04 00:04:22,159 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\0f823defaac447459b8753c60662cd99.jpeg
+2025-07-04 00:04:22,160 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\aa256b9bfb7841c38c36cd807e54e08f.png
+2025-07-04 00:04:22,162 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\be912ba23ad3425ab1412c5d2094eef1.jpeg
+2025-07-04 00:04:22,164 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\f7bc1b2880de4557925940ba1cb71c74.jpeg
+2025-07-04 00:04:22,482 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 400 Bad Request"
+2025-07-04 00:04:22,483 - __main__ - ERROR - Error processing document: Error code: 400 - {'error': {'message': 'The model `mixtral-8x7b-32768` has been decommissioned and is no longer supported. Please refer to https://console.groq.com/docs/deprecations for a recommendation on which model to use instead.', 'type': 'invalid_request_error', 'code': 'model_decommissioned'}}
+2025-07-04 00:08:21,349 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
