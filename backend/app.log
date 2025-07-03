@@ -154,3 +154,15 @@
 2025-07-04 00:04:22,482 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 400 Bad Request"
 2025-07-04 00:04:22,483 - __main__ - ERROR - Error processing document: Error code: 400 - {'error': {'message': 'The model `mixtral-8x7b-32768` has been decommissioned and is no longer supported. Please refer to https://console.groq.com/docs/deprecations for a recommendation on which model to use instead.', 'type': 'invalid_request_error', 'code': 'model_decommissioned'}}
 2025-07-04 00:08:21,349 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-04 00:08:34,471 - __main__ - INFO - Received file: Business Case.docx
+2025-07-04 00:08:34,495 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\44c225029d884673b36f95cbead7317d.jpeg
+2025-07-04 00:08:34,497 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\187ea40e80044b0fae18a2da3946e216.png
+2025-07-04 00:08:34,498 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\f047757ea2284fc2a17ec3dd08ec3def.jpeg
+2025-07-04 00:08:34,500 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\6670d88e63dc4e8da3ff691a90aa047f.jpeg
+2025-07-04 00:08:36,916 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-04 00:08:36,980 - __main__ - INFO - Received file: Business Case.docx
+2025-07-04 00:08:36,998 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\aace519f447741f99f6cce931e0b3244.jpeg
+2025-07-04 00:08:37,000 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\fc87153033a647c7be463576ed189f26.png
+2025-07-04 00:08:37,002 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\9d7d4ee50cce4ff09a24a91ed90ea9fd.jpeg
+2025-07-04 00:08:37,006 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\13fa62d5902846f4bb89071b9b44cafa.jpeg
+2025-07-04 00:08:39,025 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
