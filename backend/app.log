@@ -166,3 +166,151 @@
 2025-07-04 00:08:37,002 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\9d7d4ee50cce4ff09a24a91ed90ea9fd.jpeg
 2025-07-04 00:08:37,006 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\13fa62d5902846f4bb89071b9b44cafa.jpeg
 2025-07-04 00:08:39,025 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-04 00:11:18,032 - __main__ - INFO - Received file: Business Case.docx
+2025-07-04 00:11:18,052 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\4f6ade3a260b42c39ccefe60e5f386e1.jpeg
+2025-07-04 00:11:18,054 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\d5f600ac49e742f981ec6b22f8e7b52c.png
+2025-07-04 00:11:18,055 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\6befa2dac7de4d2a8b79f688448d2c2b.jpeg
+2025-07-04 00:11:18,057 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\67dea38457534a258ad78b734e6053bd.jpeg
+2025-07-04 00:11:20,053 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-04 00:18:01,236 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-04 00:18:13,865 - __main__ - INFO - Received file: Business Case.docx
+2025-07-04 00:18:13,902 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_1.jpeg
+2025-07-04 00:18:13,906 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_3.png
+2025-07-04 00:18:13,909 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_6.jpeg
+2025-07-04 00:18:13,915 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_7.jpeg
+2025-07-04 00:18:14,991 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2025-07-04 00:18:14,993 - groq._base_client - INFO - Retrying request to /openai/v1/chat/completions in 0.490203 seconds
+2025-07-04 00:18:16,906 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-04 00:18:16,951 - __main__ - INFO - Received file: Business Case.docx
+2025-07-04 00:18:16,967 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_1.jpeg
+2025-07-04 00:18:16,969 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_3.png
+2025-07-04 00:18:16,970 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_6.jpeg
+2025-07-04 00:18:16,973 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_7.jpeg
+2025-07-04 00:18:18,355 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2025-07-04 00:18:18,357 - groq._base_client - INFO - Retrying request to /openai/v1/chat/completions in 0.471535 seconds
+2025-07-04 00:18:19,087 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2025-07-04 00:18:19,094 - groq._base_client - INFO - Retrying request to /openai/v1/chat/completions in 0.891872 seconds
+2025-07-04 00:18:21,356 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-04 00:18:44,853 - __main__ - INFO - Received file: Business Case.docx
+2025-07-04 00:18:44,871 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_1.jpeg
+2025-07-04 00:18:44,874 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_3.png
+2025-07-04 00:18:44,877 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_6.jpeg
+2025-07-04 00:18:44,880 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_7.jpeg
+2025-07-04 00:18:46,774 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-04 00:21:45,866 - __main__ - INFO - Received file: Business Case.docx
+2025-07-04 00:21:45,885 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_1.jpeg
+2025-07-04 00:21:45,887 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_3.png
+2025-07-04 00:21:45,890 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_6.jpeg
+2025-07-04 00:21:45,892 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_7.jpeg
+2025-07-04 00:21:47,736 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-04 00:21:47,762 - __main__ - INFO - Received file: Business Case.docx
+2025-07-04 00:21:47,791 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_1.jpeg
+2025-07-04 00:21:47,793 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_3.png
+2025-07-04 00:21:47,795 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_6.jpeg
+2025-07-04 00:21:47,797 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_7.jpeg
+2025-07-04 00:21:49,647 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-04 00:36:22,996 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-04 00:36:32,198 - __main__ - INFO - Received file: Business Case.docx
+2025-07-04 00:36:32,209 - __main__ - ERROR - Error processing DOCX: [Errno 2] No such file or directory: 'temp_images\\image1.jpeg'
+2025-07-04 00:36:32,216 - __main__ - ERROR - Traceback (most recent call last):
+  File "C:\Users\sharv\Intern_project\backend\app.py", line 188, in extract_text_and_images_from_docx
+    text = docx2txt.process(docx_path, "temp_images")
+  File "C:\Users\sharv\AppData\Local\Programs\Python\Python313\Lib\site-packages\docx2txt\docx2txt.py", line 103, in process
+    with open(dst_fname, "wb") as dst_f:
+         ~~~~^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'temp_images\\image1.jpeg'
+
+2025-07-04 00:36:32,220 - __main__ - ERROR - Conversion error: [WinError 32] The process cannot access the file because it is being used by another process: 'C:\\Users\\sharv\\AppData\\Local\\Temp\\tmpwuz9a4bk.docx'
+Traceback (most recent call last):
+  File "C:\Users\sharv\Intern_project\backend\app.py", line 188, in extract_text_and_images_from_docx
+    text = docx2txt.process(docx_path, "temp_images")
+  File "C:\Users\sharv\AppData\Local\Programs\Python\Python313\Lib\site-packages\docx2txt\docx2txt.py", line 103, in process
+    with open(dst_fname, "wb") as dst_f:
+         ~~~~^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'temp_images\\image1.jpeg'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\sharv\Intern_project\backend\app.py", line 408, in convert_file
+    text, images = await extract_text_and_images_from_docx(temp_path, doc_name=doc_name)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sharv\Intern_project\backend\app.py", line 239, in extract_text_and_images_from_docx
+    raise HTTPException(status_code=500, detail="Failed to process DOCX")
+fastapi.exceptions.HTTPException: 500: Failed to process DOCX
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\sharv\Intern_project\backend\app.py", line 410, in convert_file
+    os.unlink(temp_path)
+    ~~~~~~~~~^^^^^^^^^^^
+PermissionError: [WinError 32] The process cannot access the file because it is being used by another process: 'C:\\Users\\sharv\\AppData\\Local\\Temp\\tmpwuz9a4bk.docx'
+
+2025-07-04 00:41:30,485 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-04 00:41:53,056 - __main__ - INFO - Received file: Business Case.docx
+2025-07-04 00:41:53,080 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_1.jpeg
+2025-07-04 00:41:53,086 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_2.jpeg
+2025-07-04 00:41:53,091 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_3.png
+2025-07-04 00:41:53,095 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_4.jpeg
+2025-07-04 00:41:55,263 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-04 00:41:55,309 - __main__ - INFO - Received file: Business Case.docx
+2025-07-04 00:41:55,327 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_1.jpeg
+2025-07-04 00:41:55,330 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_2.jpeg
+2025-07-04 00:41:55,332 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_3.png
+2025-07-04 00:41:55,336 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_4.jpeg
+2025-07-04 00:41:57,164 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-04 00:53:34,035 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-04 00:53:46,100 - __main__ - INFO - Received file: Business Case.docx
+2025-07-04 00:53:46,137 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_1.jpeg
+2025-07-04 00:53:46,148 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_2.jpeg
+2025-07-04 00:53:46,155 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_3.png
+2025-07-04 00:53:46,161 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_4.jpeg
+2025-07-04 00:53:49,694 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-04 00:53:49,736 - __main__ - INFO - Received file: Business Case.docx
+2025-07-04 00:53:49,755 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_1.jpeg
+2025-07-04 00:53:49,760 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_2.jpeg
+2025-07-04 00:53:49,764 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_3.png
+2025-07-04 00:53:49,769 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_4.jpeg
+2025-07-04 00:53:52,211 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-04 00:58:30,774 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-04 00:58:39,399 - __main__ - INFO - Received file: Business Case.pdf
+2025-07-04 00:58:40,718 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_1.png
+2025-07-04 00:58:41,012 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_2.png
+2025-07-04 00:58:41,305 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_3.png
+2025-07-04 00:58:44,215 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-04 00:58:44,252 - __main__ - INFO - Received file: Business Case.pdf
+2025-07-04 00:58:45,173 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_1.png
+2025-07-04 00:58:45,457 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_2.png
+2025-07-04 00:58:45,758 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_3.png
+2025-07-04 00:58:48,213 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-04 01:00:22,812 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-04 01:00:40,198 - __main__ - INFO - Received file: Python_Certificate.pdf
+2025-07-04 01:00:41,024 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Python_Certificate_1.png
+2025-07-04 01:00:42,004 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-04 01:03:18,568 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-04 01:03:30,673 - __main__ - INFO - Received file: Business Case.docx
+2025-07-04 01:03:30,690 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_1.jpeg
+2025-07-04 01:03:30,692 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_2.jpeg
+2025-07-04 01:03:30,693 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_3.png
+2025-07-04 01:03:30,695 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_4.jpeg
+2025-07-04 01:03:33,055 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-04 01:03:33,097 - __main__ - INFO - Received file: Business Case.docx
+2025-07-04 01:03:33,119 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_1.jpeg
+2025-07-04 01:03:33,122 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_2.jpeg
+2025-07-04 01:03:33,124 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_3.png
+2025-07-04 01:03:33,128 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_4.jpeg
+2025-07-04 01:03:35,068 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-04 10:12:52,250 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-04 10:13:05,474 - __main__ - INFO - Received file: Business Case.docx
+2025-07-04 10:13:05,530 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_1.jpeg
+2025-07-04 10:13:05,536 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_2.jpeg
+2025-07-04 10:13:05,541 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_3.png
+2025-07-04 10:13:05,546 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_4.jpeg
+2025-07-04 10:13:08,008 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-04 10:13:08,060 - __main__ - INFO - Received file: Business Case.docx
+2025-07-04 10:13:08,082 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_1.jpeg
+2025-07-04 10:13:08,088 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_2.jpeg
+2025-07-04 10:13:08,096 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_3.png
+2025-07-04 10:13:08,101 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_4.jpeg
+2025-07-04 10:13:09,983 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"

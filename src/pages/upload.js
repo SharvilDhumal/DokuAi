@@ -127,49 +127,12 @@ export default function UploadDashboard() {
                 xhr.setRequestHeader('Accept', 'application/json');
                 xhr.send(formData);
             })
-                // .then(data => {
-                //     console.log('API Response:', data);
-
-                //     // Check if we have valid content to display
-                //     const hasContent = data.markdown && data.markdown.trim().length > 0;
-                //     const hasImages = data.images && data.images.length > 0;
-
-                //     if (!hasContent && !hasImages) {
-                //         throw new Error('The document appears to be empty or could not be processed.');
-                //     }
-
-                //     // If we have images but no markdown, create a basic markdown with just the images
-                //     let markdownContent = data.markdown || '';
-                //     if (!hasContent && hasImages) {
-                //         markdownContent = "# Document with Images\n\n";
-                //         data.images.forEach((img, idx) => {
-                //             markdownContent += `![Image ${idx}](${img.data})\n\n`;
-                //         });
-                //     }
-
-                //     // Navigate to markdownpreview page with the data
-                //     history.push({
-                //         pathname: '/markdownpreview',
-                //         state: {
-                //             markdown: markdownContent,
-                //             filename: data.filename,
-                //             images: data.images || []
-                //         }
-                //     });
-                // })
-                // .catch(error => {
-                //     throw error;
-                // });
-
-                // In the handleSubmit function, modify the response handling:
                 .then(data => {
                     console.log('API Response:', data);
 
-                    // Remove any image references from the markdown
+                    // Keep the original markdown content with images
                     let markdownContent = data.markdown || '';
-                    markdownContent = markdownContent.replace(/!\[.*\]\(.*\)/g, '');
-                    markdownContent = markdownContent.replace(/^#+\s*Images?\s*$/gmi, '');
-
+                    
                     if (!markdownContent.trim()) {
                         markdownContent = "# Document Conversion\n\nNo text content could be extracted from the document.";
                     }
@@ -180,7 +143,7 @@ export default function UploadDashboard() {
                         state: {
                             markdown: markdownContent,
                             filename: data.filename,
-                            images: [] // Empty array since we're not showing images
+                            images: data.images || []
                         }
                     });
                 })

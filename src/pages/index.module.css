@@ -695,23 +695,6 @@
   transition: width 0.3s ease;
 }
 
-/* Remove all image-related styles */
-img,
-.imageGallery,
-.imagesContainer,
-.imageWrapper,
-.extractedImage,
-.imageCaption,
-.imageContainer,
-.markdownImage,
-.imageLoading,
-.imageError,
-.imageUrl,
-.image-container,
-.image-caption {
-  display: none !important;
-}
-
 /* Theme Toggle */
 .themeToggle {
   position: fixed;
@@ -938,8 +921,20 @@ img,
   font-size: 1.1em;
 }
 
-/* Remove image-related styles completely */
-.markdownPreview img,
-.markdownPreview .image-container {
-  display: none !important;
+/* Image Styling */
+.markdownPreview img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1.5rem auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.markdownPreview .image-caption {
+  text-align: center;
+  font-style: italic;
+  color: var(--text-secondary);
+  margin-top: -1rem;
+  margin-bottom: 1.5rem;
 }

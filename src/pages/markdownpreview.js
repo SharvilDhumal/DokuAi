@@ -24,15 +24,16 @@ function cleanMarkdownContent(md) {
   let cleaned = [];
   let inCodeBlock = false;
   let inNoteBlock = false;
+  let currentImage = null;
 
   for (let i = 0; i < lines.length; i++) {
-    let line = lines[i];
+    let line = lines[i].trim();
 
     // Skip empty lines at start of document
-    if (cleaned.length === 0 && line.trim() === '') continue;
+    if (cleaned.length === 0 && line === '') continue;
 
     // Handle code blocks
-    if (line.trim().startsWith('```')) {
+    if (line.startsWith('```')) {
       inCodeBlock = !inCodeBlock;
       cleaned.push(line);
       continue;
@@ -44,8 +45,45 @@ function cleanMarkdownContent(md) {
       continue;
     }
 
-    // Preserve image references
-    if (line.trim().startsWith('![') || line.includes('/uploads/')) {
+    // Handle image descriptions from the backend
+    if (line.toLowerCase().includes('image') && line.toLowerCase().includes('path:')) {
+      // This is an image description line, try to extract the path
+      const pathMatch = line.match(/path:\s*([^\s]+)/i);
+      if (pathMatch && pathMatch[1]) {
+        let src = pathMatch[1].trim();
+        // Clean up the path
+        src = src.replace(/^['"]|['"]$/g, '');
+        // Make sure the path is properly formatted
+        if (!src.startsWith('http') && !src.startsWith('data:')) {
+          if (!src.startsWith('/uploads/') && !src.startsWith('uploads/')) {
+            src = `/uploads/${src}`;
+          }
+          // Add the image to the cleaned output
+          cleaned.push(`![](${src})`);
+          continue;
+        }
+      }
+    }
+    
+    // Handle standard markdown image syntax
+    if (line.startsWith('![') && line.includes('](') && line.includes(')')) {
+      try {
+        const imgMatch = line.match(/!\[(.*?)\]\((.*?)\)/);
+        if (imgMatch && imgMatch[2]) {
+          let [_, alt, src] = imgMatch;
+          if (src && typeof src === 'string') {
+            src = src.trim().replace(/^['"]|['"]$/g, '');
+            if (!src.startsWith('http') && !src.startsWith('data:')) {
+              if (!src.startsWith('/uploads/') && !src.startsWith('uploads/')) {
+                src = `/uploads/${src}`;
+              }
+              line = `![${alt || ''}](${src})`;
+            }
+          }
+        }
+      } catch (error) {
+        console.warn('Error processing image line:', line, error);
+      }
       cleaned.push(line);
       continue;
     }
@@ -131,9 +169,72 @@ export default function MarkdownPreview() {
   };
 
   const renderMarkdown = () => {
-    const cleaned = cleanMarkdownContent(markdown);
-    const html = marked(cleaned);
-    return DOMPurify.sanitize(html);
+    try {
+      // First, clean the markdown but preserve images
+      const cleaned = cleanMarkdownContent(markdown);
+      
+      // Configure marked to handle images properly
+      const renderer = new marked.Renderer();
+      
+      // Custom image renderer to ensure proper image paths
+      renderer.image = (href, title, text) => {
+        try {
+          // Handle undefined or null href
+          if (!href) {
+            console.warn('Image has no source (href is undefined or null)');
+            return ''; // Return empty string if no href
+          }
+          
+          // Convert href to string and clean it up
+          let imageUrl = String(href).trim();
+          
+          // If this is just a filename without a path, add the uploads directory
+          if (!imageUrl.includes('/') && !imageUrl.startsWith('http') && !imageUrl.startsWith('data:')) {
+            imageUrl = `/uploads/${imageUrl}`;
+          }
+          
+          // Make sure the image path is absolute if it's in the uploads folder
+          if (imageUrl && !imageUrl.startsWith('http') && !imageUrl.startsWith('data:')) {
+            // If it's a relative path, make it absolute from the root
+            if (imageUrl.startsWith('/uploads/')) {
+              imageUrl = `http://localhost:5000${imageUrl}`;
+            } else if (imageUrl.startsWith('uploads/')) {
+              imageUrl = `http://localhost:5000/${imageUrl}`;
+            } else if (!imageUrl.startsWith('http') && !imageUrl.startsWith('data:')) {
+              // If it's a relative path without the uploads prefix, add it
+              imageUrl = `http://localhost:5000/uploads/${imageUrl}`;
+            }
+          }
+          
+          // Clean up the alt text
+          const altText = text ? String(text).replace(/^['"]|['"]$/g, '') : '';
+          
+          // Create the image tag with error handling
+          return `<img 
+            src="${imageUrl}" 
+            alt="${altText}" 
+            ${title ? `title="${title}"` : ''} 
+            class="markdown-image"
+            onerror="this.style.display='none'; console.error('Failed to load image: ${imageUrl}')"
+          />`;
+        } catch (error) {
+          console.error('Error rendering image:', { href, title, text, error });
+          return `<div class="image-error">[Image failed to load: ${String(href).substring(0, 30)}...]</div>`;
+        }
+      };
+      
+      // Use the custom renderer
+      const html = marked(cleaned, { renderer });
+      
+      // Sanitize the HTML but allow images
+      return DOMPurify.sanitize(html, {
+        ADD_TAGS: ['img'],
+        ADD_ATTR: ['src', 'alt', 'title', 'class']
+      });
+    } catch (error) {
+      console.error('Error rendering markdown:', error);
+      return '<p>Error rendering content. Please try again.</p>';
+    }
   };
 
   if (isLoading) {
