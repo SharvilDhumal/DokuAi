@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from '@docusaurus/router';
-import { FaCopy, FaDownload, FaCheck, FaArrowLeft, FaSun, FaMoon } from 'react-icons/fa'; // updated import
+import { FaCopy, FaDownload, FaCheck, FaArrowLeft, FaSun, FaMoon } from 'react-icons/fa';
 import Layout from '@theme/Layout';
 import Head from '@docusaurus/Head';
 import Link from '@docusaurus/Link';
@@ -10,11 +10,27 @@ import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 
 // Configure marked
+const renderer = new marked.Renderer();
+
+// Custom image renderer to handle relative paths
+renderer.image = (href, title, text) => {
+  // If the href is already a full URL, use it as is
+  if (href.startsWith('http')) {
+    return `<img src="${href}" alt="${text || ''}" title="${title || ''}" style="max-width: 100%; height: auto;" />`;
+  }
+  
+  // Otherwise, assume it's a path from the backend
+  const baseUrl = 'http://localhost:5000';
+  const fullUrl = href.startsWith('/') ? `${baseUrl}${href}` : `${baseUrl}/${href}`;
+  return `<img src="${fullUrl}" alt="${text || ''}" title="${title || ''}" style="max-width: 100%; height: auto;" />`;
+};
+
 marked.setOptions({
   breaks: true,
   gfm: true,
   smartLists: true,
   smartypants: true,
+  renderer: renderer
 });
 
 function cleanMarkdownContent(md) {
@@ -47,18 +63,14 @@ function cleanMarkdownContent(md) {
 
     // Handle image descriptions from the backend
     if (line.toLowerCase().includes('image') && line.toLowerCase().includes('path:')) {
-      // This is an image description line, try to extract the path
       const pathMatch = line.match(/path:\s*([^\s]+)/i);
       if (pathMatch && pathMatch[1]) {
         let src = pathMatch[1].trim();
-        // Clean up the path
         src = src.replace(/^['"]|['"]$/g, '');
-        // Make sure the path is properly formatted
         if (!src.startsWith('http') && !src.startsWith('data:')) {
           if (!src.startsWith('/uploads/') && !src.startsWith('uploads/')) {
             src = `/uploads/${src}`;
           }
-          // Add the image to the cleaned output
           cleaned.push(`![](${src})`);
           continue;
         }
@@ -126,7 +138,7 @@ export default function MarkdownPreview() {
   const [isLoading, setIsLoading] = useState(true);
   const [copyStatus, setCopyStatus] = useState('Copy Markdown');
   const [downloadStatus, setDownloadStatus] = useState('Download Markdown');
-  const [darkMode, setDarkMode] = useState(true); // theme state
+  const [darkMode, setDarkMode] = useState(true);
 
   const toggleTheme = () => {
     setDarkMode(!darkMode);
@@ -170,66 +182,111 @@ export default function MarkdownPreview() {
 
   const renderMarkdown = () => {
     try {
-      // First, clean the markdown but preserve images
       const cleaned = cleanMarkdownContent(markdown);
-      
-      // Configure marked to handle images properly
       const renderer = new marked.Renderer();
       
-      // Custom image renderer to ensure proper image paths
+      // renderer.image = (href, title, text) => {
+      //   try {
+      //     if (!href) return '';
+          
+      //     let imageUrl = '';
+          
+      //     // Handle case where href is an object (from the API response)
+      //     if (typeof href === 'object' && href !== null) {
+      //       // If it's an object with a 'data' property (like a base64 image)
+      //       if (href.data) {
+      //         imageUrl = `data:${href.type || 'image/png'};base64,${href.data}`;
+      //       } 
+      //       // If it's an object with a 'url' property
+      //       else if (href.url) {
+      //         imageUrl = href.url;
+      //       } 
+      //       // If we can't determine the image source, return empty string
+      //       else {
+      //         console.warn('Unsupported image object format:', href);
+      //         return '';
+      //       }
+      //     } 
+      //     // Handle string URLs
+      //     else {
+      //       imageUrl = String(href).trim();
+            
+      //       // Remove any leading slashes or backslashes
+      //       imageUrl = imageUrl.replace(/^[\\/]+/, '');
+            
+      //       // If it's not an absolute URL or data URL, prepend with /uploads/
+      //       if (!imageUrl.startsWith('http') && !imageUrl.startsWith('data:')) {
+      //         if (!imageUrl.startsWith('uploads/')) {
+      //           imageUrl = `/uploads/${imageUrl}`;
+      //         } else {
+      //           imageUrl = `/${imageUrl}`;
+      //         }
+      //       }
+      //     }
+          
+      //     // Clean up alt text
+      //     const altText = text ? String(text).replace(/^['"]|['"]$/g, '') : '';
+          
+      //     // Create a unique ID for the image container for error handling
+      //     const imgId = `img-${Math.random().toString(36).substr(2, 9)}`;
+          
+      //     return `
+      //       <div class="${styles.imageContainer}" id="${imgId}">
+      //         <img 
+      //           src="${imageUrl}" 
+      //           alt="${altText}" 
+      //           ${title ? `title="${title}"` : ''} 
+      //           class="${styles.markdownImage}"
+      //           onerror="document.getElementById('${imgId}').classList.add('${styles.imageError}'); console.error('Failed to load image: ${imageUrl.replace(/"/g, '\\"')}')"
+      //         />
+      //         ${altText ? `<div class="${styles.imageCaption}">${altText}</div>` : ''}
+      //       </div>`;
+      //   } catch (error) {
+      //     console.error('Error rendering image:', { href, title, text, error });
+      //     return `<div class="image-error">[Image failed to load]</div>`;
+      //   }
+      // };
+      
+
       renderer.image = (href, title, text) => {
         try {
-          // Handle undefined or null href
-          if (!href) {
-            console.warn('Image has no source (href is undefined or null)');
-            return ''; // Return empty string if no href
-          }
+          if (!href) return '';
           
-          // Convert href to string and clean it up
-          let imageUrl = String(href).trim();
+          // Handle both string URLs and image objects
+          let imageUrl = typeof href === 'string' ? href : href.url || href.data || '';
           
-          // If this is just a filename without a path, add the uploads directory
-          if (!imageUrl.includes('/') && !imageUrl.startsWith('http') && !imageUrl.startsWith('data:')) {
-            imageUrl = `/uploads/${imageUrl}`;
-          }
-          
-          // Make sure the image path is absolute if it's in the uploads folder
+          // Ensure the URL is properly formatted
           if (imageUrl && !imageUrl.startsWith('http') && !imageUrl.startsWith('data:')) {
-            // If it's a relative path, make it absolute from the root
-            if (imageUrl.startsWith('/uploads/')) {
-              imageUrl = `http://localhost:5000${imageUrl}`;
-            } else if (imageUrl.startsWith('uploads/')) {
-              imageUrl = `http://localhost:5000/${imageUrl}`;
-            } else if (!imageUrl.startsWith('http') && !imageUrl.startsWith('data:')) {
-              // If it's a relative path without the uploads prefix, add it
-              imageUrl = `http://localhost:5000/uploads/${imageUrl}`;
+            if (!imageUrl.startsWith('/uploads/')) {
+              imageUrl = `/uploads/${imageUrl.replace(/^[\\/]+/, '')}`;
             }
           }
           
-          // Clean up the alt text
+          // Clean up alt text
           const altText = text ? String(text).replace(/^['"]|['"]$/g, '') : '';
           
-          // Create the image tag with error handling
-          return `<img 
-            src="${imageUrl}" 
-            alt="${altText}" 
-            ${title ? `title="${title}"` : ''} 
-            class="markdown-image"
-            onerror="this.style.display='none'; console.error('Failed to load image: ${imageUrl}')"
-          />`;
+          return `
+            <div class="${styles.imageContainer}">
+              <img 
+                src="${imageUrl}" 
+                alt="${altText}" 
+                ${title ? `title="${title}"` : ''} 
+                class="${styles.markdownImage}"
+                onerror="this.onerror=null;this.parentElement.classList.add('${styles.imageError}')"
+              />
+              ${altText ? `<div class="${styles.imageCaption}">${altText}</div>` : ''}
+            </div>`;
         } catch (error) {
           console.error('Error rendering image:', { href, title, text, error });
-          return `<div class="image-error">[Image failed to load: ${String(href).substring(0, 30)}...]</div>`;
+          return `<div class="${styles.imageError}">[Image failed to load]</div>`;
         }
       };
       
-      // Use the custom renderer
       const html = marked(cleaned, { renderer });
       
-      // Sanitize the HTML but allow images
       return DOMPurify.sanitize(html, {
         ADD_TAGS: ['img'],
-        ADD_ATTR: ['src', 'alt', 'title', 'class']
+        ADD_ATTR: ['src', 'alt', 'title', 'class', 'onerror']
       });
     } catch (error) {
       console.error('Error rendering markdown:', error);

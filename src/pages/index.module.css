@@ -938,3 +938,21 @@
   margin-top: -1rem;
   margin-bottom: 1.5rem;
 }
+
+/* Add to index.module.css */
+.markdown-image {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1.5rem auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.image-error {
+  color: var(--error);
+  background: rgba(239, 68, 68, 0.1);
+  padding: 0.5rem;
+  border-radius: 4px;
+  margin: 1rem 0;
+}

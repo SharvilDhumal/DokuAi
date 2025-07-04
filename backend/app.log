@@ -314,3 +314,190 @@ PermissionError: [WinError 32] The process cannot access the file because it is 
 2025-07-04 10:13:08,096 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_3.png
 2025-07-04 10:13:08,101 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_4.jpeg
 2025-07-04 10:13:09,983 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-04 10:31:33,614 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-04 10:31:40,313 - __main__ - INFO - Received file: Business Case.docx
+2025-07-04 10:31:40,344 - __main__ - ERROR - Conversion error: module 'docx2txt' has no attribute 'process_element'
+2025-07-04 10:31:40,345 - __main__ - ERROR - Traceback (most recent call last):
+  File "C:\Users\sharv\Intern_project\backend\app.py", line 488, in convert_file
+    text, images = await extract_text_and_images_from_docx(temp_path, doc_name=doc_name)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sharv\Intern_project\backend\app.py", line 277, in extract_text_and_images_from_docx
+    text = docx2txt.process_element(element)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'docx2txt' has no attribute 'process_element'
+
+2025-07-04 10:35:07,536 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-04 10:40:06,670 - __main__ - INFO - Received file: Business Case.docx
+2025-07-04 10:40:06,673 - __main__ - INFO - Processing file: Business Case.docx
+2025-07-04 10:40:06,673 - __main__ - INFO - File size: 285804 bytes
+2025-07-04 10:40:06,673 - __main__ - INFO - Processing DOCX file
+2025-07-04 10:40:06,687 - __main__ - ERROR - Unexpected error during conversion: module 'docx2txt' has no attribute 'process_element'
+2025-07-04 10:40:06,689 - __main__ - ERROR - Traceback (most recent call last):
+  File "C:\Users\sharv\Intern_project\backend\app.py", line 512, in convert_file
+    text, images = await extract_text_and_images_from_docx(temp_path, doc_name=doc_name)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sharv\Intern_project\backend\app.py", line 277, in extract_text_and_images_from_docx
+    text = docx2txt.process_element(element)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'docx2txt' has no attribute 'process_element'
+
+2025-07-04 10:43:53,965 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-04 10:44:32,216 - __main__ - INFO - Received file: Business Case.docx
+2025-07-04 10:44:32,219 - __main__ - INFO - Processing file: Business Case.docx
+2025-07-04 10:44:32,219 - __main__ - INFO - File size: 285804 bytes
+2025-07-04 10:44:32,220 - __main__ - INFO - Processing DOCX file
+2025-07-04 10:44:32,235 - __main__ - ERROR - Unexpected error during conversion: module 'docx2txt' has no attribute 'process_element'
+2025-07-04 10:44:32,237 - __main__ - ERROR - Traceback (most recent call last):
+  File "C:\Users\sharv\Intern_project\backend\app.py", line 512, in convert_file
+    text, images = await extract_text_and_images_from_docx(temp_path, doc_name=doc_name)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sharv\Intern_project\backend\app.py", line 277, in extract_text_and_images_from_docx
+    text = docx2txt.process_element(element)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'docx2txt' has no attribute 'process_element'
+
+2025-07-04 11:13:29,056 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-04 11:13:39,768 - __main__ - INFO - Received file: Business Case.docx
+2025-07-04 11:13:39,770 - __main__ - INFO - Processing file: Business Case.docx
+2025-07-04 11:13:39,771 - __main__ - INFO - File size: 285804 bytes
+2025-07-04 11:13:39,771 - __main__ - INFO - Processing DOCX file
+2025-07-04 11:13:39,788 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_1.jpeg
+2025-07-04 11:13:39,789 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_2.jpeg
+2025-07-04 11:13:39,790 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_3.png
+2025-07-04 11:13:39,792 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_4.jpeg
+2025-07-04 11:13:39,794 - __main__ - INFO - Processing extracted content with Groq
+2025-07-04 11:13:43,713 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-04 11:13:43,720 - __main__ - INFO - Conversion completed successfully
+2025-07-04 11:13:43,756 - __main__ - INFO - Received file: Business Case.docx
+2025-07-04 11:13:43,763 - __main__ - INFO - Processing file: Business Case.docx
+2025-07-04 11:13:43,764 - __main__ - INFO - File size: 285804 bytes
+2025-07-04 11:13:43,766 - __main__ - INFO - Processing DOCX file
+2025-07-04 11:13:43,793 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_1.jpeg
+2025-07-04 11:13:43,796 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_2.jpeg
+2025-07-04 11:13:43,800 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_3.png
+2025-07-04 11:13:43,804 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_4.jpeg
+2025-07-04 11:13:43,809 - __main__ - INFO - Processing extracted content with Groq
+2025-07-04 11:13:46,723 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-04 11:13:46,727 - __main__ - INFO - Conversion completed successfully
+2025-07-04 11:14:17,589 - __main__ - INFO - Received file: Business Case.docx
+2025-07-04 11:14:17,594 - __main__ - INFO - Processing file: Business Case.docx
+2025-07-04 11:14:17,596 - __main__ - INFO - File size: 285804 bytes
+2025-07-04 11:14:17,597 - __main__ - INFO - Processing DOCX file
+2025-07-04 11:14:17,624 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_1.jpeg
+2025-07-04 11:14:17,628 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_2.jpeg
+2025-07-04 11:14:17,632 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_3.png
+2025-07-04 11:14:17,636 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_4.jpeg
+2025-07-04 11:14:17,641 - __main__ - INFO - Processing extracted content with Groq
+2025-07-04 11:14:20,692 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-04 11:14:20,697 - __main__ - INFO - Conversion completed successfully
+2025-07-04 11:14:20,721 - __main__ - INFO - Received file: Business Case.docx
+2025-07-04 11:14:20,726 - __main__ - INFO - Processing file: Business Case.docx
+2025-07-04 11:14:20,731 - __main__ - INFO - File size: 285804 bytes
+2025-07-04 11:14:20,732 - __main__ - INFO - Processing DOCX file
+2025-07-04 11:14:20,755 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_1.jpeg
+2025-07-04 11:14:20,758 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_2.jpeg
+2025-07-04 11:14:20,761 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_3.png
+2025-07-04 11:14:20,763 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_4.jpeg
+2025-07-04 11:14:20,768 - __main__ - INFO - Processing extracted content with Groq
+2025-07-04 11:14:24,670 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-04 11:14:24,673 - __main__ - INFO - Conversion completed successfully
+2025-07-04 11:20:14,055 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-04 11:20:30,251 - __main__ - INFO - Received file: Business Case.docx
+2025-07-04 11:20:30,257 - __main__ - INFO - Processing file: Business Case.docx
+2025-07-04 11:20:30,258 - __main__ - INFO - File size: 285804 bytes
+2025-07-04 11:20:30,258 - __main__ - INFO - Processing DOCX file
+2025-07-04 11:20:30,292 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_1.jpeg
+2025-07-04 11:20:30,295 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_2.jpeg
+2025-07-04 11:20:30,298 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_3.png
+2025-07-04 11:20:30,303 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_4.jpeg
+2025-07-04 11:20:30,311 - __main__ - INFO - Processing extracted content with Groq
+2025-07-04 11:20:34,241 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-04 11:20:34,247 - __main__ - INFO - Conversion completed successfully
+2025-07-04 11:20:34,279 - __main__ - INFO - Received file: Business Case.docx
+2025-07-04 11:20:34,281 - __main__ - INFO - Processing file: Business Case.docx
+2025-07-04 11:20:34,281 - __main__ - INFO - File size: 285804 bytes
+2025-07-04 11:20:34,282 - __main__ - INFO - Processing DOCX file
+2025-07-04 11:20:34,300 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_1.jpeg
+2025-07-04 11:20:34,303 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_2.jpeg
+2025-07-04 11:20:34,305 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_3.png
+2025-07-04 11:20:34,307 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_4.jpeg
+2025-07-04 11:20:34,310 - __main__ - INFO - Processing extracted content with Groq
+2025-07-04 11:20:36,221 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-04 11:20:36,224 - __main__ - INFO - Conversion completed successfully
+2025-07-04 11:23:11,212 - __main__ - INFO - Received file: Business Case.docx
+2025-07-04 11:23:11,216 - __main__ - INFO - Processing file: Business Case.docx
+2025-07-04 11:23:11,217 - __main__ - INFO - File size: 285804 bytes
+2025-07-04 11:23:11,218 - __main__ - INFO - Processing DOCX file
+2025-07-04 11:23:11,247 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_1.jpeg
+2025-07-04 11:23:11,252 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_2.jpeg
+2025-07-04 11:23:11,256 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_3.png
+2025-07-04 11:23:11,260 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_4.jpeg
+2025-07-04 11:23:11,268 - __main__ - INFO - Processing extracted content with Groq
+2025-07-04 11:23:14,932 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-04 11:23:14,937 - __main__ - INFO - Conversion completed successfully
+2025-07-04 11:23:14,991 - __main__ - INFO - Received file: Business Case.docx
+2025-07-04 11:23:14,998 - __main__ - INFO - Processing file: Business Case.docx
+2025-07-04 11:23:14,999 - __main__ - INFO - File size: 285804 bytes
+2025-07-04 11:23:15,000 - __main__ - INFO - Processing DOCX file
+2025-07-04 11:23:15,073 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_1.jpeg
+2025-07-04 11:23:15,086 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_2.jpeg
+2025-07-04 11:23:15,094 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_3.png
+2025-07-04 11:23:15,097 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_4.jpeg
+2025-07-04 11:23:15,108 - __main__ - INFO - Processing extracted content with Groq
+2025-07-04 11:23:18,713 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-04 11:23:18,719 - __main__ - INFO - Conversion completed successfully
+2025-07-04 11:33:56,671 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-04 11:38:23,826 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-04 12:04:37,140 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-04 12:05:06,828 - __main__ - INFO - Received file: Business Case.pdf
+2025-07-04 12:05:08,027 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_1.png
+2025-07-04 12:05:08,147 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_2.png
+2025-07-04 12:05:08,238 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_3.png
+2025-07-04 12:05:11,102 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-04 12:05:11,142 - __main__ - INFO - Received file: Business Case.pdf
+2025-07-04 12:05:11,893 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_1.png
+2025-07-04 12:05:11,986 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_2.png
+2025-07-04 12:05:12,084 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_3.png
+2025-07-04 12:05:15,129 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-04 12:10:34,144 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-04 12:11:44,929 - __main__ - INFO - Received file: Business Case.pdf
+2025-07-04 12:11:46,780 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_1.png
+2025-07-04 12:11:47,110 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_2.png
+2025-07-04 12:11:47,402 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_3.png
+2025-07-04 12:11:51,033 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-04 12:11:51,127 - __main__ - INFO - Received file: Business Case.pdf
+2025-07-04 12:11:52,963 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_1.png
+2025-07-04 12:11:53,284 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_2.png
+2025-07-04 12:11:53,598 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_3.png
+2025-07-04 12:11:57,220 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-04 12:26:42,041 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-04 12:26:52,706 - __main__ - INFO - Received file: Business Case.docx
+2025-07-04 12:26:52,741 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_1.jpeg
+2025-07-04 12:26:52,747 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_2.jpeg
+2025-07-04 12:26:52,755 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_3.png
+2025-07-04 12:26:52,760 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_4.jpeg
+2025-07-04 12:26:59,811 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-04 12:26:59,895 - __main__ - INFO - Received file: Business Case.docx
+2025-07-04 12:26:59,922 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_1.jpeg
+2025-07-04 12:26:59,927 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_2.jpeg
+2025-07-04 12:26:59,933 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_3.png
+2025-07-04 12:26:59,938 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_4.jpeg
+2025-07-04 12:27:03,254 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-04 14:05:59,440 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-04 14:06:08,649 - __main__ - INFO - Received file: Business Case.docx
+2025-07-04 14:06:08,700 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_1.jpeg
+2025-07-04 14:06:08,707 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_2.jpeg
+2025-07-04 14:06:08,716 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_3.png
+2025-07-04 14:06:08,723 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_4.jpeg
+2025-07-04 14:06:12,787 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-04 14:06:12,850 - __main__ - INFO - Received file: Business Case.docx
+2025-07-04 14:06:12,891 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_1.jpeg
+2025-07-04 14:06:12,898 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_2.jpeg
+2025-07-04 14:06:12,908 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_3.png
+2025-07-04 14:06:12,914 - __main__ - INFO - Image saved to C:\Users\sharv\Intern_project\backend\uploads\Business_Case_4.jpeg
+2025-07-04 14:06:17,195 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-04 14:08:17,443 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-04 14:08:47,532 - __main__ - INFO - Received file: Business Case.docx
+2025-07-04 14:08:51,839 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-04 14:08:51,893 - __main__ - INFO - Received file: Business Case.docx
+2025-07-04 14:08:55,383 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"

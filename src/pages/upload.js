@@ -5,6 +5,11 @@ import styles from './index.module.css';
 import Head from '@docusaurus/Head';
 import { useHistory } from 'react-router-dom';
 
+// Use the environment variable if set, otherwise default to localhost:5000
+const API_URL = (typeof process !== 'undefined' && process.env.REACT_APP_API_URL) || 
+                (typeof window !== 'undefined' && window.ENV?.REACT_APP_API_URL) || 
+                'http://localhost:5000';
+
 export default function UploadDashboard() {
     const [file, setFile] = useState(null);
     const [fileName, setFileName] = useState('');

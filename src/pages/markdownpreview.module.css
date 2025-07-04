@@ -1,0 +1,57 @@
+/* Image container styles */
+.imageContainer {
+  margin: 1.5rem 0;
+  text-align: center;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 8px;
+  padding: 1rem;
+  background-color: var(--ifm-color-emphasis-100);
+  transition: all 0.3s ease;
+}
+
+/* Image styles */
+.markdownImage {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  display: block;
+  margin: 0 auto;
+  max-height: 500px;
+  object-fit: contain;
+}
+
+/* Image caption styles */
+.imageCaption {
+  margin-top: 0.5rem;
+  font-size: 0.9em;
+  color: var(--ifm-color-emphasis-700);
+  font-style: italic;
+}
+
+/* Error state for images */
+.imageError {
+  position: relative;
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--ifm-color-emphasis-100);
+}
+
+.imageError::after {
+  content: 'Image failed to load';
+  color: var(--ifm-color-danger);
+  font-size: 0.9em;
+  padding: 1rem;
+  text-align: center;
+}
+
+/* Dark mode adjustments */
+[data-theme='dark'] .imageContainer {
+  border-color: var(--ifm-color-emphasis-700);
+  background-color: var(--ifm-color-emphasis-100);
+}
+
+[data-theme='dark'] .imageError {
+  background-color: var(--ifm-color-emphasis-200);
+}

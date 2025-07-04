@@ -21,6 +21,10 @@ const config = {
     locales: ['en'],
   },
 
+  clientModules: [
+    require.resolve('./src/env-config.js'),
+  ],
+
   presets: [
     [
       'classic',

@@ -54,15 +54,16 @@ app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 # CORS configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Or specify your frontend URL
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    expose_headers=["Content-Disposition"]
 )
 
 # Create uploads directory if it doesn't exist
-UPLOAD_DIR = os.path.abspath("uploads")
+# UPLOAD_DIR = os.path.abspath("uploads")
+# os.makedirs(UPLOAD_DIR, exist_ok=True)
+UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 logger.info(f"Using upload directory: {UPLOAD_DIR}")
 
@@ -73,7 +74,6 @@ mimetypes.add_type('image/jpeg', '.jpeg')
 
 # Serve static files from the uploads directory
 app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
-
 class ImageData(BaseModel):
     data: str
     type: str
@@ -118,12 +118,14 @@ async def save_image_locally(image_bytes: bytes, filename: str, doc_name: str = 
         # Ensure the uploads directory exists
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
         
-        # Save the image
-        with open(file_path, 'wb') as f:
-            f.write(image_bytes)
+        # Save the file
+        with open(file_path, 'wb') as buffer:
+            buffer.write(image_bytes)
             
-        logger.info(f"Image saved to {file_path}")
-        return f"/uploads/{unique_filename}"
+        # Return the full URL path
+        # In production, replace 'http://localhost:5000' with your actual domain
+        base_url = "http://localhost:5000"
+        return f"{base_url}/uploads/{unique_filename}"
         
     except Exception as e:
         logger.error(f"Error saving image: {str(e)}")
