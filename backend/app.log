@@ -501,3 +501,6 @@ AttributeError: module 'docx2txt' has no attribute 'process_element'
 2025-07-04 14:08:51,839 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
 2025-07-04 14:08:51,893 - __main__ - INFO - Received file: Business Case.docx
 2025-07-04 14:08:55,383 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-04 14:10:23,169 - __main__ - INFO - Received file: Business Case.docx
+2025-07-04 14:10:25,943 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-05 11:23:40,895 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
