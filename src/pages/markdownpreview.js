@@ -12,17 +12,33 @@ import DOMPurify from 'dompurify';
 // Configure marked
 const renderer = new marked.Renderer();
 
-// Custom image renderer to handle relative paths
+// Custom image renderer to handle relative paths and ensure proper display
 renderer.image = (href, title, text) => {
-  // If the href is already a full URL, use it as is
-  if (href.startsWith('http')) {
-    return `<img src="${href}" alt="${text || ''}" title="${title || ''}" style="max-width: 100%; height: auto;" />`;
+  try {
+    if (!href) return '';
+    let imageUrl = typeof href === 'string' ? href : href.url || href.data || '';
+    if (imageUrl && !imageUrl.startsWith('http') && !imageUrl.startsWith('data:')) {
+      if (!imageUrl.startsWith('/uploads/')) {
+        imageUrl = `/uploads/${imageUrl.replace(/^[\\/]+/, '')}`;
+      }
+    }
+    const altText = text ? String(text).replace(/^['"]|['"]$/g, '') : '';
+    // Use a fallback error image on error
+    return `
+      <div class="${styles.imageContainer}" style="min-height:180px;display:flex;align-items:center;justify-content:center;">
+        <img 
+          src="${imageUrl}" 
+          alt="${altText}" 
+          ${title ? `title="${title}"` : ''} 
+          class="${styles.markdownImage}"
+          onerror="this.onerror=null;this.src='/static/img/image-error.png';"
+        />
+        ${altText ? `<div class="${styles.imageCaption}">${altText}</div>` : ''}
+      </div>`;
+  } catch (error) {
+    console.error('Error rendering image:', { href, title, text, error });
+    return `<div class="${styles.imageError}" style="min-height:180px;display:flex;align-items:center;justify-content:center;">Image failed to load</div>`;
   }
-  
-  // Otherwise, assume it's a path from the backend
-  const baseUrl = 'http://localhost:5000';
-  const fullUrl = href.startsWith('/') ? `${baseUrl}${href}` : `${baseUrl}/${href}`;
-  return `<img src="${fullUrl}" alt="${text || ''}" title="${title || ''}" style="max-width: 100%; height: auto;" />`;
 };
 
 marked.setOptions({
@@ -36,11 +52,50 @@ marked.setOptions({
 function cleanMarkdownContent(md) {
   if (!md) return '';
 
-  let lines = md.split('\n');
+  // First, handle any special image placeholders or formatting
+  let cleanedMd = md;
+
+  // Handle markdown image links that might have spaces or special characters
+  cleanedMd = cleanedMd.replace(/!\[(.*?)\]\((.*?)\)/g, (match, alt, src) => {
+    // If the source is already a full URL or data URI, leave it as is
+    if (src.startsWith('http') || src.startsWith('data:')) {
+      return match;
+    }
+
+    // Clean up the source path
+    let cleanSrc = src.trim();
+
+    // Remove any surrounding quotes
+    cleanSrc = cleanSrc.replace(/^['"]|['"]$/g, '');
+
+    // If it's a local path without the /uploads/ prefix, add it
+    if (!cleanSrc.startsWith('/uploads/') && !cleanSrc.startsWith('uploads/')) {
+      cleanSrc = `uploads/${cleanSrc}`.replace(/^\/+/, '');
+    }
+
+    return `![${alt}](${cleanSrc})`;
+  });
+
+  // Handle any remaining image placeholders that might have been missed
+  const imagePlaceholderRegex = /\[IMAGE_\d+\]/g;
+  cleanedMd = cleanedMd.replace(imagePlaceholderRegex, '');
+
+  // Handle any image paths that might be wrapped in HTML tags
+  const imgTagRegex = /<img[^>]+src="([^">]+)"/g;
+  cleanedMd = cleanedMd.replace(imgTagRegex, (match, src) => {
+    if (!src.startsWith('http') && !src.startsWith('data:')) {
+      const cleanSrc = src.startsWith('/') ? src.substring(1) : src;
+      return match.replace(src, `/uploads/${cleanSrc}`);
+    }
+    return match;
+  });
+
+  // Handle line breaks and empty lines
+  let lines = cleanedMd.split('\n');
   let cleaned = [];
   let inCodeBlock = false;
+  let inQuote = false;
   let inNoteBlock = false;
-  let currentImage = null;
 
   for (let i = 0; i < lines.length; i++) {
     let line = lines[i].trim();
@@ -61,43 +116,17 @@ function cleanMarkdownContent(md) {
       continue;
     }
 
-    // Handle image descriptions from the backend
-    if (line.toLowerCase().includes('image') && line.toLowerCase().includes('path:')) {
-      const pathMatch = line.match(/path:\s*([^\s]+)/i);
-      if (pathMatch && pathMatch[1]) {
-        let src = pathMatch[1].trim();
-        src = src.replace(/^['"]|['"]$/g, '');
-        if (!src.startsWith('http') && !src.startsWith('data:')) {
-          if (!src.startsWith('/uploads/') && !src.startsWith('uploads/')) {
-            src = `/uploads/${src}`;
-          }
-          cleaned.push(`![](${src})`);
-          continue;
-        }
-      }
-    }
-    
-    // Handle standard markdown image syntax
-    if (line.startsWith('![') && line.includes('](') && line.includes(')')) {
-      try {
-        const imgMatch = line.match(/!\[(.*?)\]\((.*?)\)/);
-        if (imgMatch && imgMatch[2]) {
-          let [_, alt, src] = imgMatch;
-          if (src && typeof src === 'string') {
-            src = src.trim().replace(/^['"]|['"]$/g, '');
-            if (!src.startsWith('http') && !src.startsWith('data:')) {
-              if (!src.startsWith('/uploads/') && !src.startsWith('uploads/')) {
-                src = `/uploads/${src}`;
-              }
-              line = `![${alt || ''}](${src})`;
-            }
-          }
-        }
-      } catch (error) {
-        console.warn('Error processing image line:', line, error);
+    // Handle blockquotes
+    if (line.startsWith('>')) {
+      if (!inQuote) {
+        inQuote = true;
+        cleaned.push(''); // Add an empty line before quote if needed
       }
       cleaned.push(line);
       continue;
+    } else if (inQuote) {
+      inQuote = false;
+      cleaned.push(''); // Add an empty line after quote
     }
 
     // Handle note blocks with enhanced formatting
@@ -135,6 +164,7 @@ export default function MarkdownPreview() {
   const location = useLocation();
   const [markdown, setMarkdown] = useState('');
   const [filename, setFilename] = useState('');
+  const [placeholderMap, setPlaceholderMap] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [copyStatus, setCopyStatus] = useState('Copy Markdown');
   const [downloadStatus, setDownloadStatus] = useState('Download Markdown');
@@ -149,6 +179,7 @@ export default function MarkdownPreview() {
     if (location.state) {
       setMarkdown(location.state.markdown || '');
       setFilename(location.state.filename || 'Untitled Document.md');
+      setPlaceholderMap(location.state.placeholder_map || {});
     }
     setIsLoading(false);
   }, [location.state]);
@@ -182,89 +213,33 @@ export default function MarkdownPreview() {
 
   const renderMarkdown = () => {
     try {
-      const cleaned = cleanMarkdownContent(markdown);
+      let cleaned = cleanMarkdownContent(markdown);
+      // Replace any remaining placeholders with image tags using placeholderMap
+      if (placeholderMap && typeof cleaned === 'string') {
+        Object.entries(placeholderMap).forEach(([ph, url]) => {
+          // Replace all occurrences of the placeholder with the image markdown
+          cleaned = cleaned.split(ph).join(`![](${url})`);
+        });
+      }
       const renderer = new marked.Renderer();
-      
-      // renderer.image = (href, title, text) => {
-      //   try {
-      //     if (!href) return '';
-          
-      //     let imageUrl = '';
-          
-      //     // Handle case where href is an object (from the API response)
-      //     if (typeof href === 'object' && href !== null) {
-      //       // If it's an object with a 'data' property (like a base64 image)
-      //       if (href.data) {
-      //         imageUrl = `data:${href.type || 'image/png'};base64,${href.data}`;
-      //       } 
-      //       // If it's an object with a 'url' property
-      //       else if (href.url) {
-      //         imageUrl = href.url;
-      //       } 
-      //       // If we can't determine the image source, return empty string
-      //       else {
-      //         console.warn('Unsupported image object format:', href);
-      //         return '';
-      //       }
-      //     } 
-      //     // Handle string URLs
-      //     else {
-      //       imageUrl = String(href).trim();
-            
-      //       // Remove any leading slashes or backslashes
-      //       imageUrl = imageUrl.replace(/^[\\/]+/, '');
-            
-      //       // If it's not an absolute URL or data URL, prepend with /uploads/
-      //       if (!imageUrl.startsWith('http') && !imageUrl.startsWith('data:')) {
-      //         if (!imageUrl.startsWith('uploads/')) {
-      //           imageUrl = `/uploads/${imageUrl}`;
-      //         } else {
-      //           imageUrl = `/${imageUrl}`;
-      //         }
-      //       }
-      //     }
-          
-      //     // Clean up alt text
-      //     const altText = text ? String(text).replace(/^['"]|['"]$/g, '') : '';
-          
-      //     // Create a unique ID for the image container for error handling
-      //     const imgId = `img-${Math.random().toString(36).substr(2, 9)}`;
-          
-      //     return `
-      //       <div class="${styles.imageContainer}" id="${imgId}">
-      //         <img 
-      //           src="${imageUrl}" 
-      //           alt="${altText}" 
-      //           ${title ? `title="${title}"` : ''} 
-      //           class="${styles.markdownImage}"
-      //           onerror="document.getElementById('${imgId}').classList.add('${styles.imageError}'); console.error('Failed to load image: ${imageUrl.replace(/"/g, '\\"')}')"
-      //         />
-      //         ${altText ? `<div class="${styles.imageCaption}">${altText}</div>` : ''}
-      //       </div>`;
-      //   } catch (error) {
-      //     console.error('Error rendering image:', { href, title, text, error });
-      //     return `<div class="image-error">[Image failed to load]</div>`;
-      //   }
-      // };
-      
 
       renderer.image = (href, title, text) => {
         try {
           if (!href) return '';
-          
+
           // Handle both string URLs and image objects
           let imageUrl = typeof href === 'string' ? href : href.url || href.data || '';
-          
+
           // Ensure the URL is properly formatted
           if (imageUrl && !imageUrl.startsWith('http') && !imageUrl.startsWith('data:')) {
             if (!imageUrl.startsWith('/uploads/')) {
               imageUrl = `/uploads/${imageUrl.replace(/^[\\/]+/, '')}`;
             }
           }
-          
+
           // Clean up alt text
           const altText = text ? String(text).replace(/^['"]|['"]$/g, '') : '';
-          
+
           return `
             <div class="${styles.imageContainer}">
               <img 
@@ -272,18 +247,18 @@ export default function MarkdownPreview() {
                 alt="${altText}" 
                 ${title ? `title="${title}"` : ''} 
                 class="${styles.markdownImage}"
-                onerror="this.onerror=null;this.parentElement.classList.add('${styles.imageError}')"
+                onerror="this.onerror=null;this.src='/static/img/image-error.png';"
               />
               ${altText ? `<div class="${styles.imageCaption}">${altText}</div>` : ''}
             </div>`;
         } catch (error) {
           console.error('Error rendering image:', { href, title, text, error });
-          return `<div class="${styles.imageError}">[Image failed to load]</div>`;
+          return `<div class="${styles.imageError}" style="min-height:180px;display:flex;align-items:center;justify-content:center;">Image failed to load</div>`;
         }
       };
-      
+
       const html = marked(cleaned, { renderer });
-      
+
       return DOMPurify.sanitize(html, {
         ADD_TAGS: ['img'],
         ADD_ATTR: ['src', 'alt', 'title', 'class', 'onerror']

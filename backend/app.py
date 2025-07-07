@@ -1,29 +1,37 @@
-import os
-import uuid
+import asyncio
 import base64
 import io
-import tempfile
-from fastapi import FastAPI, HTTPException, UploadFile, Request, status
-from fastapi.responses import JSONResponse, FileResponse, Response
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
-import mimetypes
-from pydantic import BaseModel
-from typing import List, Optional, Dict, Any
+import json
 import logging
-import traceback
-from pdf2image import convert_from_path
-import fitz  # PyMuPDF
-from docx import Document
-import pytesseract
-from PIL import Image
+import os
 import re
-import asyncio
+import shutil
+import tempfile
+import time
+import traceback
+import uuid
+from pathlib import Path
+from typing import List, Optional, Dict, Any
 import docx2txt
-from PyPDF2 import PdfReader
-import groq
+import fitz  # PyMuPDF
+import numpy as np
+import PyPDF2
+import pytesseract
+import requests
+import uvicorn
+from docx import Document
+from fastapi import FastAPI, UploadFile, HTTPException, status, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
+from pdf2image import convert_from_path
+from PIL import Image
+from pydantic import BaseModel
 from dotenv import load_dotenv
 from datetime import datetime
+import groq
+import mimetypes
+from docx.opc.constants import RELATIONSHIP_TYPE as RT
 
 # Configure logging
 logging.basicConfig(
@@ -78,12 +86,17 @@ class ImageData(BaseModel):
     data: str
     type: str
     description: str = "Document image"
+    placeholder: str = ""
 
 class ConversionResponse(BaseModel):
     status: str = "success"
     markdown: str
     filename: str
     images: List[ImageData] = []
+    placeholder_map: Dict[str, str] = {}
+
+# --- 1. Standardize placeholder format ---
+PLACEHOLDER_FORMAT = "[[IMG_PLACEHOLDER_{}]]"
 
 async def save_image_locally(image_bytes: bytes, filename: str, doc_name: str = "", index: int = 0) -> str:
     """Save image to local uploads directory and return its URL path.
@@ -176,181 +189,99 @@ async def extract_images_from_pdf(pdf_bytes: bytes, doc_name: str = "") -> List[
         raise HTTPException(status_code=500, detail="Failed to extract images from PDF")
     return images
 
-async def extract_text_and_images_from_docx(docx_path: str, doc_name: str = "") -> tuple[str, List[ImageData]]:
-    """Extract text and images from DOCX while maintaining their positions.
-    
-    Args:
-        docx_path: Path to the DOCX file
-        doc_name: Base name of the document (for naming images)
-        
-    Returns:
-        tuple: (text_with_placeholders, images)
-    """
-    temp_dir = "temp_images"
-    try:
-        # Create the temp directory first
-        os.makedirs(temp_dir, exist_ok=True)
-        
-        # Process the document with docx2txt to get text with image placeholders
-        text = docx2txt.process(docx_path, temp_dir)
-        
-        images = []
-        if os.path.exists(temp_dir):
-            image_files = [f for f in os.listdir(temp_dir) 
-                         if os.path.isfile(os.path.join(temp_dir, f)) and 
-                         f.lower().endswith(('.png', '.jpg', '.jpeg', '.gif'))]
-            
-            # Process each extracted image
-            for i, img_file in enumerate(sorted(image_files), 1):
-                img_path = os.path.join(temp_dir, img_file)
-                try:
-                    with open(img_path, 'rb') as f:
-                        img_data = f.read()
-                    
-                    # Get file extension
-                    _, ext = os.path.splitext(img_file)
-                    ext = ext.lower()
-                    if ext not in ['.jpg', '.jpeg', '.png']:
-                        ext = '.png'
-                    
-                    # Save the image with proper naming
-                    image_url = await save_image_locally(
-                        img_data,
-                        f"{doc_name}_image_{i}{ext}",
-                        doc_name=doc_name,
-                        index=i
-                    )
-                    
-                    images.append(ImageData(
-                        data=image_url,
-                        type=f"image/{ext.lstrip('.')}",
-                        description=f"Image {i}"
-                    ))
-                    
-                except Exception as img_error:
-                    logger.error(f"Error processing image {img_file}: {str(img_error)}")
-                finally:
-                    # Ensure the file is closed and removed
-                    try:
-                        if os.path.exists(img_path):
-                            os.remove(img_path)
-                    except Exception as e:
-                        logger.error(f"Error removing temporary file {img_path}: {str(e)}")
-        
-        # Replace image placeholders with markdown
-        for i, img in enumerate(images, 1):
-            placeholder = f"{temp_dir}/image{i}"
-            img_markdown = f"![]({img.data})  \n*{img.description}*"
-            text = text.replace(placeholder, img_markdown)
-        
-        return text, images
-        
-    except Exception as e:
-        logger.error(f"Error processing DOCX: {str(e)}")
-        logger.error(traceback.format_exc())
-        raise HTTPException(status_code=500, detail=f"Failed to process DOCX: {str(e)}")
-    finally:
-        # Clean up the temp directory
-        try:
-            if os.path.exists(temp_dir):
-                # Remove all files in the directory
-                for f in os.listdir(temp_dir):
-                    file_path = os.path.join(temp_dir, f)
-                    try:
-                        if os.path.isfile(file_path):
-                            os.unlink(file_path)
-                    except Exception as e:
-                        logger.error(f"Error deleting {file_path}: {str(e)}")
-                # Remove the directory
-                os.rmdir(temp_dir)
-        except Exception as e:
-            logger.error(f"Error cleaning up temp directory: {str(e)}")
-
-async def extract_text_and_images_from_pdf(pdf_bytes: bytes, doc_name: str = "") -> tuple[str, List[ImageData]]:
-    """Extract text and images from PDF while maintaining their positions.
-    
-    Args:
-        pdf_bytes: PDF file content as bytes
-        doc_name: Base name of the document (for naming images)
-        
-    Returns:
-        tuple: (text_with_placeholders, images)
-    """
-    text_parts = []
+async def extract_text_and_images_from_docx(docx_path: str, doc_name: str = "") -> tuple[str, List[ImageData], Dict[str, str]]:
+    """Extract text and images from DOCX while maintaining their positions and return placeholder map."""
+    doc = Document(docx_path)
     images = []
-    
+    placeholder_map = {}
+    image_counter = 0
+    text_parts = []
+    rels = doc.part.rels
+    for para in doc.paragraphs:
+        para_text = ""
+        for run in para.runs:
+            if 'graphic' in run._element.xml:
+                # This run contains an image
+                for rel in rels.values():
+                    if rel.reltype == RT.IMAGE:
+                        image_part = rel.target_part
+                        image_bytes = image_part.blob
+                        ext = os.path.splitext(image_part.partname)[1].lower()
+                        ext = ext if ext in ['.jpg', '.jpeg', '.png', '.gif', '.bmp'] else '.png'
+                        img_name = f"{doc_name}_img_{image_counter+1}{ext}"
+                        image_url = await save_image_locally(image_bytes, img_name, doc_name=doc_name, index=image_counter+1)
+                        placeholder = PLACEHOLDER_FORMAT.format(image_counter)
+                        images.append(ImageData(data=image_url, type=f"image/{ext.lstrip('.')}", description=f"Image {image_counter+1}", placeholder=placeholder))
+                        placeholder_map[placeholder] = image_url
+                        para_text += f" {placeholder} "
+                        image_counter += 1
+                        break
+            else:
+                para_text += run.text
+        text_parts.append(para_text)
+    # Join all text parts
+    text = "\n\n".join(text_parts)
+    # Replace all placeholders with markdown image tags
+    for img in images:
+        img_markdown = f"![]({img.data})"
+        text = text.replace(img.placeholder, img_markdown)
+    return text, images, placeholder_map
+
+async def extract_text_and_images_from_pdf(pdf_bytes: bytes, doc_name: str = "") -> tuple[str, List[ImageData], Dict[str, str]]:
+    images = []
+    placeholder_map = {}
+    text_parts = []
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_pdf:
+        temp_pdf.write(pdf_bytes)
+        temp_pdf_path = temp_pdf.name
+    doc = None
     try:
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_pdf:
-            temp_pdf.write(pdf_bytes)
-            temp_pdf_path = temp_pdf.name
-        
-        try:
-            # Extract text first
-            reader = PdfReader(io.BytesIO(pdf_bytes))
-            for page_num, page in enumerate(reader.pages, 1):
-                # Extract text from the page
-                page_text = page.extract_text()
-                if page_text:
-                    # Clean up common PDF artifacts
-                    page_text = re.sub(r'\s+', ' ', page_text)  # Normalize whitespace
-                    page_text = re.sub(r'(\w)-\s+(\w)', r'\1\2', page_text)  # Fix hyphenated words
-                    text_parts.append(page_text)
-                
-                # Add image placeholder
-                text_parts.append(f"\n\n[IMAGE_PLACEHOLDER_{page_num}]\n\n")
-            
+        doc = fitz.open(temp_pdf_path)
+        img_idx = 0
+        for page_num, page in enumerate(doc, 1):
+            # Extract text
+            page_text = page.get_text("text")
+            text_parts.append(page_text)
             # Extract images
-            images_list = convert_from_path(temp_pdf_path)
-            for i, image in enumerate(images_list, 1):
-                img_byte_arr = io.BytesIO()
-                image.save(img_byte_arr, format='PNG')
-                img_bytes = img_byte_arr.getvalue()
-                
-                image_url = await save_image_locally(
-                    img_bytes, 
-                    f"{doc_name}_page_{i}.png",
-                    doc_name=doc_name,
-                    index=i
-                )
-                
-                images.append(ImageData(
-                    data=image_url,
-                    type="image/png",
-                    description=f"Page {i}"
-                ))
-            
-            # Join text parts and replace placeholders with image markdown
-            full_text = "\n\n".join(text_parts).strip()
-            
-            # Replace placeholders with image markdown
-            for i, img in enumerate(images, 1):
-                placeholder = f"[IMAGE_PLACEHOLDER_{i}]"
-                img_markdown = f"![]({img.data})  \n*{img.description}*"
-                full_text = full_text.replace(placeholder, img_markdown, 1)
-            
-            return full_text, images
-            
-        finally:
-            os.unlink(temp_pdf_path)
-            
-    except Exception as e:
-        logger.error(f"Error processing PDF: {str(e)}")
-        logger.error(traceback.format_exc())
-        raise HTTPException(status_code=500, detail="Failed to process PDF")
+            image_list = page.get_images(full=True)
+            for img in image_list:
+                xref = img[0]
+                base_image = doc.extract_image(xref)
+                img_bytes = base_image["image"]
+                ext = f'.{base_image["ext"]}'
+                img_name = f"{doc_name}_img_{img_idx+1}{ext}"
+                image_url = await save_image_locally(img_bytes, img_name, doc_name=doc_name, index=img_idx+1)
+                placeholder = PLACEHOLDER_FORMAT.format(img_idx)
+                images.append(ImageData(data=image_url, type=f"image/{base_image['ext']}", description=f"Image {img_idx+1}", placeholder=placeholder))
+                placeholder_map[placeholder] = image_url
+                # Insert placeholder after the text for this page
+                text_parts.append(f"\n{placeholder}\n")
+                img_idx += 1
+        full_text = "\n".join(text_parts).strip()
+        for img in images:
+            img_markdown = f"![]({img.data})"
+            full_text = full_text.replace(img.placeholder, img_markdown)
+        return full_text, images, placeholder_map
+    finally:
+        if doc is not None:
+            doc.close()
+        os.unlink(temp_pdf_path)
 
 def process_document_with_groq(text: str, images: List[ImageData], filename: str) -> str:
     """Process document text with Groq API and return formatted Markdown."""
     if not text.strip() and not images:
         return "# Document Conversion\n\nNo text content could be extracted from the document."
+    
+    # If we already have images in the text (from PDF/DOCX extraction), just return as is
+    if any(f"![](" in text for img in images):
+        return text
         
     try:
         client = groq.Client()
         
-        # Prepare image references for the prompt
-        image_references = "\n".join(
-            f"Image {idx+1}: {img.description} (path: {img.data})" 
-            for idx, img in enumerate(images)
-        ) if images else "No images"
+        # Prepare image placeholders in the text
+        for i, img in enumerate(images):
+            text = text.replace(f"[IMAGE_{i}]", f"![]({img.data})")
         
         system_prompt = """You are an expert technical documentation specialist with deep knowledge of Markdown formatting. 
 Your task is to convert technical documentation into perfectly formatted Markdown while preserving all technical accuracy.
@@ -362,18 +293,19 @@ Key Rules:
 4. Format all lists, notes, and code blocks properly
 5. Preserve all original information without adding or removing content
 6. Ensure consistent spacing and formatting throughout
+7. DO NOT modify or move any image markdown (![alt](url)) that is already in the text
 
 The output should be production-ready technical documentation in Markdown format."""
 
-        user_prompt = f"""Convert the following document into professional Markdown format:
+        user_prompt = f"""Convert the following document into professional Markdown format.
+The document already contains properly positioned image placeholders in the format ![](image_url).
+DO NOT move or modify these image placeholders in any way.
 
 Document content:
 {text}
 
-Images available:
-{image_references}
-
-Please format this as clean, well-structured markdown while preserving all technical details and following the formatting rules."""
+Please format this as clean, well-structured markdown while preserving all technical details and following the formatting rules.
+Most importantly, DO NOT move or modify any existing image markdown (![alt](url)) in the text."""
 
         chat_completion = client.chat.completions.create(
             messages=[
@@ -417,43 +349,94 @@ async def convert_file(file: UploadFile):
     """Convert uploaded PDF or DOCX file to Markdown with extracted images."""
     logger.info(f"Received file: {file.filename}")
     temp_path = None
+    
     try:
+        # Check if file is provided
+        if not file:
+            raise HTTPException(status_code=400, detail="No file provided")
+        
         filename = file.filename
         if not filename.lower().endswith(('.pdf', '.docx')):
             raise HTTPException(status_code=400, detail="Only PDF/DOCX files are allowed")
 
+        logger.info(f"Starting conversion for file: {filename}")
+        
+        # Read file content
+        file_content = await file.read()
+        if not file_content:
+            raise HTTPException(status_code=400, detail="File is empty")
+            
+        logger.info(f"File size: {len(file_content)} bytes")
+        
         # Get the base name without extension
         doc_name = os.path.splitext(filename)[0]
-        contents = await file.read()
+        text = ""
+        images = []
+        placeholder_map = {}
         
-        if not contents:
-            raise HTTPException(status_code=400, detail="Uploaded file is empty")
-        
-        if filename.lower().endswith('.pdf'):
-            text, images = await extract_text_and_images_from_pdf(contents, doc_name=doc_name)
-        else:
-            # Create a temporary file with a unique name
-            fd, temp_path = tempfile.mkstemp(suffix=".docx")
-            try:
-                with os.fdopen(fd, 'wb') as temp:
-                    temp.write(contents)
-                
-                text, images = await extract_text_and_images_from_docx(temp_path, doc_name=doc_name)
-            finally:
-                # Ensure the temporary file is removed
-                if temp_path and os.path.exists(temp_path):
-                    try:
-                        os.unlink(temp_path)
-                    except Exception as e:
-                        logger.error(f"Error removing temporary file {temp_path}: {str(e)}")
-        
-        # Process the text with Groq to format it as markdown
-        markdown_output = process_document_with_groq(text, images, filename)
+        try:
+            # Extract text and images based on file type
+            if filename.lower().endswith('.pdf'):
+                logger.info("Processing PDF file")
+                text, images, placeholder_map = await extract_text_and_images_from_pdf(file_content, doc_name=doc_name)
+            else:  # .docx
+                logger.info("Processing DOCX file")
+                # Create a temporary file
+                fd, temp_path = tempfile.mkstemp(suffix=".docx")
+                try:
+                    with os.fdopen(fd, 'wb') as temp:
+                        temp.write(file_content)
+                    
+                    text, images, placeholder_map = await extract_text_and_images_from_docx(temp_path, doc_name=doc_name)
+                finally:
+                    # Clean up temp file
+                    if temp_path and os.path.exists(temp_path):
+                        try:
+                            os.unlink(temp_path)
+                        except Exception as e:
+                            logger.error(f"Error removing temporary file {temp_path}: {str(e)}")
+            
+            logger.info(f"Extracted text length: {len(text)}, Number of images: {len(images)}")
+            
+            # If we already have markdown with images, use it directly
+            if text and any(f"![](" in text for img in images):
+                markdown_content = text
+            # Otherwise, process with Groq
+            elif text or images:
+                markdown_content = process_document_with_groq(text, images, filename)
+            else:
+                markdown_content = "# Document Conversion\n\nNo content could be extracted from the document."
+
+            # Ensure all images are properly referenced in the markdown
+            for img in images:
+                # Only append if the image URL is not already in the markdown
+                if img.data not in markdown_content:
+                    markdown_content += f"\n\n![]({img.data})"
+
+            logger.info("Document processing completed successfully")
+            
+            # Create response
+            return {
+                "status": "success",
+                "markdown": markdown_content,
+                "filename": filename,
+                "images": images,
+                "placeholder_map": placeholder_map
+            }
+            
+        except Exception as e:
+            logger.error(f"Error during document processing: {str(e)}\n{traceback.format_exc()}")
+            raise HTTPException(
+                status_code=500, 
+                detail=f"Error processing document: {str(e)}"
+            )
         
         return ConversionResponse(
-            markdown=markdown_output,
+            status="success",
+            markdown=markdown_content,
             filename=filename,
-            images=images
+            images=images,
+            placeholder_map=placeholder_map
         )
         
     except HTTPException:

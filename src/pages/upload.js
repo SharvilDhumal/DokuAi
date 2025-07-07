@@ -6,9 +6,9 @@ import Head from '@docusaurus/Head';
 import { useHistory } from 'react-router-dom';
 
 // Use the environment variable if set, otherwise default to localhost:5000
-const API_URL = (typeof process !== 'undefined' && process.env.REACT_APP_API_URL) || 
-                (typeof window !== 'undefined' && window.ENV?.REACT_APP_API_URL) || 
-                'http://localhost:5000';
+const API_URL = (typeof process !== 'undefined' && process.env.REACT_APP_API_URL) ||
+    (typeof window !== 'undefined' && window.ENV?.REACT_APP_API_URL) ||
+    'http://localhost:5000';
 
 export default function UploadDashboard() {
     const [file, setFile] = useState(null);
@@ -133,22 +133,22 @@ export default function UploadDashboard() {
                 xhr.send(formData);
             })
                 .then(data => {
-                    console.log('API Response:', data);
-
-                    // Keep the original markdown content with images
+                    // Only log once for debugging
+                    if (process.env.NODE_ENV === 'development') {
+                        console.log('API Response:', data);
+                    }
                     let markdownContent = data.markdown || '';
-                    
                     if (!markdownContent.trim()) {
                         markdownContent = "# Document Conversion\n\nNo text content could be extracted from the document.";
                     }
-
-                    // Navigate to markdownpreview page with the data
+                    // Pass placeholder_map to markdownpreview
                     history.push({
                         pathname: '/markdownpreview',
                         state: {
                             markdown: markdownContent,
                             filename: data.filename,
-                            images: data.images || []
+                            images: data.images || [],
+                            placeholder_map: data.placeholder_map || {}
                         }
                     });
                 })
