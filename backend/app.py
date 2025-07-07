@@ -200,22 +200,26 @@ async def extract_text_and_images_from_docx(docx_path: str, doc_name: str = "") 
     for para in doc.paragraphs:
         para_text = ""
         for run in para.runs:
-            if 'graphic' in run._element.xml:
-                # This run contains an image
-                for rel in rels.values():
-                    if rel.reltype == RT.IMAGE:
-                        image_part = rel.target_part
-                        image_bytes = image_part.blob
-                        ext = os.path.splitext(image_part.partname)[1].lower()
-                        ext = ext if ext in ['.jpg', '.jpeg', '.png', '.gif', '.bmp'] else '.png'
-                        img_name = f"{doc_name}_img_{image_counter+1}{ext}"
-                        image_url = await save_image_locally(image_bytes, img_name, doc_name=doc_name, index=image_counter+1)
-                        placeholder = PLACEHOLDER_FORMAT.format(image_counter)
-                        images.append(ImageData(data=image_url, type=f"image/{ext.lstrip('.')}", description=f"Image {image_counter+1}", placeholder=placeholder))
-                        placeholder_map[placeholder] = image_url
-                        para_text += f" {placeholder} "
-                        image_counter += 1
-                        break
+            run_xml = run._element.xml
+            # Look for image relationship ID in the run's XML
+            match = re.search(r'r:embed="(rId[0-9]+)"', run_xml)
+            if match:
+                rId = match.group(1)
+                rel = rels.get(rId)
+                if rel and rel.reltype == RT.IMAGE:
+                    image_part = rel.target_part
+                    image_bytes = image_part.blob
+                    ext = os.path.splitext(image_part.partname)[1].lower()
+                    ext = ext if ext in ['.jpg', '.jpeg', '.png', '.gif', '.bmp'] else '.png'
+                    img_name = f"{doc_name}_img_{image_counter+1}{ext}"
+                    image_url = await save_image_locally(image_bytes, img_name, doc_name=doc_name, index=image_counter+1)
+                    placeholder = PLACEHOLDER_FORMAT.format(image_counter)
+                    images.append(ImageData(data=image_url, type=f"image/{ext.lstrip('.')}" , description=f"Image {image_counter+1}", placeholder=placeholder))
+                    placeholder_map[placeholder] = image_url
+                    para_text += f" {placeholder} "
+                    image_counter += 1
+                else:
+                    para_text += run.text
             else:
                 para_text += run.text
         text_parts.append(para_text)
@@ -398,21 +402,15 @@ async def convert_file(file: UploadFile):
             
             logger.info(f"Extracted text length: {len(text)}, Number of images: {len(images)}")
             
-            # If we already have markdown with images, use it directly
-            if text and any(f"![](" in text for img in images):
-                markdown_content = text
-            # Otherwise, process with Groq
-            elif text or images:
+            # Always process with Groq for Markdown formatting, even if images are present
+            if text or images:
                 markdown_content = process_document_with_groq(text, images, filename)
             else:
                 markdown_content = "# Document Conversion\n\nNo content could be extracted from the document."
-
             # Ensure all images are properly referenced in the markdown
             for img in images:
-                # Only append if the image URL is not already in the markdown
                 if img.data not in markdown_content:
                     markdown_content += f"\n\n![]({img.data})"
-
             logger.info("Document processing completed successfully")
             
             # Create response
