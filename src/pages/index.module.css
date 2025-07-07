@@ -956,3 +956,9 @@
   border-radius: 4px;
   margin: 1rem 0;
 }
+
+/* Custom text selection color */
+::selection {
+  background: #0c8b87;
+  color: #000; /* Optional: Adjust text color for readability */
+}
