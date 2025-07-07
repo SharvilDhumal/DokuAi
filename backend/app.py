@@ -243,28 +243,42 @@ async def extract_text_and_images_from_pdf(pdf_bytes: bytes, doc_name: str = "")
         doc = fitz.open(temp_pdf_path)
         img_idx = 0
         for page_num, page in enumerate(doc, 1):
-            # Extract text
+            # Extract text and split into paragraphs (by double newlines or lines)
             page_text = page.get_text("text")
-            text_parts.append(page_text)
-            # Extract images
+            paragraphs = [p.strip() for p in re.split(r'\n{2,}', page_text) if p.strip()]
+            para_with_images = []
             image_list = page.get_images(full=True)
-            for img in image_list:
-                xref = img[0]
+            img_in_para = 0
+            for i, para in enumerate(paragraphs):
+                para_with_images.append(para)
+                # Insert image placeholder after every paragraph if there are images left
+                if img_idx < len(image_list):
+                    placeholder = f"[IMAGE_{img_idx}]"
+                    para_with_images.append(placeholder)
+                    xref = image_list[img_idx][0]
+                    base_image = doc.extract_image(xref)
+                    img_bytes = base_image["image"]
+                    ext = f'.{base_image["ext"]}'
+                    img_name = f"{doc_name}_img_{img_idx+1}{ext}"
+                    image_url = await save_image_locally(img_bytes, img_name, doc_name=doc_name, index=img_idx+1)
+                    images.append(ImageData(data=image_url, type=f"image/{base_image['ext']}", description=f"Image {img_idx+1}", placeholder=placeholder))
+                    placeholder_map[placeholder] = image_url
+                    img_idx += 1
+            # If there are still images left after all paragraphs, append them at the end
+            while img_idx < len(image_list):
+                placeholder = f"[IMAGE_{img_idx}]"
+                para_with_images.append(placeholder)
+                xref = image_list[img_idx][0]
                 base_image = doc.extract_image(xref)
                 img_bytes = base_image["image"]
                 ext = f'.{base_image["ext"]}'
                 img_name = f"{doc_name}_img_{img_idx+1}{ext}"
                 image_url = await save_image_locally(img_bytes, img_name, doc_name=doc_name, index=img_idx+1)
-                placeholder = PLACEHOLDER_FORMAT.format(img_idx)
                 images.append(ImageData(data=image_url, type=f"image/{base_image['ext']}", description=f"Image {img_idx+1}", placeholder=placeholder))
                 placeholder_map[placeholder] = image_url
-                # Insert placeholder after the text for this page
-                text_parts.append(f"\n{placeholder}\n")
                 img_idx += 1
-        full_text = "\n".join(text_parts).strip()
-        for img in images:
-            img_markdown = f"![]({img.data})"
-            full_text = full_text.replace(img.placeholder, img_markdown)
+            text_parts.append("\n\n".join(para_with_images))
+        full_text = "\n\n".join(text_parts).strip()
         return full_text, images, placeholder_map
     finally:
         if doc is not None:
@@ -275,42 +289,13 @@ def process_document_with_groq(text: str, images: List[ImageData], filename: str
     """Process document text with Groq API and return formatted Markdown."""
     if not text.strip() and not images:
         return "# Document Conversion\n\nNo text content could be extracted from the document."
-    
-    # If we already have images in the text (from PDF/DOCX extraction), just return as is
-    if any(f"![](" in text for img in images):
-        return text
-        
     try:
         client = groq.Client()
-        
         # Prepare image placeholders in the text
-        for i, img in enumerate(images):
-            text = text.replace(f"[IMAGE_{i}]", f"![]({img.data})")
-        
-        system_prompt = """You are an expert technical documentation specialist with deep knowledge of Markdown formatting. 
-Your task is to convert technical documentation into perfectly formatted Markdown while preserving all technical accuracy.
-
-Key Rules:
-1. Maintain exact technical details and terminology
-2. Use proper Markdown syntax for all elements
-3. Structure content with clear hierarchy
-4. Format all lists, notes, and code blocks properly
-5. Preserve all original information without adding or removing content
-6. Ensure consistent spacing and formatting throughout
-7. DO NOT modify or move any image markdown (![alt](url)) that is already in the text
-
-The output should be production-ready technical documentation in Markdown format."""
-
-        user_prompt = f"""Convert the following document into professional Markdown format.
-The document already contains properly positioned image placeholders in the format ![](image_url).
-DO NOT move or modify these image placeholders in any way.
-
-Document content:
-{text}
-
-Please format this as clean, well-structured markdown while preserving all technical details and following the formatting rules.
-Most importantly, DO NOT move or modify any existing image markdown (![alt](url)) in the text."""
-
+        for img in images:
+            text = text.replace(img.placeholder, f"![]({img.data})")
+        system_prompt = """You are an expert technical documentation specialist with deep knowledge of Markdown formatting.\nYour task is to convert technical documentation into perfectly formatted Markdown while preserving all technical accuracy.\n\nKey Rules:\n1. Maintain exact technical details and terminology\n2. Use proper Markdown syntax for all elements\n3. Structure content with clear hierarchy\n4. Format all lists, notes, and code blocks properly\n5. Preserve all original information without adding or removing content\n6. Ensure consistent spacing and formatting throughout\n7. Place images inline exactly where the ![](...) markdown appears in the text\n8. Beautify the output: use lists for steps, highlight NOTE:, style section titles (Purpose:, Steps:) as headers or bold, and add spacing for readability\n\nThe output should be production-ready technical documentation in Markdown format."""
+        user_prompt = f"""Convert the following document into professional Markdown format.\nThe document already contains properly positioned image markdown in the format ![](image_url).\nDO NOT move or modify these image markdowns in any way.\n\nDocument content:\n{text}\n\nPlease format this as clean, well-structured markdown while preserving all technical details and following the formatting rules.\nMost importantly, DO NOT move or modify any existing image markdown (![alt](url)) in the text."""
         chat_completion = client.chat.completions.create(
             messages=[
                 {
@@ -329,18 +314,12 @@ Most importantly, DO NOT move or modify any existing image markdown (![alt](url)
             frequency_penalty=0.1,
             presence_penalty=0.1
         )
-        
         markdown_output = chat_completion.choices[0].message.content
-        
-        # Validate output
         if len(markdown_output.split()) < len(text.split()) * 0.7:
             raise ValueError("Significant content loss detected")
-            
         return markdown_output
-        
     except Exception as e:
         logger.error(f"Error processing document: {str(e)}")
-        # Fallback with basic formatting
         fallback = f"# {os.path.splitext(filename)[0]}\n\n{text}"
         if images:
             fallback += "\n\n## Images\n"

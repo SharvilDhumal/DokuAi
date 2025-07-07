@@ -5860,3 +5860,51 @@ ConnectionResetError: [WinError 10054] An existing connection was forcibly close
 2025-07-07 22:28:08,805 - __main__ - INFO - Processing DOCX file
 2025-07-07 22:28:08,903 - __main__ - INFO - Extracted text length: 1673, Number of images: 4
 2025-07-07 22:28:08,904 - __main__ - INFO - Document processing completed successfully
+2025-07-07 22:38:21,535 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-07 22:38:31,881 - __main__ - INFO - Received file: Business Case.pdf
+2025-07-07 22:38:31,882 - __main__ - INFO - Starting conversion for file: Business Case.pdf
+2025-07-07 22:38:31,882 - __main__ - INFO - File size: 338945 bytes
+2025-07-07 22:38:31,883 - __main__ - INFO - Processing PDF file
+2025-07-07 22:38:31,944 - __main__ - INFO - Extracted text length: 1670, Number of images: 4
+2025-07-07 22:38:31,945 - __main__ - INFO - Document processing completed successfully
+2025-07-07 22:38:53,663 - __main__ - INFO - Received file: Business Case.docx
+2025-07-07 22:38:53,663 - __main__ - INFO - Starting conversion for file: Business Case.docx
+2025-07-07 22:38:53,664 - __main__ - INFO - File size: 285804 bytes
+2025-07-07 22:38:53,664 - __main__ - INFO - Processing DOCX file
+2025-07-07 22:38:53,708 - __main__ - INFO - Extracted text length: 1673, Number of images: 4
+2025-07-07 22:38:53,709 - __main__ - INFO - Document processing completed successfully
+2025-07-07 22:41:51,189 - __main__ - INFO - Received file: Business Case.pdf
+2025-07-07 22:41:51,191 - __main__ - INFO - Starting conversion for file: Business Case.pdf
+2025-07-07 22:41:51,192 - __main__ - INFO - File size: 338945 bytes
+2025-07-07 22:41:51,194 - __main__ - INFO - Processing PDF file
+2025-07-07 22:41:51,266 - __main__ - INFO - Extracted text length: 1670, Number of images: 4
+2025-07-07 22:41:51,267 - __main__ - INFO - Document processing completed successfully
+2025-07-07 23:05:53,931 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-07 23:06:02,360 - __main__ - INFO - Received file: Business Case.docx
+2025-07-07 23:06:02,362 - __main__ - INFO - Starting conversion for file: Business Case.docx
+2025-07-07 23:06:02,362 - __main__ - INFO - File size: 285804 bytes
+2025-07-07 23:06:02,363 - __main__ - INFO - Processing DOCX file
+2025-07-07 23:06:02,414 - __main__ - INFO - Extracted text length: 1673, Number of images: 4
+2025-07-07 23:06:04,811 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-07 23:06:04,823 - __main__ - INFO - Document processing completed successfully
+2025-07-07 23:06:04,888 - __main__ - INFO - Received file: Business Case.docx
+2025-07-07 23:06:04,889 - __main__ - INFO - Starting conversion for file: Business Case.docx
+2025-07-07 23:06:04,889 - __main__ - INFO - File size: 285804 bytes
+2025-07-07 23:06:04,890 - __main__ - INFO - Processing DOCX file
+2025-07-07 23:06:04,931 - __main__ - INFO - Extracted text length: 1673, Number of images: 4
+2025-07-07 23:06:06,642 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-07 23:06:06,645 - __main__ - INFO - Document processing completed successfully
+2025-07-07 23:08:52,923 - __main__ - INFO - Received file: Business Case.pdf
+2025-07-07 23:08:52,923 - __main__ - INFO - Starting conversion for file: Business Case.pdf
+2025-07-07 23:08:52,923 - __main__ - INFO - File size: 338945 bytes
+2025-07-07 23:08:52,924 - __main__ - INFO - Processing PDF file
+2025-07-07 23:08:52,974 - __main__ - INFO - Extracted text length: 1416, Number of images: 2
+2025-07-07 23:08:54,727 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-07 23:08:54,730 - __main__ - INFO - Document processing completed successfully
+2025-07-07 23:08:54,758 - __main__ - INFO - Received file: Business Case.pdf
+2025-07-07 23:08:54,759 - __main__ - INFO - Starting conversion for file: Business Case.pdf
+2025-07-07 23:08:54,759 - __main__ - INFO - File size: 338945 bytes
+2025-07-07 23:08:54,760 - __main__ - INFO - Processing PDF file
+2025-07-07 23:08:54,796 - __main__ - INFO - Extracted text length: 1416, Number of images: 2
+2025-07-07 23:08:56,331 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-07 23:08:56,366 - __main__ - INFO - Document processing completed successfully

@@ -39,7 +39,7 @@
 }
 
 .imageError::after {
-  content: 'Image failed to load';
+  content: "Image failed to load";
   color: var(--ifm-color-danger);
   font-size: 0.9em;
   padding: 1rem;
@@ -47,11 +47,122 @@
 }
 
 /* Dark mode adjustments */
-[data-theme='dark'] .imageContainer {
+[data-theme="dark"] .imageContainer {
   border-color: var(--ifm-color-emphasis-700);
   background-color: var(--ifm-color-emphasis-100);
 }
 
-[data-theme='dark'] .imageError {
+[data-theme="dark"] .imageError {
   background-color: var(--ifm-color-emphasis-200);
+}
+
+.markdownPreview {
+  font-family: "Fira Mono", "Consolas", "Menlo", "Monaco", "Liberation Mono",
+    monospace;
+  background: #f8fafc;
+  color: #222;
+  border-radius: 12px;
+  padding: 2rem 2.5rem;
+  margin: 2rem auto;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+  line-height: 1.7;
+  font-size: 1.08rem;
+  max-width: 900px;
+  overflow-x: auto;
+}
+
+.markdownPreview p {
+  margin: 1.1em 0;
+  line-height: 1.7;
+  padding: 0.1em 0.2em;
+}
+
+.markdownPreview ul,
+.markdownPreview ol {
+  margin-left: 2em;
+  margin-bottom: 1.2em;
+  padding-left: 1.2em;
+}
+
+.markdownPreview li {
+  margin-bottom: 0.4em;
+  line-height: 1.6;
+}
+
+.image-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 2em 0;
+}
+
+.image-center img {
+  max-width: 80%;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  margin-bottom: 0.5em;
+}
+
+.image-caption {
+  font-size: 0.95em;
+  color: #666;
+  font-style: italic;
+  margin-top: 0.2em;
+  text-align: center;
+}
+
+.note-highlight {
+  background: #fffbe6;
+  color: #b26a00;
+  font-weight: bold;
+  padding: 0.1em 0.5em;
+  border-radius: 4px;
+  margin-right: 0.3em;
+}
+
+.section-spacing {
+  height: 1.5em;
+}
+
+.markdownPreview pre,
+.markdownPreview code {
+  font-family: "Fira Mono", "Consolas", "Menlo", "Monaco", "Liberation Mono",
+    monospace;
+  background: #f4f4f4;
+  border-radius: 6px;
+  padding: 0.3em 0.7em;
+  font-size: 0.98em;
+  color: #222;
+}
+
+.markdownPreview pre {
+  padding: 1em;
+  overflow-x: auto;
+  margin: 1.5em 0;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.04);
+}
+
+.markdownPreview h1,
+.markdownPreview h2,
+.markdownPreview h3,
+.markdownPreview h4 {
+  font-weight: 700;
+  margin-top: 2em;
+  margin-bottom: 0.7em;
+  color: #1e293b;
+  letter-spacing: 0.01em;
+}
+
+.markdownPreview strong {
+  color: #1e293b;
+}
+
+@media (max-width: 700px) {
+  .markdownPreview {
+    padding: 1rem 0.5rem;
+    font-size: 0.98rem;
+  }
+  .image-center img {
+    max-width: 100%;
+  }
 }

@@ -8,6 +8,8 @@ import clsx from 'clsx';
 import styles from './index.module.css';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
+import hljs from 'highlight.js';
+import 'highlight.js/styles/github.css';
 
 // Configure marked
 const renderer = new marked.Renderer();
@@ -56,6 +58,21 @@ function cleanMarkdownContent(md) {
   if (!md) return '';
   // Only minimal cleaning: do not alter structure, just normalize line endings
   return md.replace(/\r\n?/g, '\n');
+}
+
+function enhanceMarkdownHtml(html) {
+  // Highlight NOTE: blocks
+  html = html.replace(/<p>\s*NOTE:\s*/gi, '<p><span class="note-highlight">NOTE:</span> ');
+  // Bold section titles like Purpose:, Steps:
+  html = html.replace(/<p>\s*(Purpose|Steps|Summary|Conclusion|Goal|Objective):/gi, '<p><strong>$1:</strong>');
+  // Add spacing between sections (after headers)
+  html = html.replace(/(<h[1-6][^>]*>.*?<\/h[1-6]>)/g, '$1<div class="section-spacing"></div>');
+  // Center images, add max width, and captions if alt text is present
+  html = html.replace(/<img([^>]*)alt="([^"]*)"([^>]*)>/g, (match, before, alt, after) => {
+    let caption = alt && alt.trim() ? `<div class="image-caption">${alt}</div>` : '';
+    return `<div class="image-center"><img${before}alt="${alt}"${after} style="max-width:80%;display:block;margin:0 auto;box-shadow:0 2px 12px rgba(0,0,0,0.08);border-radius:8px;"/>${caption}</div>`;
+  });
+  return html;
 }
 
 export default function MarkdownPreview() {
@@ -112,17 +129,22 @@ export default function MarkdownPreview() {
   const renderMarkdown = () => {
     try {
       let cleaned = cleanMarkdownContent(markdown);
-      // Replace any remaining placeholders with image tags using placeholderMap
       if (placeholderMap && typeof cleaned === 'string') {
         Object.entries(placeholderMap).forEach(([ph, url]) => {
           cleaned = cleaned.split(ph).join(`![](${url})`);
         });
       }
-      // Let marked render the markdown as-is, preserving all structure
-      const html = marked(cleaned);
+      let html = marked(cleaned);
+      html = enhanceMarkdownHtml(html);
+      // Syntax highlight code blocks
+      setTimeout(() => {
+        document.querySelectorAll('pre code').forEach(block => {
+          hljs.highlightElement(block);
+        });
+      }, 0);
       return DOMPurify.sanitize(html, {
-        ADD_TAGS: ['img'],
-        ADD_ATTR: ['src', 'alt', 'title', 'class', 'onerror']
+        ADD_TAGS: ['img', 'span', 'div', 'strong'],
+        ADD_ATTR: ['src', 'alt', 'title', 'class', 'onerror', 'style']
       });
     } catch (error) {
       console.error('Error rendering markdown:', error);
