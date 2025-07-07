@@ -241,43 +241,83 @@ async def extract_text_and_images_from_pdf(pdf_bytes: bytes, doc_name: str = "")
     doc = None
     try:
         doc = fitz.open(temp_pdf_path)
-        img_idx = 0
+        global_img_idx = 0
         for page_num, page in enumerate(doc, 1):
-            # Extract text and split into paragraphs (by double newlines or lines)
-            page_text = page.get_text("text")
-            paragraphs = [p.strip() for p in re.split(r'\n{2,}', page_text) if p.strip()]
-            para_with_images = []
+            blocks = page.get_text("blocks")
             image_list = page.get_images(full=True)
-            img_in_para = 0
-            for i, para in enumerate(paragraphs):
-                para_with_images.append(para)
-                # Insert image placeholder after every paragraph if there are images left
-                if img_idx < len(image_list):
-                    placeholder = f"[IMAGE_{img_idx}]"
-                    para_with_images.append(placeholder)
-                    xref = image_list[img_idx][0]
+            images_no_bbox = []
+            # Prepare text blocks with Y and text
+            text_blocks = []
+            for block in blocks:
+                if block[4].strip():
+                    text_blocks.append({
+                        'y': block[1],
+                        'text': block[4].strip()
+                    })
+            # Prepare image blocks with Y and xref
+            image_blocks = []
+            for img_idx, img in enumerate(image_list):
+                xref = img[0]
+                try:
+                    bbox = page.get_image_bbox(xref)
+                    y0 = bbox.y0 if hasattr(bbox, 'y0') else bbox[1]
+                    image_blocks.append({
+                        'y': y0,
+                        'xref': xref,
+                        'img_idx': global_img_idx
+                    })
+                except Exception:
+                    images_no_bbox.append({'xref': xref, 'img_idx': global_img_idx})
+                global_img_idx += 1
+            # Build a list of output blocks (text or image placeholder)
+            output_blocks = []
+            # Track where to insert images
+            text_y_list = [tb['y'] for tb in text_blocks]
+            for i, tb in enumerate(text_blocks):
+                output_blocks.append(tb['text'])
+                # For each image whose y is between this and the next text block, insert after this
+                images_to_insert = [ib for ib in image_blocks if (
+                    (ib['y'] >= tb['y']) and (i == len(text_blocks)-1 or ib['y'] < text_blocks[i+1]['y'])
+                )]
+                for ib in images_to_insert:
+                    placeholder = f"[IMAGE_{ib['img_idx']}]"
+                    output_blocks.append(placeholder)
+                    xref = ib['xref']
                     base_image = doc.extract_image(xref)
                     img_bytes = base_image["image"]
                     ext = f'.{base_image["ext"]}'
-                    img_name = f"{doc_name}_img_{img_idx+1}{ext}"
-                    image_url = await save_image_locally(img_bytes, img_name, doc_name=doc_name, index=img_idx+1)
-                    images.append(ImageData(data=image_url, type=f"image/{base_image['ext']}", description=f"Image {img_idx+1}", placeholder=placeholder))
+                    img_name = f"{doc_name}_img_{ib['img_idx']+1}{ext}"
+                    image_url = await save_image_locally(img_bytes, img_name, doc_name=doc_name, index=ib['img_idx']+1)
+                    images.append(ImageData(data=image_url, type=f"image/{base_image['ext']}", description=f"Image {ib['img_idx']+1}", placeholder=placeholder))
                     placeholder_map[placeholder] = image_url
-                    img_idx += 1
-            # If there are still images left after all paragraphs, append them at the end
-            while img_idx < len(image_list):
-                placeholder = f"[IMAGE_{img_idx}]"
-                para_with_images.append(placeholder)
-                xref = image_list[img_idx][0]
+            # Images above all text blocks (y < min text y): insert at top
+            if text_blocks:
+                min_y = min(tb['y'] for tb in text_blocks)
+                images_top = [ib for ib in image_blocks if ib['y'] < min_y]
+                for ib in sorted(images_top, key=lambda b: b['y']):
+                    placeholder = f"[IMAGE_{ib['img_idx']}]"
+                    output_blocks.insert(0, placeholder)
+                    xref = ib['xref']
+                    base_image = doc.extract_image(xref)
+                    img_bytes = base_image["image"]
+                    ext = f'.{base_image["ext"]}'
+                    img_name = f"{doc_name}_img_{ib['img_idx']+1}{ext}"
+                    image_url = await save_image_locally(img_bytes, img_name, doc_name=doc_name, index=ib['img_idx']+1)
+                    images.append(ImageData(data=image_url, type=f"image/{base_image['ext']}", description=f"Image {ib['img_idx']+1}", placeholder=placeholder))
+                    placeholder_map[placeholder] = image_url
+            # Images without bbox: append at end
+            for img in images_no_bbox:
+                placeholder = f"[IMAGE_{img['img_idx']}]"
+                output_blocks.append(placeholder)
+                xref = img['xref']
                 base_image = doc.extract_image(xref)
                 img_bytes = base_image["image"]
                 ext = f'.{base_image["ext"]}'
-                img_name = f"{doc_name}_img_{img_idx+1}{ext}"
-                image_url = await save_image_locally(img_bytes, img_name, doc_name=doc_name, index=img_idx+1)
-                images.append(ImageData(data=image_url, type=f"image/{base_image['ext']}", description=f"Image {img_idx+1}", placeholder=placeholder))
+                img_name = f"{doc_name}_img_{img['img_idx']+1}{ext}"
+                image_url = await save_image_locally(img_bytes, img_name, doc_name=doc_name, index=img['img_idx']+1)
+                images.append(ImageData(data=image_url, type=f"image/{base_image['ext']}", description=f"Image {img['img_idx']+1}", placeholder=placeholder))
                 placeholder_map[placeholder] = image_url
-                img_idx += 1
-            text_parts.append("\n\n".join(para_with_images))
+            text_parts.append("\n\n".join(output_blocks))
         full_text = "\n\n".join(text_parts).strip()
         return full_text, images, placeholder_map
     finally:
