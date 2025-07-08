@@ -6131,3 +6131,4 @@ ValueError: bad image name
 2025-07-08 12:14:50,210 - __main__ - INFO - Extracted text length: 1673, Number of images: 4
 2025-07-08 12:14:51,795 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
 2025-07-08 12:14:51,797 - __main__ - INFO - Document processing completed successfully
+2025-07-08 13:54:25,354 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
