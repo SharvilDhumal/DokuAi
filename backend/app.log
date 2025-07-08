@@ -6114,3 +6114,20 @@ ValueError: bad image name
 2025-07-08 11:02:45,476 - __main__ - INFO - Extracted text length: 1379, Number of images: 4
 2025-07-08 11:02:47,552 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
 2025-07-08 11:02:47,554 - __main__ - INFO - Document processing completed successfully
+2025-07-08 12:01:45,752 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-08 12:06:43,917 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-08 12:14:40,758 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-08 12:14:48,527 - __main__ - INFO - Received file: Business Case.docx
+2025-07-08 12:14:48,527 - __main__ - INFO - Starting conversion for file: Business Case.docx
+2025-07-08 12:14:48,528 - __main__ - INFO - File size: 285804 bytes
+2025-07-08 12:14:48,528 - __main__ - INFO - Processing DOCX file
+2025-07-08 12:14:48,541 - __main__ - INFO - Extracted text length: 1673, Number of images: 4
+2025-07-08 12:14:50,165 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-08 12:14:50,167 - __main__ - INFO - Document processing completed successfully
+2025-07-08 12:14:50,194 - __main__ - INFO - Received file: Business Case.docx
+2025-07-08 12:14:50,195 - __main__ - INFO - Starting conversion for file: Business Case.docx
+2025-07-08 12:14:50,195 - __main__ - INFO - File size: 285804 bytes
+2025-07-08 12:14:50,196 - __main__ - INFO - Processing DOCX file
+2025-07-08 12:14:50,210 - __main__ - INFO - Extracted text length: 1673, Number of images: 4
+2025-07-08 12:14:51,795 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-08 12:14:51,797 - __main__ - INFO - Document processing completed successfully
