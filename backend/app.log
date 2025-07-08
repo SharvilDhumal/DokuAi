@@ -6071,3 +6071,46 @@ ValueError: bad image name
 2025-07-08 00:08:25,590 - __main__ - INFO - Extracted text length: 1673, Number of images: 4
 2025-07-08 00:08:27,253 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
 2025-07-08 00:08:27,256 - __main__ - INFO - Document processing completed successfully
+2025-07-08 10:50:24,479 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-08 10:52:02,132 - __main__ - INFO - Received file: Business Case.docx
+2025-07-08 10:52:02,133 - __main__ - INFO - Starting conversion for file: Business Case.docx
+2025-07-08 10:52:02,134 - __main__ - INFO - File size: 285804 bytes
+2025-07-08 10:52:02,134 - __main__ - INFO - Processing DOCX file
+2025-07-08 10:52:02,204 - __main__ - INFO - Extracted text length: 1673, Number of images: 4
+2025-07-08 10:52:04,415 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-08 10:52:04,424 - __main__ - INFO - Document processing completed successfully
+2025-07-08 10:52:04,475 - __main__ - INFO - Received file: Business Case.docx
+2025-07-08 10:52:04,475 - __main__ - INFO - Starting conversion for file: Business Case.docx
+2025-07-08 10:52:04,476 - __main__ - INFO - File size: 285804 bytes
+2025-07-08 10:52:04,477 - __main__ - INFO - Processing DOCX file
+2025-07-08 10:52:04,508 - __main__ - INFO - Extracted text length: 1673, Number of images: 4
+2025-07-08 10:52:06,330 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK" 
+2025-07-08 10:52:06,333 - __main__ - INFO - Document processing completed successfully
+2025-07-08 11:01:30,390 - __main__ - INFO - Received file: Business Case.docx
+2025-07-08 11:01:30,391 - __main__ - INFO - Starting conversion for file: Business Case.docx
+2025-07-08 11:01:30,391 - __main__ - INFO - File size: 285804 bytes
+2025-07-08 11:01:30,392 - __main__ - INFO - Processing DOCX file
+2025-07-08 11:01:30,443 - __main__ - INFO - Extracted text length: 1673, Number of images: 4
+2025-07-08 11:01:32,190 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-08 11:01:32,192 - __main__ - INFO - Document processing completed successfully
+2025-07-08 11:01:32,222 - __main__ - INFO - Received file: Business Case.docx
+2025-07-08 11:01:32,223 - __main__ - INFO - Starting conversion for file: Business Case.docx
+2025-07-08 11:01:32,224 - __main__ - INFO - File size: 285804 bytes
+2025-07-08 11:01:32,226 - __main__ - INFO - Processing DOCX file
+2025-07-08 11:01:32,275 - __main__ - INFO - Extracted text length: 1673, Number of images: 4
+2025-07-08 11:01:34,239 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-08 11:01:34,241 - __main__ - INFO - Document processing completed successfully
+2025-07-08 11:02:43,010 - __main__ - INFO - Received file: Business Case.pdf
+2025-07-08 11:02:43,010 - __main__ - INFO - Starting conversion for file: Business Case.pdf
+2025-07-08 11:02:43,010 - __main__ - INFO - File size: 338945 bytes
+2025-07-08 11:02:43,011 - __main__ - INFO - Processing PDF file
+2025-07-08 11:02:43,155 - __main__ - INFO - Extracted text length: 1379, Number of images: 4
+2025-07-08 11:02:45,357 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-08 11:02:45,412 - __main__ - INFO - Document processing completed successfully
+2025-07-08 11:02:45,433 - __main__ - INFO - Received file: Business Case.pdf
+2025-07-08 11:02:45,434 - __main__ - INFO - Starting conversion for file: Business Case.pdf
+2025-07-08 11:02:45,434 - __main__ - INFO - File size: 338945 bytes
+2025-07-08 11:02:45,435 - __main__ - INFO - Processing PDF file
+2025-07-08 11:02:45,476 - __main__ - INFO - Extracted text length: 1379, Number of images: 4
+2025-07-08 11:02:47,552 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-08 11:02:47,554 - __main__ - INFO - Document processing completed successfully
