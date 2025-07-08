@@ -370,6 +370,69 @@ async def extract_text_and_images_from_pdf(pdf_bytes: bytes, doc_name: str = "")
         except Exception as e:
             logger.warning(f"Error removing temporary file: {str(e)}")
 
+def beautify_markdown(markdown: str) -> str:
+    """
+    Enhanced post-processing for professional Markdown:
+    - Converts 'NOTE :' or 'NOTE:' to blockquotes with bold
+    - Converts 'Steps for ...' and 'Optional Steps ...' to bold or subheadings
+    - Converts UI element references to bold
+    - Converts 'o', 'i.', 'ii.', '○' to proper Markdown sub-lists
+    - Adds ### subheadings for sections like 'Optional Steps'
+    - Never modifies lines with image tags
+    - Ensures consistent spacing and formatting
+    """
+    import re
+    lines = markdown.splitlines()
+    beautified = []
+    in_sublist = False
+    sublist_indent = '  '
+    for i, line in enumerate(lines):
+        stripped = line.strip()
+        # Don't touch image lines
+        if re.match(r'^!\[.*\]\(.*\)$', stripped):
+            beautified.append(line)
+            continue
+        # NOTE blockquote
+        if re.match(r'^NOTE ?[:：]', stripped, re.IGNORECASE):
+            note_content = re.sub(r'^NOTE ?[:：]', '', stripped, flags=re.IGNORECASE).strip()
+            beautified.append(f"> **NOTE:** {note_content}")
+            continue
+        # Steps for ... or similar
+        if re.match(r'^(Steps for|Instructions for|How to|Process for) ', stripped, re.IGNORECASE):
+            beautified.append(f"**{stripped}**")
+            continue
+        # Optional Steps as subheading
+        if re.match(r'^Optional Steps', stripped, re.IGNORECASE):
+            beautified.append(f"### {stripped}")
+            continue
+        # UI element references (e.g., click Add new API client)
+        ui_match = re.search(r'(click|select|choose|press) ([A-Za-z0-9 _>]+)', stripped, re.IGNORECASE)
+        if ui_match:
+            action, element = ui_match.groups()
+            # Bold the UI element
+            new_line = re.sub(element, f"**{element.strip()}**", stripped)
+            beautified.append(new_line)
+            continue
+        # Sublist: o, ○, i., ii., etc.
+        if re.match(r'^[oO\u25CB] ', stripped):
+            beautified.append(f"{sublist_indent}- {stripped[2:].strip()}")
+            in_sublist = True
+            continue
+        if re.match(r'^[ivxlc]+\. ', stripped, re.IGNORECASE):
+            beautified.append(f"{sublist_indent}- {stripped[3:].strip()}")
+            in_sublist = True
+            continue
+        # End sublist if next line is not a sublist
+        if in_sublist and not (re.match(r'^[oO\u25CB] ', stripped) or re.match(r'^[ivxlc]+\. ', stripped, re.IGNORECASE)):
+            in_sublist = False
+        # Add extra spacing before headings or blockquotes
+        if beautified and (stripped.startswith('#') or stripped.startswith('>')) and beautified[-1].strip() != '':
+            beautified.append('')
+        beautified.append(line)
+    # Remove extra blank lines
+    beautified_text = re.sub(r'\n{3,}', '\n\n', '\n'.join(beautified))
+    return beautified_text.strip()
+
 def process_document_with_groq(text: str, images: List[ImageData], filename: str) -> str:
     """Process document text with Groq API and return formatted Markdown.
     
@@ -378,43 +441,147 @@ def process_document_with_groq(text: str, images: List[ImageData], filename: str
     """
     if not text.strip() and not images:
         return "# Document Conversion\n\nNo text content could be extracted from the document."
-        
+    
+    # If there are no images, we can process the text directly
+    if not images:
+        try:
+            client = groq.Client()
+            system_prompt = (
+                """
+You are an expert technical documentation specialist and Markdown formatter. Your job is to transform raw extracted text into beautiful, production-ready Markdown for technical documentation, blog posts, or guides.
+
+**Formatting Rules:**
+- Use clear, hierarchical headings (#, ##, ###) for sections and subsections.
+- Use bullet ( - ) and numbered ( 1. ) lists for steps, features, or items.
+- Use **bold** and *italic* for emphasis where appropriate.
+- Use blockquotes ( > ) for notes, warnings, or tips.
+- Use code blocks (triple backticks) for commands, code, or configuration.
+- Add horizontal rules (---) to separate major sections.
+- Add spacing for readability.
+- If you see lines like 'Purpose:', 'Steps:', 'NOTE:', etc., convert them to appropriate Markdown (e.g., headings, blockquotes).
+- Beautify the output for clarity and easy reading.
+
+**Example Input:**
+Purpose:
+This tool converts PDF to Markdown.
+
+Steps:
+1. Upload your file
+2. Wait for conversion
+3. Download the Markdown
+
+NOTE: Images are preserved.
+
+**Example Output:**
+# Purpose
+
+This tool converts PDF to Markdown.
+
+---
+
+## Steps
+
+1. Upload your file
+2. Wait for conversion
+3. Download the Markdown
+
+> **Note:** Images are preserved.
+
+---
+
+- Always preserve the order and content of the original text.
+- Do NOT move or modify any image markdown or placeholders (e.g., ![](url) or __IMG_PLACEHOLDER_X__).
+                """
+            )
+            user_prompt = f"""Format the following document as beautiful, professional Markdown. Apply all formatting rules above. Do not move or modify any image markdown or placeholders.
+
+Document content:
+{text}"""
+            chat_completion = client.chat.completions.create(
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt}
+                ],
+                model="llama3-70b-8192",
+                temperature=0.1,
+                max_tokens=12000,
+                top_p=0.9,
+                frequency_penalty=0.1,
+                presence_penalty=0.1
+            )
+            markdown_output = chat_completion.choices[0].message.content
+            # Verify content preservation
+            original_word_count = len(text.split())
+            new_word_count = len(markdown_output.split())
+            if new_word_count < original_word_count * 0.7:
+                raise ValueError("Significant content loss detected during processing")
+            markdown_output = beautify_markdown(markdown_output)
+            return markdown_output
+        except Exception as e:
+            logger.error(f"Error processing document with Groq: {str(e)}")
+            return f"# {os.path.splitext(filename)[0]}\n\n{text}"
+    
+    # Process documents with images
     try:
         # Replace image placeholders with temporary markers that won't be modified by Groq
         placeholder_map = {}
         processed_text = text
-        
         for img in images:
-            # Create a unique placeholder that won't be modified by Groq
             safe_placeholder = f"__IMG_PLACEHOLDER_{len(placeholder_map)}__"
-            placeholder_map[safe_placeholder] = f"![]({img.data})"
+            placeholder_map[safe_placeholder] = f"![]({img.data})\n"
             processed_text = processed_text.replace(img.placeholder, safe_placeholder)
-        
         client = groq.Client()
-        
-        system_prompt = """You are an expert technical documentation specialist. Your task is to convert 
-        the provided content into well-formatted Markdown while strictly following these rules:
-        
-        1. PRESERVE ALL CONTENT: Do not remove or modify any text or placeholders.
-        2. IMAGE PLACEHOLDERS: Keep all __IMG_PLACEHOLDER_X__ markers exactly as they are.
-        3. FORMATTING: Apply consistent Markdown formatting to the text around the placeholders.
-        4. STRUCTURE: Use proper headings, lists, and other Markdown elements to improve readability.
-        5. NO CONTENT LOSS: Ensure no text or placeholders are removed or reordered.
-        
-        The document may contain image placeholders in the format __IMG_PLACEHOLDER_X__. 
-        These MUST remain exactly as they are in the output.
-        """
-        
-        user_prompt = f"""Please format the following document as clean, well-structured Markdown.
-        
-        IMPORTANT: 
-        - Do NOT modify or remove any __IMG_PLACEHOLDER_X__ markers
-        - Keep all original text content
-        - Only apply formatting and structure
-        
-        Document content:
-        {processed_text}"""
-        
+        system_prompt = (
+            """
+You are an expert technical documentation specialist and Markdown formatter. Your job is to transform raw extracted text into beautiful, production-ready Markdown for technical documentation, blog posts, or guides.
+
+**Formatting Rules:**
+- Use clear, hierarchical headings (#, ##, ###) for sections and subsections.
+- Use bullet ( - ) and numbered ( 1. ) lists for steps, features, or items.
+- Use **bold** and *italic* for emphasis where appropriate.
+- Use blockquotes ( > ) for notes, warnings, or tips.
+- Use code blocks (triple backticks) for commands, code, or configuration.
+- Add horizontal rules (---) to separate major sections.
+- Add spacing for readability.
+- If you see lines like 'Purpose:', 'Steps:', 'NOTE:', etc., convert them to appropriate Markdown (e.g., headings, blockquotes).
+- Beautify the output for clarity and easy reading.
+
+**Example Input:**
+Purpose:
+This tool converts PDF to Markdown.
+
+Steps:
+1. Upload your file
+2. Wait for conversion
+3. Download the Markdown
+
+NOTE: Images are preserved.
+
+**Example Output:**
+# Purpose
+
+This tool converts PDF to Markdown.
+
+---
+
+## Steps
+
+1. Upload your file
+2. Wait for conversion
+3. Download the Markdown
+
+> **Note:** Images are preserved.
+
+---
+
+- Always preserve the order and content of the original text.
+- Do NOT move or modify any image markdown or placeholders (e.g., ![](url) or __IMG_PLACEHOLDER_X__).
+            """
+        )
+        user_prompt = f"""Format the following document as beautiful, professional Markdown. Apply all formatting rules above. Do not move or modify any image markdown or placeholders.
+
+Document content:
+{processed_text}"""
         chat_completion = client.chat.completions.create(
             messages=[
                 {"role": "system", "content": system_prompt},
@@ -427,28 +594,30 @@ def process_document_with_groq(text: str, images: List[ImageData], filename: str
             frequency_penalty=0.1,
             presence_penalty=0.1
         )
-        
         markdown_output = chat_completion.choices[0].message.content
-        
         # Restore the original image markdown
         for placeholder, img_markdown in placeholder_map.items():
             markdown_output = markdown_output.replace(placeholder, img_markdown)
-        
+        # Clean up any remaining formatting issues
+        markdown_output = markdown_output.replace('---\n', '\n')
+        markdown_output = re.sub(r'\n{3,}', '\n\n', markdown_output)
         # Verify content preservation
         original_word_count = len(text.split())
         new_word_count = len(markdown_output.split())
-        if new_word_count < original_word_count * 0.7:  # If we lost more than 30% of content
-            raise ValueError("Significant content loss detected during processing")
-            
+        if new_word_count < original_word_count * 0.7:
+            logger.warning("Content loss detected, falling back to basic formatting")
+            markdown_output = f"# {os.path.splitext(filename)[0]}\n\n{text}"
+            for img in images:
+                markdown_output = markdown_output.replace(img.placeholder, f"![]({img.data})\n")
+        markdown_output = beautify_markdown(markdown_output)
         return markdown_output
-        
     except Exception as e:
         logger.error(f"Error processing document with Groq: {str(e)}")
-        # Fallback: Just return the original text with image placeholders replaced
-        fallback = text
+        fallback = f"# {os.path.splitext(filename)[0]}\n\n{text}"
         for img in images:
-            fallback = fallback.replace(img.placeholder, f"![]({img.data})")
-        return f"# {os.path.splitext(filename)[0]}\n\n{fallback}"
+            fallback = fallback.replace(img.placeholder, f"![]({img.data})\n")
+        fallback = beautify_markdown(fallback)
+        return fallback
 
 @app.post("/api/convert", response_model=ConversionResponse)
 async def convert_file(file: UploadFile):
