@@ -235,137 +235,220 @@ async def extract_text_and_images_from_pdf(pdf_bytes: bytes, doc_name: str = "")
     images = []
     placeholder_map = {}
     text_parts = []
+    
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_pdf:
         temp_pdf.write(pdf_bytes)
         temp_pdf_path = temp_pdf.name
+    
     doc = None
     try:
         doc = fitz.open(temp_pdf_path)
         global_img_idx = 0
+        
         for page_num, page in enumerate(doc, 1):
-            blocks = page.get_text("blocks")
+            # Get page dimensions for relative positioning
+            page_width = page.rect.width
+            page_height = page.rect.height
+            
+            # Get all text blocks with their positions
+            blocks = page.get_text("blocks", sort=True)  # sort=True helps with reading order
             image_list = page.get_images(full=True)
-            images_no_bbox = []
-            # Prepare text blocks with Y and text
-            text_blocks = []
+            
+            # Create a list to hold all content elements (text and images)
+            content_elements = []
+            
+            # Process text blocks
             for block in blocks:
-                if block[4].strip():
-                    text_blocks.append({
-                        'y': block[1],
-                        'text': block[4].strip()
+                if block[4].strip():  # If block has text
+                    content_elements.append({
+                        'type': 'text',
+                        'y0': block[1],
+                        'y1': block[3],
+                        'x0': block[0],
+                        'x1': block[2],
+                        'content': block[4].strip(),
+                        'page': page_num
                     })
-            # Prepare image blocks with Y and xref
-            image_blocks = []
-            for img_idx, img in enumerate(image_list):
+            
+            # Process images
+            for img_idx, img in enumerate(image_list, 1):
                 xref = img[0]
                 try:
-                    bbox = page.get_image_bbox(xref)
-                    y0 = bbox.y0 if hasattr(bbox, 'y0') else bbox[1]
-                    image_blocks.append({
-                        'y': y0,
-                        'xref': xref,
-                        'img_idx': global_img_idx
+                    base_image = doc.extract_image(xref)
+                    img_bytes = base_image["image"]
+                    ext = f'.{base_image["ext"]}'
+                    img_name = f"{doc_name}_img_{global_img_idx + 1}{ext}"
+                    
+                    # Get image position using get_image_rect if available, otherwise approximate
+                    try:
+                        bbox = page.get_image_rects(xref)
+                        if bbox:
+                            bbox = bbox[0]  # Take first rectangle if multiple
+                            y0, y1, x0, x1 = bbox.y0, bbox.y1, bbox.x0, bbox.x1
+                        else:
+                            # Fallback to page dimensions if can't get exact position
+                            y0, y1, x0, x1 = 0, page_height, 0, page_width
+                    except Exception:
+                        y0, y1, x0, x1 = 0, page_height, 0, page_width
+                    
+                    # Create placeholder and save image
+                    placeholder = f"[IMAGE_{global_img_idx}]"
+                    image_url = await save_image_locally(img_bytes, img_name, doc_name=doc_name, index=global_img_idx+1)
+                    images.append(ImageData(
+                        data=image_url,
+                        type=f"image/{base_image['ext']}",
+                        description=f"Image {global_img_idx+1}",
+                        placeholder=placeholder
+                    ))
+                    placeholder_map[placeholder] = image_url
+                    
+                    # Add image to content elements
+                    content_elements.append({
+                        'type': 'image',
+                        'y0': y0,
+                        'y1': y1,
+                        'x0': x0,
+                        'x1': x1,
+                        'content': placeholder,
+                        'page': page_num
                     })
-                except Exception:
-                    images_no_bbox.append({'xref': xref, 'img_idx': global_img_idx})
-                global_img_idx += 1
-            # Build a list of output blocks (text or image placeholder)
-            output_blocks = []
-            # Track where to insert images
-            text_y_list = [tb['y'] for tb in text_blocks]
-            for i, tb in enumerate(text_blocks):
-                output_blocks.append(tb['text'])
-                # For each image whose y is between this and the next text block, insert after this
-                images_to_insert = [ib for ib in image_blocks if (
-                    (ib['y'] >= tb['y']) and (i == len(text_blocks)-1 or ib['y'] < text_blocks[i+1]['y'])
-                )]
-                for ib in images_to_insert:
-                    placeholder = f"[IMAGE_{ib['img_idx']}]"
-                    output_blocks.append(placeholder)
-                    xref = ib['xref']
-                    base_image = doc.extract_image(xref)
-                    img_bytes = base_image["image"]
-                    ext = f'.{base_image["ext"]}'
-                    img_name = f"{doc_name}_img_{ib['img_idx']+1}{ext}"
-                    image_url = await save_image_locally(img_bytes, img_name, doc_name=doc_name, index=ib['img_idx']+1)
-                    images.append(ImageData(data=image_url, type=f"image/{base_image['ext']}", description=f"Image {ib['img_idx']+1}", placeholder=placeholder))
-                    placeholder_map[placeholder] = image_url
-            # Images above all text blocks (y < min text y): insert at top
-            if text_blocks:
-                min_y = min(tb['y'] for tb in text_blocks)
-                images_top = [ib for ib in image_blocks if ib['y'] < min_y]
-                for ib in sorted(images_top, key=lambda b: b['y']):
-                    placeholder = f"[IMAGE_{ib['img_idx']}]"
-                    output_blocks.insert(0, placeholder)
-                    xref = ib['xref']
-                    base_image = doc.extract_image(xref)
-                    img_bytes = base_image["image"]
-                    ext = f'.{base_image["ext"]}'
-                    img_name = f"{doc_name}_img_{ib['img_idx']+1}{ext}"
-                    image_url = await save_image_locally(img_bytes, img_name, doc_name=doc_name, index=ib['img_idx']+1)
-                    images.append(ImageData(data=image_url, type=f"image/{base_image['ext']}", description=f"Image {ib['img_idx']+1}", placeholder=placeholder))
-                    placeholder_map[placeholder] = image_url
-            # Images without bbox: append at end
-            for img in images_no_bbox:
-                placeholder = f"[IMAGE_{img['img_idx']}]"
-                output_blocks.append(placeholder)
-                xref = img['xref']
-                base_image = doc.extract_image(xref)
-                img_bytes = base_image["image"]
-                ext = f'.{base_image["ext"]}'
-                img_name = f"{doc_name}_img_{img['img_idx']+1}{ext}"
-                image_url = await save_image_locally(img_bytes, img_name, doc_name=doc_name, index=img['img_idx']+1)
-                images.append(ImageData(data=image_url, type=f"image/{base_image['ext']}", description=f"Image {img['img_idx']+1}", placeholder=placeholder))
-                placeholder_map[placeholder] = image_url
-            text_parts.append("\n\n".join(output_blocks))
-        full_text = "\n\n".join(text_parts).strip()
+                    
+                    global_img_idx += 1
+                    
+                except Exception as e:
+                    logger.warning(f"Error processing image {img_idx} on page {page_num}: {str(e)}")
+            
+            # Sort all elements by vertical position, then horizontal position
+            content_elements.sort(key=lambda x: (x['y0'], x['x0']))
+            
+            # Group elements into lines based on vertical position
+            lines = []
+            current_line = []
+            last_y = -1
+            
+            for element in content_elements:
+                if current_line and abs(element['y0'] - last_y) > 5:  # Threshold for new line
+                    # Sort elements in the line by x-coordinate
+                    current_line.sort(key=lambda x: x['x0'])
+                    lines.append(current_line)
+                    current_line = []
+                current_line.append(element)
+                last_y = element['y0']
+            
+            if current_line:  # Add the last line
+                current_line.sort(key=lambda x: x['x0'])
+                lines.append(current_line)
+            
+            # Build the page content
+            page_content = []
+            for line in lines:
+                line_content = []
+                for element in line:
+                    if element['type'] == 'text':
+                        line_content.append(element['content'])
+                    else:  # image
+                        line_content.append(element['content'])
+                page_content.append(" ".join(line_content).strip())
+            
+            text_parts.append("\n\n".join(page_content).strip())
+        
+        # Combine all pages with page breaks
+        full_text = "\n\n---\n\n".join(text_parts).strip()
+        
         return full_text, images, placeholder_map
+        
+    except Exception as e:
+        logger.error(f"Error in PDF processing: {str(e)}")
+        raise
+        
     finally:
         if doc is not None:
             doc.close()
-        os.unlink(temp_pdf_path)
+        try:
+            if os.path.exists(temp_pdf_path):
+                os.unlink(temp_pdf_path)
+        except Exception as e:
+            logger.warning(f"Error removing temporary file: {str(e)}")
 
 def process_document_with_groq(text: str, images: List[ImageData], filename: str) -> str:
-    """Process document text with Groq API and return formatted Markdown."""
+    """Process document text with Groq API and return formatted Markdown.
+    
+    This function preserves the exact position of images by using placeholders
+    that are replaced after the markdown processing is complete.
+    """
     if not text.strip() and not images:
         return "# Document Conversion\n\nNo text content could be extracted from the document."
+        
     try:
-        client = groq.Client()
-        # Prepare image placeholders in the text
+        # Replace image placeholders with temporary markers that won't be modified by Groq
+        placeholder_map = {}
+        processed_text = text
+        
         for img in images:
-            text = text.replace(img.placeholder, f"![]({img.data})")
-        system_prompt = """You are an expert technical documentation specialist with deep knowledge of Markdown formatting.\nYour task is to convert technical documentation into perfectly formatted Markdown while preserving all technical accuracy.\n\nKey Rules:\n1. Maintain exact technical details and terminology\n2. Use proper Markdown syntax for all elements\n3. Structure content with clear hierarchy\n4. Format all lists, notes, and code blocks properly\n5. Preserve all original information without adding or removing content\n6. Ensure consistent spacing and formatting throughout\n7. Place images inline exactly where the ![](...) markdown appears in the text\n8. Beautify the output: use lists for steps, highlight NOTE:, style section titles (Purpose:, Steps:) as headers or bold, and add spacing for readability\n\nThe output should be production-ready technical documentation in Markdown format."""
-        user_prompt = f"""Convert the following document into professional Markdown format.\nThe document already contains properly positioned image markdown in the format ![](image_url).\nDO NOT move or modify these image markdowns in any way.\n\nDocument content:\n{text}\n\nPlease format this as clean, well-structured markdown while preserving all technical details and following the formatting rules.\nMost importantly, DO NOT move or modify any existing image markdown (![alt](url)) in the text."""
+            # Create a unique placeholder that won't be modified by Groq
+            safe_placeholder = f"__IMG_PLACEHOLDER_{len(placeholder_map)}__"
+            placeholder_map[safe_placeholder] = f"![]({img.data})"
+            processed_text = processed_text.replace(img.placeholder, safe_placeholder)
+        
+        client = groq.Client()
+        
+        system_prompt = """You are an expert technical documentation specialist. Your task is to convert 
+        the provided content into well-formatted Markdown while strictly following these rules:
+        
+        1. PRESERVE ALL CONTENT: Do not remove or modify any text or placeholders.
+        2. IMAGE PLACEHOLDERS: Keep all __IMG_PLACEHOLDER_X__ markers exactly as they are.
+        3. FORMATTING: Apply consistent Markdown formatting to the text around the placeholders.
+        4. STRUCTURE: Use proper headings, lists, and other Markdown elements to improve readability.
+        5. NO CONTENT LOSS: Ensure no text or placeholders are removed or reordered.
+        
+        The document may contain image placeholders in the format __IMG_PLACEHOLDER_X__. 
+        These MUST remain exactly as they are in the output.
+        """
+        
+        user_prompt = f"""Please format the following document as clean, well-structured Markdown.
+        
+        IMPORTANT: 
+        - Do NOT modify or remove any __IMG_PLACEHOLDER_X__ markers
+        - Keep all original text content
+        - Only apply formatting and structure
+        
+        Document content:
+        {processed_text}"""
+        
         chat_completion = client.chat.completions.create(
             messages=[
-                {
-                    "role": "system",
-                    "content": system_prompt
-                },
-                {
-                    "role": "user",
-                    "content": user_prompt
-                }
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
             ],
             model="llama3-70b-8192",
             temperature=0.1,
-            max_tokens=8000,
+            max_tokens=12000,
             top_p=0.9,
             frequency_penalty=0.1,
             presence_penalty=0.1
         )
+        
         markdown_output = chat_completion.choices[0].message.content
-        if len(markdown_output.split()) < len(text.split()) * 0.7:
-            raise ValueError("Significant content loss detected")
+        
+        # Restore the original image markdown
+        for placeholder, img_markdown in placeholder_map.items():
+            markdown_output = markdown_output.replace(placeholder, img_markdown)
+        
+        # Verify content preservation
+        original_word_count = len(text.split())
+        new_word_count = len(markdown_output.split())
+        if new_word_count < original_word_count * 0.7:  # If we lost more than 30% of content
+            raise ValueError("Significant content loss detected during processing")
+            
         return markdown_output
+        
     except Exception as e:
-        logger.error(f"Error processing document: {str(e)}")
-        fallback = f"# {os.path.splitext(filename)[0]}\n\n{text}"
-        if images:
-            fallback += "\n\n## Images\n"
-            for img in images:
-                fallback += f"\n![]({img.data})"
-        return fallback
+        logger.error(f"Error processing document with Groq: {str(e)}")
+        # Fallback: Just return the original text with image placeholders replaced
+        fallback = text
+        for img in images:
+            fallback = fallback.replace(img.placeholder, f"![]({img.data})")
+        return f"# {os.path.splitext(filename)[0]}\n\n{fallback}"
 
 @app.post("/api/convert", response_model=ConversionResponse)
 async def convert_file(file: UploadFile):
