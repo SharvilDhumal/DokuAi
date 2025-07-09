@@ -292,7 +292,7 @@ async def extract_text_and_images_from_pdf(pdf_bytes: bytes, doc_name: str = "")
                         y0, y1, x0, x1 = 0, page_height, 0, page_width
                     
                     # Create placeholder and save image
-                    placeholder = f"[IMAGE_{global_img_idx}]"
+                    placeholder = PLACEHOLDER_FORMAT.format(global_img_idx)
                     image_url = await save_image_locally(img_bytes, img_name, doc_name=doc_name, index=global_img_idx+1)
                     images.append(ImageData(
                         data=image_url,
@@ -355,6 +355,11 @@ async def extract_text_and_images_from_pdf(pdf_bytes: bytes, doc_name: str = "")
         # Combine all pages with page breaks
         full_text = "\n\n---\n\n".join(text_parts).strip()
         
+        # Replace all placeholders with markdown image tags
+        for img in images:
+            img_markdown = f"![]({img.data})"
+            full_text = full_text.replace(img.placeholder, img_markdown)
+        
         return full_text, images, placeholder_map
         
     except Exception as e:
@@ -373,65 +378,130 @@ async def extract_text_and_images_from_pdf(pdf_bytes: bytes, doc_name: str = "")
 def beautify_markdown(markdown: str) -> str:
     """
     Enhanced post-processing for professional Markdown:
-    - Converts 'NOTE :' or 'NOTE:' to blockquotes with bold
-    - Converts 'Steps for ...' and 'Optional Steps ...' to bold or subheadings
-    - Converts UI element references to bold
-    - Converts 'o', 'i.', 'ii.', '○' to proper Markdown sub-lists
-    - Adds ### subheadings for sections like 'Optional Steps'
-    - Never modifies lines with image tags
-    - Ensures consistent spacing and formatting
+    - Fixes code block formatting issues
+    - Preserves image tags in their exact positions
+    - Converts instructional text to proper paragraphs
+    - Cleans up accidental code blocks and backticks
+    - Maintains proper spacing and indentation
     """
     import re
+    
+    def clean_line(line: str) -> str:
+        """Clean up a single line of markdown."""
+        # Remove accidental code blocks (4+ spaces at start of line that aren't in a list)
+        if re.match(r'^ {4,}(?![\-*+\d.])', line):
+            line = line.lstrip()
+            
+        # Fix lines that start with backticks but aren't code blocks
+        if line.strip().startswith('`') and not line.strip().startswith('```'):
+            line = line.replace('`', '').strip()
+            
+        # Fix lines that look like code blocks but are just text
+        if re.match(r'^\s*`[^`]', line) and not re.match(r'^\s*```', line):
+            line = line.replace('`', '').strip()
+            
+        # Fix lines that look like code blocks but are just text with backticks
+        if re.match(r'^\s*`[^`]+`\s*$', line):
+            line = line.strip('` ')
+            
+        return line
+    
     lines = markdown.splitlines()
-    beautified = []
-    in_sublist = False
-    sublist_indent = '  '
+    result = []
+    in_code_block = False
+    in_list = False
+    list_indent = 0
+    
     for i, line in enumerate(lines):
         stripped = line.strip()
-        # Don't touch image lines
+        
+        # Handle code blocks
+        if stripped.startswith('```'):
+            in_code_block = not in_code_block
+            result.append(line)
+            continue
+            
+        if in_code_block:
+            result.append(line)
+            continue
+            
+        # Preserve image tags exactly as they are
         if re.match(r'^!\[.*\]\(.*\)$', stripped):
-            beautified.append(line)
+            if result and result[-1].strip() and not result[-1].startswith(('!', '>', '#')):
+                result.append('')  # Add space before image if needed
+            result.append(line)
+            if i < len(lines) - 1 and lines[i+1].strip() and not lines[i+1].startswith((' ', '\t', '-', '*', '1.', '!')):
+                result.append('')  # Add space after image if needed
             continue
-        # NOTE blockquote
-        if re.match(r'^NOTE ?[:：]', stripped, re.IGNORECASE):
-            note_content = re.sub(r'^NOTE ?[:：]', '', stripped, flags=re.IGNORECASE).strip()
-            beautified.append(f"> **NOTE:** {note_content}")
+            
+        # Skip empty lines in the middle of processing
+        if not stripped:
+            if result and result[-1]:  # Only add one empty line max
+                result.append('')
             continue
-        # Steps for ... or similar
-        if re.match(r'^(Steps for|Instructions for|How to|Process for) ', stripped, re.IGNORECASE):
-            beautified.append(f"**{stripped}**")
+            
+        # Clean up the line
+        line = clean_line(line)
+        
+        # Handle headings
+        if re.match(r'^#+\s+', line):
+            if result and result[-1]:
+                result.append('')
+            result.append(line)
+            result.append('')
             continue
-        # Optional Steps as subheading
-        if re.match(r'^Optional Steps', stripped, re.IGNORECASE):
-            beautified.append(f"### {stripped}")
-            continue
-        # UI element references (e.g., click Add new API client)
-        ui_match = re.search(r'(click|select|choose|press) ([A-Za-z0-9 _>]+)', stripped, re.IGNORECASE)
-        if ui_match:
-            action, element = ui_match.groups()
-            # Bold the UI element
-            new_line = re.sub(element, f"**{element.strip()}**", stripped)
-            beautified.append(new_line)
-            continue
-        # Sublist: o, ○, i., ii., etc.
-        if re.match(r'^[oO\u25CB] ', stripped):
-            beautified.append(f"{sublist_indent}- {stripped[2:].strip()}")
-            in_sublist = True
-            continue
-        if re.match(r'^[ivxlc]+\. ', stripped, re.IGNORECASE):
-            beautified.append(f"{sublist_indent}- {stripped[3:].strip()}")
-            in_sublist = True
-            continue
-        # End sublist if next line is not a sublist
-        if in_sublist and not (re.match(r'^[oO\u25CB] ', stripped) or re.match(r'^[ivxlc]+\. ', stripped, re.IGNORECASE)):
-            in_sublist = False
-        # Add extra spacing before headings or blockquotes
-        if beautified and (stripped.startswith('#') or stripped.startswith('>')) and beautified[-1].strip() != '':
-            beautified.append('')
-        beautified.append(line)
-    # Remove extra blank lines
-    beautified_text = re.sub(r'\n{3,}', '\n\n', '\n'.join(beautified))
-    return beautified_text.strip()
+            
+        # Handle lists
+        list_match = re.match(r'^(\s*)([•○▪•\-*+]|\d+[.)])\s+(.+)', line)
+        if list_match:
+            indent, marker, content = list_match.groups()
+            current_indent = len(indent)
+            
+            # Adjust list level
+            if current_indent > list_indent + 2:
+                current_indent = list_indent + 2
+            elif current_indent < list_indent - 2:
+                current_indent = max(0, list_indent - 2)
+                
+            # Create proper list item
+            if marker.isdigit() or marker.endswith(('.', ')')):
+                line = ' ' * current_indent + '1. ' + content
+            else:
+                line = ' ' * current_indent + '- ' + content
+                
+            list_indent = current_indent
+            in_list = True
+        else:
+            # Handle continuation lines in lists
+            if in_list and line.startswith('  '):
+                line = ' ' * (list_indent + 2) + line.lstrip()
+            else:
+                in_list = False
+                list_indent = 0
+        
+        # Add the processed line
+        if result and not result[-1] and not line.strip():
+            continue  # Skip multiple empty lines
+            
+        result.append(line)
+    
+    # Final pass to clean up any remaining issues
+    final_result = []
+    for i, line in enumerate(result):
+        # Remove any remaining single backticks that aren't part of code blocks
+        if '`' in line and not any(block in line for block in ['```', '`python', '`bash']):
+            line = re.sub(r'(?<!`)`(?!`)', "'", line)  # Replace single backticks with single quotes
+            
+        # Fix any remaining code block issues
+        if line.strip() and not line.strip().startswith(('!', '>', '#', '-', '*', '1.', '```')):
+            # If line looks like it was meant to be regular text but is indented
+            if re.match(r'^\s{4,}', line) and not re.match(r'^\s*\d+\.', line):
+                line = line.lstrip()
+                
+        final_result.append(line)
+    
+    # Join with proper spacing
+    return '\n'.join(final_result).strip() + '\n'
 
 def process_document_with_groq(text: str, images: List[ImageData], filename: str) -> str:
     """Process document text with Groq API and return formatted Markdown.
@@ -497,6 +567,13 @@ This tool converts PDF to Markdown.
 
 Document content:
 {text}"""
+            # Calculate a safe max_tokens value (leaving room for both input and output)
+            estimated_input_tokens = len(system_prompt.split()) + len(user_prompt.split())
+            safe_max_tokens = min(4000, 8192 - estimated_input_tokens - 100)  # Leave 100 tokens buffer
+            
+            if safe_max_tokens < 100:  # If not enough tokens left for a reasonable response
+                raise ValueError("Document is too large to process with the current model's context window")
+                
             chat_completion = client.chat.completions.create(
                 messages=[
                     {"role": "system", "content": system_prompt},
@@ -504,7 +581,7 @@ Document content:
                 ],
                 model="llama3-70b-8192",
                 temperature=0.1,
-                max_tokens=12000,
+                max_tokens=safe_max_tokens,
                 top_p=0.9,
                 frequency_penalty=0.1,
                 presence_penalty=0.1
@@ -582,6 +659,13 @@ This tool converts PDF to Markdown.
 
 Document content:
 {processed_text}"""
+        # Calculate a safe max_tokens value (leaving room for both input and output)
+        estimated_input_tokens = len(system_prompt.split()) + len(user_prompt.split())
+        safe_max_tokens = min(4000, 8192 - estimated_input_tokens - 100)  # Leave 100 tokens buffer
+        
+        if safe_max_tokens < 100:  # If not enough tokens left for a reasonable response
+            raise ValueError("Document is too large to process with the current model's context window")
+            
         chat_completion = client.chat.completions.create(
             messages=[
                 {"role": "system", "content": system_prompt},
@@ -589,7 +673,7 @@ Document content:
             ],
             model="llama3-70b-8192",
             temperature=0.1,
-            max_tokens=12000,
+            max_tokens=safe_max_tokens,
             top_p=0.9,
             frequency_penalty=0.1,
             presence_penalty=0.1
