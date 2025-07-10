@@ -1,19 +1,38 @@
 // index.js
-import React from 'react';
+import React, { useState } from 'react';
 import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
 import styles from './index.module.css';
 import Head from '@docusaurus/Head';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import AuthModal from '../components/AuthModal/AuthModal';
+import { useAuth } from '../context/AuthContext';
+import { AuthProvider } from '../context/AuthContext';
 // At the top of index.js
 import DokuAILogo from '@site/static/img/DokuAI_img.png';
 
-export default function Home() {
+function HomeContent() {
+  const { user, isAuthenticated, logout } = useAuth();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  const handleLoginSuccess = (userData) => {
+    console.log('Login successful:', userData);
+    // You can add additional logic here after successful login
+  };
+
+  const handleLogout = () => {
+    logout();
+    // You can add additional logic here after logout
+  };
+
   return (
     <Layout
       title="DokuAI - AI-Powered Documentation"
       description="Convert PDF/DOCX to structured Markdown with AI. Secure role-based access for teams."
     >
-      <Head>        <html data-theme="dark" />
+      <Head>
+        <html data-theme="dark" />
       </Head>
       <main className={styles.heroContainer}>
         <div className={styles.heroContent}>
@@ -25,14 +44,44 @@ export default function Home() {
             />
             <span className={styles.logoText}>DokuAI</span>
           </div>
+
+          {/* Authentication Status */}
+          <div className={styles.authStatus}>
+            {isAuthenticated ? (
+              <div className={styles.userInfo}>
+                <span>Welcome, {user?.name || 'User'}!</span>
+                <button onClick={handleLogout} className={styles.logoutButton}>
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setIsAuthModalOpen(true)}
+                className={styles.loginButton}
+              >
+                Login / Register
+              </button>
+            )}
+          </div>
+
           <h1 className={styles.title}>Welcome to <span className={styles.titleHighlight}>DokuAI</span></h1>
           <p className={styles.subtitle}>
             Transform <span className={styles.highlight}>PDF/DOCX</span> documents into perfectly structured <span className={styles.highlight}>Markdown</span> using AI.
             <br />Enterprise-grade security with <span className={styles.highlight}>role-based access control</span>.
           </p>
-          <Link to="/upload" className={styles.ctaButton}>
-            Get Started →
-          </Link>
+
+          {isAuthenticated ? (
+            <Link to="/upload" className={styles.ctaButton}>
+              Get Started →
+            </Link>
+          ) : (
+            <button
+              onClick={() => setIsAuthModalOpen(true)}
+              className={styles.ctaButton}
+            >
+              Login to Get Started →
+            </button>
+          )}
         </div>
 
         <section className={styles.features}>
@@ -67,7 +116,36 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* Authentication Modal */}
+        <AuthModal
+          isOpen={isAuthModalOpen}
+          onClose={() => setIsAuthModalOpen(false)}
+          onLoginSuccess={handleLoginSuccess}
+        />
+
+        {/* Toast Container */}
+        <ToastContainer
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="dark"
+        />
       </main>
     </Layout>
+  );
+}
+
+export default function Home() {
+  return (
+    <AuthProvider>
+      <HomeContent />
+    </AuthProvider>
   );
 }

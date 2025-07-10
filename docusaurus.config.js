@@ -85,6 +85,7 @@ const config = {
   },
   customFields: {
     BACKEND_URL: process.env.BACKEND_URL || 'http://localhost:5000',
+    AUTH_API_URL: process.env.AUTH_API_URL || 'http://localhost:5001/api/auth',
   },
   stylesheets: [
     'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css',
