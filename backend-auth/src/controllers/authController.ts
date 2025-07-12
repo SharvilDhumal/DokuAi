@@ -334,7 +334,8 @@ export const verifyResetToken = async (req: Request, res: Response) => {
 };
 
 export const verifyEmail = async (req: Request, res: Response) => {
-  const { token } = req.query;
+  // Support both GET (query) and POST (body)
+  const token = req.method === "POST" ? req.body.token : req.query.token;
 
   if (!token) {
     return res.status(400).json({
