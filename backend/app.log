@@ -6814,3 +6814,23 @@ KeyError: 'y0'
 2025-07-12 10:34:39,223 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
 2025-07-12 16:27:34,102 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
 2025-07-12 17:21:31,318 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-12 17:28:47,515 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-13 10:45:15,389 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-13 11:05:16,367 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-13 11:23:24,869 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-13 11:29:08,432 - __main__ - INFO - Received file: Business Case.pdf
+2025-07-13 11:29:08,433 - __main__ - INFO - Starting conversion for file: Business Case.pdf
+2025-07-13 11:29:08,434 - __main__ - INFO - File size: 338945 bytes
+2025-07-13 11:29:08,434 - __main__ - INFO - Processing PDF file
+2025-07-13 11:29:08,789 - __main__ - INFO - Extracted text length: 1572, Number of images: 4
+2025-07-13 11:29:11,321 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-13 11:29:11,332 - __main__ - INFO - Document processing completed successfully
+2025-07-13 11:29:11,362 - __main__ - INFO - Received file: Business Case.pdf
+2025-07-13 11:29:11,363 - __main__ - INFO - Starting conversion for file: Business Case.pdf
+2025-07-13 11:29:11,363 - __main__ - INFO - File size: 338945 bytes
+2025-07-13 11:29:11,364 - __main__ - INFO - Processing PDF file
+2025-07-13 11:29:11,587 - __main__ - INFO - Extracted text length: 1572, Number of images: 4
+2025-07-13 11:29:13,737 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-13 11:29:13,740 - __main__ - INFO - Document processing completed successfully
+2025-07-13 20:27:27,512 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-13 22:17:58,181 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads

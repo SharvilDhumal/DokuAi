@@ -1,5 +1,6 @@
 // @ts-check
 import { themes as prismThemes } from 'prism-react-renderer';
+const path = require('path');
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
@@ -89,6 +90,8 @@ const config = {
   },
   stylesheets: [
     'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css',
+  ],
+  plugins: [
   ],
 };
 

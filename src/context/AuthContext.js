@@ -17,6 +17,11 @@ export const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
 
+    // DEBUG: Force loading to false after 2 seconds
+    useEffect(() => {
+        setTimeout(() => setIsLoading(false), 2000);
+    }, []);
+
     // Check if user is logged in on app start
     useEffect(() => {
         const token = localStorage.getItem('authToken');

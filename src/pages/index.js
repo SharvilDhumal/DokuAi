@@ -1,5 +1,5 @@
 // index.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
 import styles from './index.module.css';
@@ -8,13 +8,18 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import AuthModal from '../components/AuthModal/AuthModal';
 import { useAuth } from '../context/AuthContext';
-import { AuthProvider } from '../context/AuthContext';
 // At the top of index.js
 import DokuAILogo from '@site/static/img/DokuAI_img.png';
 
 function HomeContent() {
   const { user, isAuthenticated, logout } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  useEffect(() => {
+    const handler = () => setIsAuthModalOpen(true);
+    window.addEventListener('open-auth-modal', handler);
+    return () => window.removeEventListener('open-auth-modal', handler);
+  }, []);
 
   const handleLoginSuccess = (userData) => {
     console.log('Login successful:', userData);
@@ -46,23 +51,7 @@ function HomeContent() {
           </div>
 
           {/* Authentication Status */}
-          <div className={styles.authStatus}>
-            {isAuthenticated ? (
-              <div className={styles.userInfo}>
-                <span>Welcome, {user?.name || 'User'}!</span>
-                <button onClick={handleLogout} className={styles.logoutButton}>
-                  Logout
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={() => setIsAuthModalOpen(true)}
-                className={styles.loginButton}
-              >
-                Login / Register
-              </button>
-            )}
-          </div>
+          {/* Removed authStatus block to avoid duplicate login/logout button under navbar */}
 
           <h1 className={styles.title}>Welcome to <span className={styles.titleHighlight}>DokuAI</span></h1>
           <p className={styles.subtitle}>
@@ -74,14 +63,7 @@ function HomeContent() {
             <Link to="/upload" className={styles.ctaButton}>
               Get Started →
             </Link>
-          ) : (
-            <button
-              onClick={() => setIsAuthModalOpen(true)}
-              className={styles.ctaButton}
-            >
-              Login to Get Started →
-            </button>
-          )}
+          ) : null}
         </div>
 
         <section className={styles.features}>
@@ -142,10 +124,4 @@ function HomeContent() {
   );
 }
 
-export default function Home() {
-  return (
-    <AuthProvider>
-      <HomeContent />
-    </AuthProvider>
-  );
-}
+export default HomeContent;

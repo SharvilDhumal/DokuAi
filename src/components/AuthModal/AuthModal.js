@@ -3,8 +3,10 @@ import { toast } from 'react-toastify';
 import axios from 'axios';
 import styles from './AuthModal.module.css';
 import { AUTH_API_URL } from '../../env-config';
+import { useAuth } from '../../context/AuthContext';
 
 const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
+    const { login } = useAuth();
     const [isLogin, setIsLogin] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
@@ -64,10 +66,7 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
 
             if (response.data.success) {
                 if (isLogin) {
-                    // Store token and user data
-                    localStorage.setItem('authToken', response.data.token);
-                    localStorage.setItem('user', JSON.stringify(response.data.user));
-
+                    login(response.data.token, response.data.user);
                     toast.success('Login successful!');
                     onLoginSuccess(response.data.user);
                     onClose();
