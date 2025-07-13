@@ -120,12 +120,12 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
                 <div className={styles.modalHeader}>
                     <h2>{isLogin ? 'Login' : 'Register'}</h2>
                     <p>{isLogin ? 'Welcome back to DokuAI' : 'Create your DokuAI account'}</p>
+                    <div style={{ height: '1.5px', background: '#2e855522', margin: '1.2rem 0 0.5rem 0', borderRadius: '2px' }}></div>
                 </div>
 
-                <form onSubmit={handleSubmit} className={styles.form}>
+                <form onSubmit={handleSubmit} className={styles.form} style={{ gap: '2rem' }}>
                     {!isLogin && (
                         <div className={styles.inputGroup}>
-                            <label htmlFor="name">Full Name</label>
                             <input
                                 type="text"
                                 id="name"
@@ -139,7 +139,6 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
                     )}
 
                     <div className={styles.inputGroup}>
-                        <label htmlFor="email">Email</label>
                         <input
                             type="email"
                             id="email"
@@ -152,8 +151,7 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
                     </div>
 
                     <div className={styles.inputGroup}>
-                        <label htmlFor="password">Password</label>
-                        <div className={styles.passwordInput}>
+                        <div className={styles.passwordInput} style={{ borderRadius: '8px', overflow: 'hidden', background: '#20233a' }}>
                             <input
                                 type={showPassword ? 'text' : 'password'}
                                 id="password"
@@ -166,6 +164,7 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
                             <button
                                 type="button"
                                 className={styles.passwordToggle}
+                                style={{ borderRadius: '8px' }}
                                 onClick={() => setShowPassword(!showPassword)}
                             >
                                 {showPassword ? '👁️' : '👁️‍🗨️'}
@@ -175,7 +174,6 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
 
                     {!isLogin && (
                         <div className={styles.inputGroup}>
-                            <label htmlFor="confirmPassword">Confirm Password</label>
                             <input
                                 type="password"
                                 id="confirmPassword"
