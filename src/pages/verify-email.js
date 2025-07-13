@@ -20,10 +20,8 @@ export default function VerifyEmail() {
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    setStatus('Email verified! Redirecting to login...');
-                    setTimeout(() => {
-                        window.location.href = '/login';
-                    }, 2000);
+                    setStatus('Email verified! Please close this tab and return to your original window.');
+                    // No redirect
                 } else {
                     setStatus(data.message || 'Verification failed.');
                 }
