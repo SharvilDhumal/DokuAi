@@ -10,6 +10,8 @@ export default function ResetPasswordPage() {
     const [isValid, setIsValid] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [formData, setFormData] = useState({ newPassword: '', confirmPassword: '' });
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [message, setMessage] = useState('');
     const [success, setSuccess] = useState(false);
 
@@ -97,32 +99,50 @@ export default function ResetPasswordPage() {
                     ) : success ? (
                         <div className={styles.footer}><p>{message}</p></div>
                     ) : (
-                        <form onSubmit={handleSubmit} className={styles.form}>
+                        <form onSubmit={handleSubmit} className={styles.form} style={{ gap: '2rem' }}>
                             <div className={styles.inputGroup}>
-                                <label htmlFor="newPassword">New Password</label>
-                                <input
-                                    type="password"
-                                    id="newPassword"
-                                    name="newPassword"
-                                    value={formData.newPassword}
-                                    onChange={handleInputChange}
-                                    placeholder="Enter your new password"
-                                    required
-                                    minLength={8}
-                                />
+                                <div className={styles.passwordInput} style={{ borderRadius: '8px', overflow: 'hidden', background: '#20233a' }}>
+                                    <input
+                                        type={showPassword ? 'text' : 'password'}
+                                        id="newPassword"
+                                        name="newPassword"
+                                        value={formData.newPassword}
+                                        onChange={handleInputChange}
+                                        placeholder="Enter your new password"
+                                        required
+                                        minLength={8}
+                                    />
+                                    <button
+                                        type="button"
+                                        className={styles.passwordToggle}
+                                        style={{ borderRadius: '8px' }}
+                                        onClick={() => setShowPassword(!showPassword)}
+                                    >
+                                        {showPassword ? '👁️' : '👁️‍🗨️'}
+                                    </button>
+                                </div>
                             </div>
                             <div className={styles.inputGroup}>
-                                <label htmlFor="confirmPassword">Confirm New Password</label>
-                                <input
-                                    type="password"
-                                    id="confirmPassword"
-                                    name="confirmPassword"
-                                    value={formData.confirmPassword}
-                                    onChange={handleInputChange}
-                                    placeholder="Confirm your new password"
-                                    required
-                                    minLength={8}
-                                />
+                                <div className={styles.passwordInput} style={{ borderRadius: '8px', overflow: 'hidden', background: '#20233a' }}>
+                                    <input
+                                        type={showConfirmPassword ? 'text' : 'password'}
+                                        id="confirmPassword"
+                                        name="confirmPassword"
+                                        value={formData.confirmPassword}
+                                        onChange={handleInputChange}
+                                        placeholder="Confirm your new password"
+                                        required
+                                        minLength={8}
+                                    />
+                                    <button
+                                        type="button"
+                                        className={styles.passwordToggle}
+                                        style={{ borderRadius: '8px' }}
+                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                    >
+                                        {showConfirmPassword ? '👁️' : '👁️‍🗨️'}
+                                    </button>
+                                </div>
                             </div>
                             {message && <div className={styles.error}><p>{message}</p></div>}
                             <button type="submit" className={styles.submitButton} disabled={isLoading}>
