@@ -73,9 +73,7 @@ const config = {
         <div class="footer__brand-tagline">AI-Powered Document to Markdown Converter</div>
         <div class="footer__brand-social">
           <a href="https://github.com/SharvilDhumal/Intern_project1" target="_blank" rel="noopener"><i class="fab fa-github"></i></a>
-          <a href="https://linkedin.com/" target="_blank" rel="noopener"><i class="fab fa-linkedin"></i></a>
-          <a href="https://twitter.com/" target="_blank" rel="noopener"><i class="fab fa-twitter"></i></a>
-          <a href="https://youtube.com/" target="_blank" rel="noopener"><i class="fab fa-youtube"></i></a>
+          <a href="https://www.linkedin.com/in/sharvil-dhumal" target="_blank" rel="noopener"><i class="fab fa-linkedin"></i></a>
         </div>
         <div style="margin-top:1rem; font-size:0.95rem; color:#888;">&copy; 2025 DokuAI. All rights reserved.</div>
       `,

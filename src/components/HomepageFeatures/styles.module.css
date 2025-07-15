@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-top: 4rem;
   padding: 2.5rem 0; /* Remove horizontal padding */
   width: 100vw; /* Stretch full viewport width */
   background: #f8f9fb;
@@ -29,14 +30,21 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 350px;
+  min-height: 260px;
+  height: 100%;
+  box-sizing: border-box;
 }
 
 .featureCard:hover,
 .featureCard:focus {
-  box-shadow: 0 6px 24px rgba(24, 28, 47, 0.13);
-  background: #f3f7fa;
-  cursor: default;
+  box-shadow: none;
+  background: #fff;
+}
+
+.featureCard:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
 }
 
 .featureSvg {
@@ -45,13 +53,22 @@
   margin-bottom: 1rem;
 }
 
-@media (max-width: 900px) {
+@media (min-width: 900px) {
+  .featuresContainer {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (max-width: 900px) and (min-width: 600px) {
+  .featuresContainer {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 600px) {
   .featuresContainer {
     grid-template-columns: 1fr;
-    gap: 1.2rem;
   }
   .featureCard {
-    min-height: 280px;
+    min-height: 220px;
     padding: 1.2rem 0.7rem 1rem 0.7rem;
   }
   .featureSvg {

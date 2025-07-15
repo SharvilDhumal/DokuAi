@@ -4,35 +4,63 @@ import styles from './styles.module.css';
 import MountainSvg from '@site/static/img/undraw_docusaurus_mountain.svg';
 import TreeSvg from '@site/static/img/undraw_docusaurus_tree.svg';
 import ReactSvg from '@site/static/img/undraw_docusaurus_react.svg';
+// Add more SVGs for new features
+import TagSvg from '@site/static/img/undraw_docusaurus_tree.svg'; // Placeholder, replace with actual
+import DatabaseSvg from '@site/static/img/undraw_docusaurus_mountain.svg'; // Placeholder, replace with actual
+import KeySvg from '@site/static/img/undraw_docusaurus_tree.svg'; // Placeholder, replace with actual
 
 const FeatureList = [
   {
-    title: 'Easy to Use',
+    title: 'AI-Powered Conversion',
     Svg: MountainSvg,
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        Advanced NLP transforms documents into clean, structured Markdown with perfect formatting.
       </>
     ),
   },
   {
-    title: 'Focus on What Matters',
-    Svg: TreeSvg,
+    title: 'Role-Based Access',
+    Svg: KeySvg,
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+        Granular permissions for Admins, Editors, and Viewers with audit logging.
       </>
     ),
   },
   {
-    title: 'Powered by React',
+    title: 'Multi-Framework',
     Svg: ReactSvg,
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+        Unified dashboard supporting Angular and Docusaurus workflows.
+      </>
+    ),
+  },
+  {
+    title: 'Smart Tagging',
+    Svg: TagSvg,
+    description: (
+      <>
+        Auto-categorization of content as API, Tutorial, or Guide documentation.
+      </>
+    ),
+  },
+  {
+    title: 'PostgreSQL Backend',
+    Svg: DatabaseSvg,
+    description: (
+      <>
+        Enterprise-grade database with full version history and rollback.
+      </>
+    ),
+  },
+  {
+    title: 'Secure & Scalable',
+    Svg: TreeSvg,
+    description: (
+      <>
+        Enterprise-grade security, scalability, and compliance for your documentation workflows.
       </>
     ),
   },
@@ -40,7 +68,7 @@ const FeatureList = [
 
 function Feature({ Svg, title, description }) {
   return (
-    <div className={clsx('col col--4', styles.featureCard)}>
+    <div className={styles.featureCard}>
       <div className="text--center">
         <Svg className={styles.featureSvg} role="img" />
       </div>
