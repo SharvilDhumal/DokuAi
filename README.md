@@ -1,6 +1,6 @@
 # DokuAI: AI-Powered Document to Markdown Converter
 
-DokuAI is a web application that converts PDF and DOCX documents into clean, professional Markdown with embedded images—powered by AI. It’s designed for technical writers, developers, and teams who want to migrate or maintain documentation in Markdown-based systems.
+DokuAI is a full-stack web application that converts PDF and DOCX documents into clean, professional Markdown with embedded images—powered by AI. It features robust authentication, role-based access, and a modern, responsive UI for technical writers, developers, and teams.
 
 ---
 
@@ -13,20 +13,18 @@ DokuAI is a web application that converts PDF and DOCX documents into clean, pro
   - **PDF**: Images are placed as close as possible to their original position using a smart heuristic.
 - **Live Markdown Preview**: See your converted document with syntax highlighting, styled images, and more.
 - **Download or Copy Markdown**: Export your Markdown for use in wikis, codebases, or static site generators.
+- **Authentication & Role-Based Access**: Secure login, registration, email verification, password reset, and granular permissions.
+- **Audit Logging**: Tracks authentication events for security.
 - **Robust Error Handling**: Friendly messages and logging for unsupported files or backend issues.
-
----
-
-## 🖼️ Screenshots
-
-> _Add screenshots here of the upload page, preview, and a sample Markdown output!_
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: React (Docusaurus), Marked.js, Highlight.js
-- **Backend**: Python (FastAPI), python-docx, PyMuPDF (fitz), Groq LLM API
+- **Frontend**: React (Docusaurus), Marked.js, Highlight.js, React Context API
+- **Backend**:
+  - **Document Conversion**: Python (FastAPI, Flask), Groq LLM, PyMuPDF, python-docx
+  - **Authentication**: Node.js (Express, TypeScript), PostgreSQL, JWT, Nodemailer
 - **Storage**: Local file system for uploads and extracted images
 
 ---
@@ -36,10 +34,11 @@ DokuAI is a web application that converts PDF and DOCX documents into clean, pro
 ### Prerequisites
 
 - Python 3.9+
-- Node.js 16+
+- Node.js 16+ (for frontend), Node.js 18+ (for backend-auth)
+- PostgreSQL 12+ (for authentication backend)
 - (Optional) Groq API key for AI formatting
 
-### Backend Setup
+### Backend Setup (Document Conversion)
 
 ```bash
 cd backend
@@ -51,6 +50,17 @@ echo GROQ_API_KEY=your_groq_api_key > .env
 python app.py
 ```
 
+### Authentication Backend Setup
+
+```bash
+cd backend-auth
+npm install
+cp env.example .env  # Edit .env with your DB, JWT, SMTP, and frontend config
+# Set up PostgreSQL and run schema.sql as described in backend-auth/README.md
+npm run build
+npm start
+```
+
 ### Frontend Setup
 
 ```bash
@@ -58,8 +68,9 @@ npm install
 npm start
 ```
 
-- The frontend will run on [http://localhost:3000](http://localhost:3000)
-- The backend API runs on [http://localhost:5000](http://localhost:5000)
+- The frontend runs on [http://localhost:3000](http://localhost:3000)
+- The document conversion backend runs on [http://localhost:5000](http://localhost:5000)
+- The authentication backend runs on [http://localhost:5001](http://localhost:5001)
 
 ---
 
@@ -69,6 +80,64 @@ npm start
 2. Select or drag a PDF/DOCX file.
 3. Wait for the AI to process and preview the Markdown.
 4. Copy or download the Markdown for your documentation needs.
+
+---
+
+## 🔒 Authentication & Security
+
+- **User registration with email verification**
+- **Secure login with JWT tokens**
+- **Password reset via email**
+- **Role-based access control (Admin, Editor, Viewer)**
+- **Audit logging of authentication events**
+- **Rate limiting, CORS, Helmet, and input validation for security**
+
+---
+
+## 📂 Project Structure
+
+```
+Intern_project/
+│
+├── backend/                # Python FastAPI/Flask backend for document conversion
+│   ├── app.py
+│   ├── requirements.txt
+│   ├── uploads/            # Uploaded and processed files
+│   └── utils/
+│
+├── backend-auth/           # Node.js/Express/TypeScript authentication backend
+│   ├── src/
+│   │   ├── controllers/
+│   │   ├── middleware/
+│   │   ├── models/
+│   │   ├── routes/
+│   │   └── utils/
+│   ├── database/
+│   │   └── schema.sql
+│   ├── package.json
+│   └── README.md
+│
+├── src/                    # Frontend (Docusaurus/React)
+│   ├── components/
+│   │   ├── AuthModal/
+│   │   ├── HomepageFeatures/
+│   │   └── ResetPassword/
+│   ├── context/
+│   │   └── AuthContext.js
+│   ├── css/
+│   │   └── custom.css
+│   ├── pages/
+│   │   ├── index.js
+│   │   ├── upload.js
+│   │   ├── reset-password.js
+│   │   └── markdownpreview.js
+│   └── theme/
+│
+├── static/                 # Static assets (images, icons)
+├── docusaurus.config.js    # Docusaurus site config (footer, navbar, etc.)
+├── package.json            # Frontend dependencies
+└── README.md               # This file
+```
 
 ---
 
@@ -104,4 +173,11 @@ Pull requests and issues are welcome! Please open an issue for feature requests 
 
 ## 📫 Contact
 
-For questions or support, open an issue or contact the maintainer.
+For questions or support, open an issue or contact the maintainer via [LinkedIn](https://www.linkedin.com/in/sharvil-dhumal).
+
+---
+
+**Note:**
+
+- For detailed authentication backend setup, see `backend-auth/README.md`.
+- For database schema, see `backend-auth/database/schema.sql`.
