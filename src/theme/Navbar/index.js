@@ -1,40 +1,45 @@
-import React, { useEffect } from 'react';
-import Navbar from '@theme-original/Navbar';
+import React, { useState } from 'react';
+import Link from '@docusaurus/Link';
 import { useAuth } from '../../context/AuthContext';
+import styles from './CustomNavbar.module.css';
 
-export default function NavbarWrapper(props) {
+export default function CustomNavbar() {
     const { user, logout } = useAuth();
+    const [menuOpen, setMenuOpen] = useState(false);
 
-    useEffect(() => {
-        // Wait for navbar to render, then inject the button
-        const interval = setInterval(() => {
-            const rightSection = document.querySelector('.navbar__items--right');
-            if (rightSection && !rightSection.querySelector('.custom-auth-btn')) {
-                const btn = document.createElement('button');
-                btn.className = 'custom-auth-btn';
-                btn.style.background = 'none';
-                btn.style.border = 'none';
-                btn.style.color = '#2e8555';
-                btn.style.cursor = 'pointer';
-                btn.style.fontFamily = 'Poppins, Space Grotesk, sans-serif';
-                btn.style.fontWeight = 600;
-                btn.style.marginLeft = '1rem';
-                btn.innerText = user ? 'Logout' : 'Login';
-                btn.onclick = user
-                    ? logout
-                    : () => window.dispatchEvent(new Event('open-auth-modal'));
-                rightSection.appendChild(btn);
-            } else if (rightSection && rightSection.querySelector('.custom-auth-btn')) {
-                // Update button text and handler if user state changes
-                const btn = rightSection.querySelector('.custom-auth-btn');
-                btn.innerText = user ? 'Logout' : 'Login';
-                btn.onclick = user
-                    ? logout
-                    : () => window.dispatchEvent(new Event('open-auth-modal'));
-            }
-        }, 100);
-        return () => clearInterval(interval);
-    }, [user, logout]);
-
-    return <Navbar {...props} />;
+    return (
+        <nav className={styles.navbar + ' ' + (menuOpen ? styles.open : '')}>
+            <div className={styles.navInner}>
+                <Link to="/" className={styles.brand} aria-label="DokuAI Home">
+                    <img src={require('@site/static/img/DokuAI_img.png').default} alt="DokuAI Logo" className={styles.logo} />
+                    <span className={styles.brandText}>DokuAI</span>
+                </Link>
+                <button
+                    className={styles.hamburger}
+                    aria-label="Toggle menu"
+                    onClick={() => setMenuOpen((open) => !open)}
+                >
+                    <span className={styles.hamburgerBar}></span>
+                    <span className={styles.hamburgerBar}></span>
+                    <span className={styles.hamburgerBar}></span>
+                </button>
+                <div className={styles.rightGroup + ' ' + (menuOpen ? styles.show : '')}>
+                    <Link
+                        to="/upload"
+                        className={styles.uploadLink}
+                        aria-label="Upload"
+                    >
+                        Upload
+                    </Link>
+                    <button
+                        className={styles.authButton}
+                        onClick={user ? logout : () => window.dispatchEvent(new Event('open-auth-modal'))}
+                        aria-label={user ? 'Logout' : 'Login'}
+                    >
+                        {user ? 'Logout' : 'Login'}
+                    </button>
+                </div>
+            </div>
+        </nav>
+    );
 } 

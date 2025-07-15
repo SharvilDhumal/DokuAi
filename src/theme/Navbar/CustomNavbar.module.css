@@ -1,0 +1,207 @@
+.navbar {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+  background: rgba(24, 28, 47, 0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 16px 0 rgba(0, 0, 0, 0.1);
+  transition: background 0.3s, box-shadow 0.3s;
+}
+
+.navInner {
+  max-width: 1120px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1.5rem;
+  min-height: 60px;
+  box-sizing: border-box;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none !important;
+  padding-left: 0.7rem;
+}
+
+.brand:hover,
+.brand:focus {
+  text-decoration: none !important;
+}
+
+.logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #232946;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  object-fit: contain;
+  display: block;
+}
+
+.brandText {
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.04em;
+  font-family: "Poppins", "Space Grotesk", Arial, sans-serif;
+  display: flex;
+  align-items: center;
+  line-height: 1.1;
+}
+
+.links {
+  display: flex;
+  align-items: center;
+  gap: 2.2rem;
+  transition: all 0.2s;
+  justify-content: flex-end;
+  margin-left: 0;
+}
+
+.rightGroup {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  padding-right: 1.2rem;
+}
+
+.uploadLink {
+  display: flex;
+  align-items: center;
+  font-weight: 700;
+  color: #25c2a0;
+  font-size: 1.13rem;
+  text-decoration: none !important;
+  position: relative;
+  transition: color 0.18s, transform 0.18s, font-weight 0.18s;
+  padding: 0.25rem 0.9rem;
+  border-radius: 6px;
+  height: 38px;
+  box-sizing: border-box;
+}
+.uploadLink:hover,
+.uploadLink:focus {
+  color: #32d8b4;
+  text-decoration: none !important;
+  transform: scale(1.07);
+  font-weight: 800;
+  background: rgba(50, 216, 180, 0.07);
+}
+
+.authButton {
+  background: linear-gradient(90deg, #25c2a0 0%, #32d8b4 100%);
+  color: #181c2f;
+  font-weight: 700;
+  font-size: 1.08rem;
+  border: none;
+  border-radius: 999px;
+  padding: 0.25rem 1.2rem;
+  margin-left: 0;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(50, 216, 180, 0.1);
+  transition: background 0.18s, color 0.18s, transform 0.18s, filter 0.18s;
+  font-family: "Poppins", "Space Grotesk", Arial, sans-serif;
+  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  height: 38px;
+  box-sizing: border-box;
+}
+.authButton:hover,
+.authButton:focus {
+  background: linear-gradient(90deg, #32d8b4 0%, #25c2a0 100%);
+  color: #fff;
+  transform: scale(1.06);
+  filter: brightness(1.08);
+}
+
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 38px;
+  height: 38px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 1100;
+}
+.hamburgerBar {
+  width: 24px;
+  height: 3px;
+  background: #fff;
+  margin: 3px 0;
+  border-radius: 2px;
+  transition: all 0.2s;
+}
+
+.leftGroup {
+  display: flex;
+  align-items: center;
+  gap: 1.7rem;
+}
+
+@media (max-width: 900px) {
+  .navInner {
+    padding: 0.5rem 0.7rem;
+  }
+  .brandText {
+    font-size: 1.15rem;
+  }
+  .links {
+    gap: 1.2rem;
+  }
+  .rightGroup {
+    gap: 0.7rem;
+    padding-right: 0.5rem;
+  }
+}
+
+@media (max-width: 700px) {
+  .navInner {
+    padding: 0.5rem 0.2rem;
+  }
+  .links {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: rgba(24, 28, 47, 0.97);
+    box-shadow: 0 8px 32px rgba(20, 30, 60, 0.13);
+    border-radius: 0 0 16px 16px;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1.2rem;
+    padding: 1.2rem 1.5rem 1.2rem 2.5rem;
+    min-width: 180px;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-10px);
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  .show {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+  .hamburger {
+    display: flex;
+  }
+  .authButton,
+  .uploadLink {
+    width: 100%;
+    justify-content: flex-end;
+    height: 38px;
+  }
+  .leftGroup {
+    gap: 0.7rem;
+  }
+}
