@@ -60,6 +60,7 @@ const config = {
       },
       items: [
         { to: '/upload', label: 'Upload', position: 'left' },
+        // Custom login/logout button will be handled in Navbar/index.js
       ],
     },
     footer: {

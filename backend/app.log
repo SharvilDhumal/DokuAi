@@ -6849,3 +6849,46 @@ KeyError: 'y0'
 2025-07-14 00:10:24,727 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
 2025-07-14 00:10:24,731 - __main__ - INFO - Document processing completed successfully
 2025-07-14 10:40:44,181 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-14 14:51:58,932 - __main__ - INFO - Received file: Business Case.docx
+2025-07-14 14:51:58,935 - __main__ - INFO - Starting conversion for file: Business Case.docx
+2025-07-14 14:51:58,935 - __main__ - INFO - File size: 285804 bytes
+2025-07-14 14:51:58,936 - __main__ - INFO - Processing DOCX file
+2025-07-14 14:51:59,050 - __main__ - INFO - Extracted text length: 1673, Number of images: 4
+2025-07-14 14:52:01,776 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-14 14:52:01,794 - __main__ - INFO - Document processing completed successfully
+2025-07-14 14:52:01,845 - __main__ - INFO - Received file: Business Case.docx
+2025-07-14 14:52:01,846 - __main__ - INFO - Starting conversion for file: Business Case.docx
+2025-07-14 14:52:01,846 - __main__ - INFO - File size: 285804 bytes
+2025-07-14 14:52:01,846 - __main__ - INFO - Processing DOCX file
+2025-07-14 14:52:01,885 - __main__ - INFO - Extracted text length: 1673, Number of images: 4
+2025-07-14 14:52:03,907 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-14 14:52:03,911 - __main__ - INFO - Document processing completed successfully
+2025-07-14 14:52:36,172 - __main__ - INFO - Received file: Business Case.docx
+2025-07-14 14:52:36,173 - __main__ - INFO - Starting conversion for file: Business Case.docx
+2025-07-14 14:52:36,175 - __main__ - INFO - File size: 285804 bytes
+2025-07-14 14:52:36,175 - __main__ - INFO - Processing DOCX file
+2025-07-14 14:52:36,233 - __main__ - INFO - Extracted text length: 1673, Number of images: 4
+2025-07-14 14:52:38,303 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-14 14:52:38,310 - __main__ - INFO - Document processing completed successfully
+2025-07-14 14:52:38,370 - __main__ - INFO - Received file: Business Case.docx
+2025-07-14 14:52:38,372 - __main__ - INFO - Starting conversion for file: Business Case.docx
+2025-07-14 14:52:38,373 - __main__ - INFO - File size: 285804 bytes
+2025-07-14 14:52:38,374 - __main__ - INFO - Processing DOCX file
+2025-07-14 14:52:38,424 - __main__ - INFO - Extracted text length: 1673, Number of images: 4
+2025-07-14 14:52:40,247 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-14 14:52:40,252 - __main__ - INFO - Document processing completed successfully
+2025-07-14 16:12:13,093 - __main__ - INFO - Received file: Business Case.pdf
+2025-07-14 16:12:13,094 - __main__ - INFO - Starting conversion for file: Business Case.pdf
+2025-07-14 16:12:13,095 - __main__ - INFO - File size: 338945 bytes
+2025-07-14 16:12:13,096 - __main__ - INFO - Processing PDF file
+2025-07-14 16:12:13,569 - __main__ - INFO - Extracted text length: 1572, Number of images: 4
+2025-07-14 16:12:16,322 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-14 16:12:16,328 - __main__ - INFO - Document processing completed successfully
+2025-07-14 16:12:16,391 - __main__ - INFO - Received file: Business Case.pdf
+2025-07-14 16:12:16,394 - __main__ - INFO - Starting conversion for file: Business Case.pdf
+2025-07-14 16:12:16,395 - __main__ - INFO - File size: 338945 bytes
+2025-07-14 16:12:16,396 - __main__ - INFO - Processing PDF file
+2025-07-14 16:12:16,603 - __main__ - INFO - Extracted text length: 1572, Number of images: 4
+2025-07-14 16:12:19,147 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-14 16:12:19,151 - __main__ - INFO - Document processing completed successfully
+2025-07-15 10:41:35,577 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
