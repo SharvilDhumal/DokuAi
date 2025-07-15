@@ -6892,3 +6892,4 @@ KeyError: 'y0'
 2025-07-14 16:12:19,147 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
 2025-07-14 16:12:19,151 - __main__ - INFO - Document processing completed successfully
 2025-07-15 10:41:35,577 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-15 22:27:29,275 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
