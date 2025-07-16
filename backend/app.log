@@ -6895,3 +6895,18 @@ KeyError: 'y0'
 2025-07-15 22:27:29,275 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
 2025-07-16 09:51:05,532 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
 2025-07-16 11:08:08,465 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-16 12:06:47,391 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-16 12:08:48,929 - __main__ - INFO - Received file: Business Case.docx
+2025-07-16 12:08:48,929 - __main__ - INFO - Starting conversion for file: Business Case.docx
+2025-07-16 12:08:48,930 - __main__ - INFO - File size: 285804 bytes
+2025-07-16 12:08:48,930 - __main__ - INFO - Processing DOCX file
+2025-07-16 12:08:48,987 - __main__ - INFO - Extracted text length: 1673, Number of images: 4
+2025-07-16 12:08:51,774 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-16 12:08:51,785 - __main__ - INFO - Document processing completed successfully
+2025-07-16 12:08:51,813 - __main__ - INFO - Received file: Business Case.docx
+2025-07-16 12:08:51,814 - __main__ - INFO - Starting conversion for file: Business Case.docx
+2025-07-16 12:08:51,815 - __main__ - INFO - File size: 285804 bytes
+2025-07-16 12:08:51,815 - __main__ - INFO - Processing DOCX file
+2025-07-16 12:08:51,856 - __main__ - INFO - Extracted text length: 1673, Number of images: 4
+2025-07-16 12:08:53,977 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-16 12:08:53,980 - __main__ - INFO - Document processing completed successfully
