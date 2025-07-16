@@ -16,6 +16,7 @@ DokuAI is a full-stack web application that converts PDF and DOCX documents into
 - **Authentication & Role-Based Access**: Secure login, registration, email verification, password reset, and granular permissions.
 - **Audit Logging**: Tracks authentication events for security.
 - **Robust Error Handling**: Friendly messages and logging for unsupported files or backend issues.
+- **Modern UI**: Responsive, accessible, and customizable with Docusaurus and React.
 
 ---
 
@@ -104,24 +105,41 @@ Intern_project/
 │   ├── requirements.txt
 │   ├── uploads/            # Uploaded and processed files
 │   └── utils/
+│       └── db.ts
 │
 ├── backend-auth/           # Node.js/Express/TypeScript authentication backend
 │   ├── src/
 │   │   ├── controllers/
+│   │   │   └── authController.ts
 │   │   ├── middleware/
+│   │   │   └── auth.ts
 │   │   ├── models/
+│   │   │   └── userModel.ts
 │   │   ├── routes/
-│   │   └── utils/
+│   │   │   └── auth.ts
+│   │   ├── utils/
+│   │   │   ├── db.ts
+│   │   │   └── emailService.ts
+│   │   └── server.ts
 │   ├── database/
 │   │   └── schema.sql
 │   ├── package.json
-│   └── README.md
+│   ├── README.md
+│   ├── quick-setup.bat
+│   ├── setup.js
+│   └── tsconfig.json
 │
 ├── src/                    # Frontend (Docusaurus/React)
 │   ├── components/
 │   │   ├── AuthModal/
+│   │   │   ├── AuthModal.js
+│   │   │   └── AuthModal.module.css
 │   │   ├── HomepageFeatures/
+│   │   │   ├── index.js
+│   │   │   └── styles.module.css
 │   │   └── ResetPassword/
+│   │       ├── ResetPassword.js
+│   │       └── ResetPassword.module.css
 │   ├── context/
 │   │   └── AuthContext.js
 │   ├── css/
@@ -130,23 +148,33 @@ Intern_project/
 │   │   ├── index.js
 │   │   ├── upload.js
 │   │   ├── reset-password.js
-│   │   └── markdownpreview.js
+│   │   ├── markdownpreview.js
+│   │   ├── index.module.css
+│   │   └── markdownpreview.module.css
 │   └── theme/
+│       ├── Navbar/
+│       ├── NavbarItem/
+│       └── Root.js
 │
-├── static/                 # Static assets (images, icons)
-├── docusaurus.config.js    # Docusaurus site config (footer, navbar, etc.)
-├── package.json            # Frontend dependencies
-└── README.md               # This file
+├── static/                 # Static assets (images, icons, logos)
+├── docusaurus.config.js    # Docusaurus site config (footer, navbar, theme, etc.)
+├── package.json            # Frontend dependencies and scripts
+├── README.md               # Main project documentation
+├── AUTHENTICATION_SETUP.md # Additional setup instructions for authentication
+├── sidebars.js             # Docusaurus sidebar config
+├── .gitignore, package-lock.json, etc.
 ```
 
 ---
 
-## 🤖 How It Works
+## 🧩 How the Pieces Work Together
 
-- **Text & Image Extraction**: The backend parses the document, extracting text and images.
-- **AI Formatting**: The extracted content is sent to Groq LLM, which formats it into Markdown, preserving structure and technical details.
-- **Smart Image Placement**: For PDFs, images are placed after the most relevant paragraph using a Y-coordinate heuristic.
-- **Preview & Export**: The frontend renders the Markdown with enhanced styling and lets you copy or download the result.
+- **User visits the site** and can register/login (handled by backend-auth and frontend modals).
+- **Authenticated users** can upload PDF/DOCX files.
+- **Backend (Python)** processes the file, extracts content, and uses AI to generate Markdown.
+- **Frontend** displays a live preview and allows users to copy or download the Markdown.
+- **Role-based access** ensures only authorized users can upload or manage documents.
+- **Audit logs** and security features protect user data and track important events.
 
 ---
 

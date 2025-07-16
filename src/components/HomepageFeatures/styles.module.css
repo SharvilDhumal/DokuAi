@@ -26,19 +26,12 @@
   box-shadow: 0 2px 12px rgba(24, 28, 47, 0.07);
   padding: 2rem 1.5rem 1.5rem 1.5rem;
   margin: 0 auto;
-  transition: box-shadow 0.18s, background 0.18s;
   display: flex;
   flex-direction: column;
   align-items: center;
   min-height: 260px;
   height: 100%;
   box-sizing: border-box;
-}
-
-.featureCard:hover,
-.featureCard:focus {
-  box-shadow: none;
-  background: #fff;
 }
 
 .featureCard:focus {

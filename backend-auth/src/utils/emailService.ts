@@ -15,7 +15,7 @@ const transporter = nodemailer.createTransport({
 
 /** Add a logo image URL (hosted or static) */
 const LOGO_URL =
-  "https://raw.githubusercontent.com/facebook/docusaurus/main/website/static/img/docusaurus.png"; // Replace with your logo
+  "https://raw.githubusercontent.com/SharvilDhumal/Intern_project1/5063ff1b43f3059153a56de84b35182984630b98/static/img/DokuAi_img.png";
 
 export const sendVerificationEmail = async (email: string, token: string) => {
   const baseUrl = process.env.FRONTEND_URL || "http://localhost:3000";
