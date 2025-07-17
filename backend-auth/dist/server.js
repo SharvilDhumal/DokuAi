@@ -9,6 +9,7 @@ const helmet_1 = __importDefault(require("helmet"));
 const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const auth_1 = __importDefault(require("./routes/auth"));
+const admin_1 = __importDefault(require("./routes/admin"));
 // Load environment variables
 dotenv_1.default.config();
 const app = (0, express_1.default)();
@@ -43,6 +44,7 @@ app.get("/health", (req, res) => {
 });
 // Routes
 app.use("/api/auth", auth_1.default);
+app.use("/api/admin", admin_1.default);
 // 404 handler
 app.use("*", (req, res) => {
     res.status(404).json({

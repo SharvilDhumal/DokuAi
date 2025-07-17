@@ -81,6 +81,14 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- Table to log document conversions for admin panel activity tracking
+CREATE TABLE IF NOT EXISTS conversion_logs (
+    id SERIAL PRIMARY KEY,
+    user_email VARCHAR(255) NOT NULL,
+    file_name VARCHAR(255) NOT NULL,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Grant necessary permissions (adjust as needed for your setup)
 -- GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO your_app_user;
 -- GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO your_app_user; 

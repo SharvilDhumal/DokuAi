@@ -32,6 +32,7 @@ from datetime import datetime
 import groq
 import mimetypes
 from docx.opc.constants import RELATIONSHIP_TYPE as RT
+import psycopg2
 
 # Configure logging
 logging.basicConfig(
@@ -704,7 +705,7 @@ Document content:
         return fallback
 
 @app.post("/api/convert", response_model=ConversionResponse)
-async def convert_file(file: UploadFile):
+async def convert_file(file: UploadFile, request: Request):
     """Convert uploaded PDF or DOCX file to Markdown with extracted images."""
     logger.info(f"Received file: {file.filename}")
     temp_path = None
@@ -769,6 +770,20 @@ async def convert_file(file: UploadFile):
             logger.info("Document processing completed successfully")
             
             # Create response
+            # After successful conversion, log to conversion_logs
+            user_email = request.headers.get("x-user-email") or "anonymous"
+            try:
+                conn = psycopg2.connect(POSTGRES_DSN)
+                cur = conn.cursor()
+                cur.execute(
+                    "INSERT INTO conversion_logs (user_email, file_name) VALUES (%s, %s)",
+                    (user_email, filename)
+                )
+                conn.commit()
+                cur.close()
+                conn.close()
+            except Exception as e:
+                logger.error(f"Failed to log conversion: {str(e)}")
             return {
                 "status": "success",
                 "markdown": markdown_content,

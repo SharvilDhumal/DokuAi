@@ -6846,7 +6846,7 @@ KeyError: 'y0'
 2025-07-14 00:10:21,399 - __main__ - INFO - File size: 338945 bytes
 2025-07-14 00:10:21,399 - __main__ - INFO - Processing PDF file
 2025-07-14 00:10:21,702 - __main__ - INFO - Extracted text length: 1572, Number of images: 4
-2025-07-14 00:10:24,727 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-14 00:10:24,727 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1    /chat/completions "HTTP/1.1 200 OK"
 2025-07-14 00:10:24,731 - __main__ - INFO - Document processing completed successfully
 2025-07-14 10:40:44,181 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
 2025-07-14 14:51:58,932 - __main__ - INFO - Received file: Business Case.docx
@@ -6910,3 +6910,7 @@ KeyError: 'y0'
 2025-07-16 12:08:51,856 - __main__ - INFO - Extracted text length: 1673, Number of images: 4
 2025-07-16 12:08:53,977 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
 2025-07-16 12:08:53,980 - __main__ - INFO - Document processing completed successfully
+2025-07-16 16:32:16,961 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-16 17:05:41,536 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-17 10:45:44,111 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-17 11:44:59,493 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads

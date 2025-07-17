@@ -71,6 +71,8 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('user', JSON.stringify(userData));
         setUser(userData);
         setIsAuthenticated(true);
+        // Redirect to home page after successful login
+        window.location.href = '/';
     };
 
     const logout = () => {
@@ -78,6 +80,8 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('user');
         setUser(null);
         setIsAuthenticated(false);
+        // Redirect to home page after logout
+        window.location.href = '/';
     };
 
     const updateUser = (userData) => {

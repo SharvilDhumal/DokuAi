@@ -20,4 +20,6 @@ router.get("/verify-reset-token", verifyResetToken);
 router.post("/verify-email", verifyEmail);
 router.get("/verify-token", verifyToken);
 
+// NOTE: Admin routes are defined in a separate file: admin.ts
+
 export default router;

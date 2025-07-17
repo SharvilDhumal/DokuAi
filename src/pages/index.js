@@ -46,6 +46,13 @@ export default function Home() {
 
   const handleLoginSuccess = (userData) => {
     console.log('Login successful:', userData);
+    // Close the auth modal
+    setIsAuthModalOpen(false);
+    
+    // Redirect based on user role
+    if (userData.role === 'admin') {
+      window.location.href = "/admin-panel";
+    }
     // You can add additional logic here after successful login
   };
 

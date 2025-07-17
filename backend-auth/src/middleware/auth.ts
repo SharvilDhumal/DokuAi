@@ -10,7 +10,11 @@ interface AuthRequest extends Request {
   };
 }
 
-export const authenticateToken = (
+export type { AuthRequest };
+
+import pool from "../utils/db";
+
+export const authenticateToken = async (
   req: AuthRequest,
   res: Response,
   next: NextFunction
@@ -26,10 +30,35 @@ export const authenticateToken = (
   }
 
   try {
+    // Verify the token
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
-    req.user = decoded;
+    
+    // Get the latest user data from the database
+    const userResult = await pool.query(
+      "SELECT id, email, role, is_verified FROM user1 WHERE id = $1",
+      [decoded.userId]
+    );
+
+    if (userResult.rowCount === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    const user = userResult.rows[0];
+    
+    // Set the user in the request object
+    req.user = {
+      userId: user.id,
+      email: user.email,
+      role: user.role,
+      is_verified: user.is_verified
+    };
+    
     next();
   } catch (error) {
+    console.error("Authentication error:", error);
     return res.status(403).json({
       success: false,
       message: "Invalid or expired token",

@@ -380,12 +380,35 @@ export const verifyToken = async (req: Request, res: Response) => {
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as any;
+    
+    // Get the latest user data from the database
+    const userResult = await pool.query(
+      "SELECT id, email, role, is_verified FROM user1 WHERE id = $1",
+      [decoded.userId]
+    );
+
+    if (userResult.rowCount === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    const user = userResult.rows[0];
+    
     res.json({
       success: true,
       message: "Token is valid",
-      user: decoded,
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        is_verified: user.is_verified
+      },
+      role: user.role // Include role at the root level for easier access
     });
   } catch (error) {
+    console.error("Token verification error:", error);
     res.status(403).json({
       success: false,
       message: "Invalid or expired token",

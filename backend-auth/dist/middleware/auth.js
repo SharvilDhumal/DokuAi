@@ -5,7 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.requireRole = exports.requireVerified = exports.authenticateToken = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const authenticateToken = (req, res, next) => {
+const db_1 = __importDefault(require("../utils/db"));
+const authenticateToken = async (req, res, next) => {
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];
     if (!token) {
@@ -15,11 +16,28 @@ const authenticateToken = (req, res, next) => {
         });
     }
     try {
+        // Verify the token
         const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
-        req.user = decoded;
+        // Get the latest user data from the database
+        const userResult = await db_1.default.query("SELECT id, email, role, is_verified FROM user1 WHERE id = $1", [decoded.userId]);
+        if (userResult.rowCount === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found",
+            });
+        }
+        const user = userResult.rows[0];
+        // Set the user in the request object
+        req.user = {
+            userId: user.id,
+            email: user.email,
+            role: user.role,
+            is_verified: user.is_verified
+        };
         next();
     }
     catch (error) {
+        console.error("Authentication error:", error);
         return res.status(403).json({
             success: false,
             message: "Invalid or expired token",

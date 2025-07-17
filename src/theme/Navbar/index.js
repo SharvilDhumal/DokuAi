@@ -22,6 +22,16 @@ export default function CustomNavbar() {
                     >
                         Upload
                     </Link>
+                    {user && user.role === 'admin' && (
+                        <Link
+                            to="/admin-panel"
+                            className={styles.uploadLink}
+                            aria-label="Admin Panel"
+                            style={{ marginLeft: 16 }}
+                        >
+                            Admin Panel
+                        </Link>
+                    )}
                 </div>
                 <button
                     className={styles.hamburger}

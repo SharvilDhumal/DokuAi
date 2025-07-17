@@ -2,10 +2,17 @@
 // This file handles environment variables for the browser environment
 
 const getEnvVar = (key, defaultValue = '') => {
-  // Try to get from Docusaurus custom fields first
+  // Try to get from environment variables first
+  if (typeof process !== 'undefined' && process.env) {
+    if (process.env[`REACT_APP_${key}`] !== undefined) {
+      return process.env[`REACT_APP_${key}`];
+    }
+  }
+
+  // Try to get from Docusaurus custom fields
   if (typeof window !== 'undefined' && window.docusaurus) {
     const customFields = window.docusaurus?.customFields;
-    if (customFields && customFields[key]) {
+    if (customFields && customFields[key] !== undefined) {
       return customFields[key];
     }
   }
@@ -15,22 +22,34 @@ const getEnvVar = (key, defaultValue = '') => {
 };
 
 // Environment configuration for frontend
-export const config = {
-  // Authentication API URL
+const config = {
+  // Authentication API URL (Node.js backend)
   AUTH_API_URL: getEnvVar('AUTH_API_URL', 'http://localhost:5001/api/auth'),
+  
+  // Admin API base URL (same as auth but without /api/auth)
+  ADMIN_API_URL: getEnvVar('ADMIN_API_URL', 'http://localhost:5001'),
 
-  // Python backend URL
+  // Python backend URL (FastAPI)
   BACKEND_URL: getEnvVar('BACKEND_URL', 'http://localhost:5000'),
 
-  // Other environment variables can be added here
+  // Environment
   NODE_ENV: getEnvVar('NODE_ENV', 'development'),
+  IS_DEVELOPMENT: getEnvVar('NODE_ENV', 'development') === 'development',
+  IS_PRODUCTION: getEnvVar('NODE_ENV', 'development') === 'production',
 
   // Frontend URL
   FRONTEND_URL: getEnvVar('FRONTEND_URL', 'http://localhost:3000'),
 };
 
-// Export individual config values for easy import
-export const AUTH_API_URL = config.AUTH_API_URL;
-export const BACKEND_URL = config.BACKEND_URL;
-export const NODE_ENV = config.NODE_ENV;
-export const FRONTEND_URL = config.FRONTEND_URL;
+// Export individual variables for easier imports
+export const {
+  AUTH_API_URL,
+  ADMIN_API_URL,
+  BACKEND_URL,
+  NODE_ENV,
+  IS_DEVELOPMENT,
+  IS_PRODUCTION,
+  FRONTEND_URL
+} = config;
+
+export default config;
