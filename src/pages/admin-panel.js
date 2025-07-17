@@ -313,13 +313,23 @@ function AdminPanelContent() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {logs.map((log, index) => (
-                                            <tr key={index}>
-                                                <td>{log.user_email || 'N/A'}</td>
-                                                <td>{log.file_name || 'N/A'}</td>
-                                                <td>{log.timestamp || 'N/A'}</td>
-                                            </tr>
-                                        ))}
+                                        {logs.map((log, index) => {
+                                            // Format the timestamp
+                                            const formattedTime = log.created_at 
+                                                ? new Date(log.created_at).toLocaleString() 
+                                                : 'N/A';
+                                                
+                                            return (
+                                                <tr key={index}>
+                                                    <td>{log.user_email || 'Anonymous'}</td>
+                                                    <td>
+                                                        {log.original_file_name || log.file_name || 'N/A'}
+                                                        {log.conversion_type && ` (${log.conversion_type.toUpperCase()})`}
+                                                    </td>
+                                                    <td>{formattedTime}</td>
+                                                </tr>
+                                            );
+                                        })}
                                     </tbody>
                                 </table>
                             ) : (

@@ -4,6 +4,7 @@ import Layout from '@theme/Layout';
 import styles from './index.module.css';
 import Head from '@docusaurus/Head';
 import { useHistory } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 // Use the environment variable if set, otherwise default to localhost:5000
 const API_URL = (typeof process !== 'undefined' && process.env.REACT_APP_API_URL) ||
@@ -19,6 +20,7 @@ export default function UploadDashboard() {
     const [markdownOutput, setMarkdownOutput] = useState('');
     const [uploadProgress, setUploadProgress] = useState(0);
     const history = useHistory();
+    const { user } = useAuth();
 
     // Use environment variable for API URL with fallback to localhost
     const API_URL = 'http://localhost:5000';
@@ -130,6 +132,12 @@ export default function UploadDashboard() {
 
                 xhr.open('POST', `${API_URL}/api/convert`);
                 xhr.setRequestHeader('Accept', 'application/json');
+                
+                // Add user's email to headers if available
+                if (user && user.email) {
+                    xhr.setRequestHeader('x-user-email', user.email);
+                }
+                
                 xhr.send(formData);
             })
                 .then(data => {

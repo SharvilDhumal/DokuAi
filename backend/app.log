@@ -6914,3 +6914,121 @@ KeyError: 'y0'
 2025-07-16 17:05:41,536 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
 2025-07-17 10:45:44,111 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
 2025-07-17 11:44:59,493 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-17 12:08:47,602 - __main__ - INFO - Received file: Business Case.docx
+2025-07-17 12:08:47,605 - __main__ - INFO - Starting conversion for file: Business Case.docx
+2025-07-17 12:08:47,606 - __main__ - INFO - File size: 285804 bytes
+2025-07-17 12:08:47,607 - __main__ - INFO - Processing DOCX file
+2025-07-17 12:08:47,691 - __main__ - INFO - Extracted text length: 1673, Number of images: 4
+2025-07-17 12:08:53,453 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-17 12:08:53,468 - __main__ - INFO - Document processing completed successfully
+2025-07-17 12:08:53,471 - __main__ - ERROR - Failed to log conversion: name 'POSTGRES_DSN' is not defined
+2025-07-17 12:08:53,511 - __main__ - INFO - Received file: Business Case.docx
+2025-07-17 12:08:53,512 - __main__ - INFO - Starting conversion for file: Business Case.docx
+2025-07-17 12:08:53,513 - __main__ - INFO - File size: 285804 bytes
+2025-07-17 12:08:53,514 - __main__ - INFO - Processing DOCX file
+2025-07-17 12:08:53,582 - __main__ - INFO - Extracted text length: 1673, Number of images: 4
+2025-07-17 12:08:56,620 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-17 12:08:56,626 - __main__ - INFO - Document processing completed successfully
+2025-07-17 12:08:56,631 - __main__ - ERROR - Failed to log conversion: name 'POSTGRES_DSN' is not defined
+2025-07-17 14:19:43,947 - __main__ - INFO - Received file: Business Case.docx
+2025-07-17 14:19:43,948 - __main__ - INFO - Starting conversion for file: Business Case.docx
+2025-07-17 14:19:43,949 - __main__ - INFO - File size: 285804 bytes
+2025-07-17 14:19:43,950 - __main__ - INFO - Processing DOCX file
+2025-07-17 14:19:44,001 - __main__ - INFO - Extracted text length: 1673, Number of images: 4
+2025-07-17 14:19:46,708 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-17 14:19:46,711 - __main__ - INFO - Document processing completed successfully
+2025-07-17 14:19:46,712 - __main__ - ERROR - Failed to log conversion: name 'POSTGRES_DSN' is not defined
+2025-07-17 14:19:46,751 - __main__ - INFO - Received file: Business Case.docx
+2025-07-17 14:19:46,754 - __main__ - INFO - Starting conversion for file: Business Case.docx
+2025-07-17 14:19:46,755 - __main__ - INFO - File size: 285804 bytes
+2025-07-17 14:19:46,757 - __main__ - INFO - Processing DOCX file
+2025-07-17 14:19:46,805 - __main__ - INFO - Extracted text length: 1673, Number of images: 4
+2025-07-17 14:19:49,692 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-17 14:19:49,699 - __main__ - INFO - Document processing completed successfully
+2025-07-17 14:19:49,702 - __main__ - ERROR - Failed to log conversion: name 'POSTGRES_DSN' is not defined
+2025-07-17 14:30:22,804 - __main__ - INFO - Received file: Business Case.docx
+2025-07-17 14:30:22,804 - __main__ - INFO - Starting conversion for file: Business Case.docx
+2025-07-17 14:30:22,805 - __main__ - INFO - File size: 285804 bytes
+2025-07-17 14:30:22,806 - __main__ - INFO - Processing DOCX file
+2025-07-17 14:30:22,830 - __main__ - INFO - Extracted text length: 1673, Number of images: 4
+2025-07-17 14:30:24,814 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-17 14:30:24,817 - __main__ - INFO - Document processing completed successfully
+2025-07-17 14:30:24,817 - __main__ - ERROR - Failed to log conversion: name 'POSTGRES_DSN' is not defined
+2025-07-17 14:30:24,844 - __main__ - INFO - Received file: Business Case.docx
+2025-07-17 14:30:24,845 - __main__ - INFO - Starting conversion for file: Business Case.docx
+2025-07-17 14:30:24,845 - __main__ - INFO - File size: 285804 bytes
+2025-07-17 14:30:24,846 - __main__ - INFO - Processing DOCX file
+2025-07-17 14:30:24,889 - __main__ - INFO - Extracted text length: 1673, Number of images: 4
+2025-07-17 14:30:27,591 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-17 14:30:27,594 - __main__ - INFO - Document processing completed successfully
+2025-07-17 14:30:27,594 - __main__ - ERROR - Failed to log conversion: name 'POSTGRES_DSN' is not defined
+2025-07-17 15:28:48,888 - __main__ - INFO - Received file: Business Case.docx
+2025-07-17 15:28:48,889 - __main__ - INFO - Starting conversion for file: Business Case.docx
+2025-07-17 15:28:48,889 - __main__ - INFO - File size: 285804 bytes
+2025-07-17 15:28:48,890 - __main__ - INFO - Processing DOCX file
+2025-07-17 15:28:48,913 - __main__ - INFO - Extracted text length: 1673, Number of images: 4
+2025-07-17 15:28:49,528 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2025-07-17 15:28:49,529 - __main__ - ERROR - Error processing document with Groq: Error code: 503 - {'error': {'message': 'Service unavailable. Visit https://groqstatus.com/ to see if there is an active incident.', 'type': 'internal_server_error'}}
+2025-07-17 15:28:49,531 - __main__ - INFO - Document processing completed successfully
+2025-07-17 15:28:49,532 - __main__ - ERROR - Failed to log conversion: name 'POSTGRES_DSN' is not defined
+2025-07-17 15:28:49,698 - __main__ - INFO - Received file: Business Case.docx
+2025-07-17 15:28:49,699 - __main__ - INFO - Starting conversion for file: Business Case.docx
+2025-07-17 15:28:49,699 - __main__ - INFO - File size: 285804 bytes
+2025-07-17 15:28:49,700 - __main__ - INFO - Processing DOCX file
+2025-07-17 15:28:49,737 - __main__ - INFO - Extracted text length: 1673, Number of images: 4
+2025-07-17 15:28:50,381 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2025-07-17 15:28:50,382 - __main__ - ERROR - Error processing document with Groq: Error code: 503 - {'error': {'message': 'Service unavailable. Visit https://groqstatus.com/ to see if there is an active incident.', 'type': 'internal_server_error'}}
+2025-07-17 15:28:50,383 - __main__ - INFO - Document processing completed successfully
+2025-07-17 15:28:50,383 - __main__ - ERROR - Failed to log conversion: name 'POSTGRES_DSN' is not defined
+2025-07-17 15:35:33,305 - __main__ - INFO - Received file: Business Case.docx
+2025-07-17 15:35:33,306 - __main__ - INFO - Starting conversion for file: Business Case.docx
+2025-07-17 15:35:33,306 - __main__ - INFO - File size: 285804 bytes
+2025-07-17 15:35:33,306 - __main__ - INFO - Processing DOCX file
+2025-07-17 15:35:33,353 - __main__ - INFO - Extracted text length: 1673, Number of images: 4
+2025-07-17 15:35:35,618 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-17 15:35:35,621 - __main__ - INFO - Document processing completed successfully
+2025-07-17 15:35:35,621 - __main__ - ERROR - Failed to log conversion: name 'POSTGRES_DSN' is not defined
+2025-07-17 15:35:35,654 - __main__ - INFO - Received file: Business Case.docx
+2025-07-17 15:35:35,655 - __main__ - INFO - Starting conversion for file: Business Case.docx
+2025-07-17 15:35:35,655 - __main__ - INFO - File size: 285804 bytes
+2025-07-17 15:35:35,656 - __main__ - INFO - Processing DOCX file
+2025-07-17 15:35:35,686 - __main__ - INFO - Extracted text length: 1673, Number of images: 4
+2025-07-17 15:35:38,004 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-17 15:35:38,007 - __main__ - INFO - Document processing completed successfully
+2025-07-17 15:35:38,008 - __main__ - ERROR - Failed to log conversion: name 'POSTGRES_DSN' is not defined
+2025-07-17 15:37:45,694 - __main__ - INFO - Received file: Business Case.docx
+2025-07-17 15:37:45,695 - __main__ - INFO - Starting conversion for file: Business Case.docx
+2025-07-17 15:37:45,695 - __main__ - INFO - File size: 285804 bytes
+2025-07-17 15:37:45,695 - __main__ - INFO - Processing DOCX file
+2025-07-17 15:37:45,733 - __main__ - INFO - Extracted text length: 1673, Number of images: 4
+2025-07-17 15:37:47,801 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-17 15:37:47,803 - __main__ - INFO - Document processing completed successfully
+2025-07-17 15:37:47,803 - __main__ - ERROR - Failed to log conversion: name 'POSTGRES_DSN' is not defined
+2025-07-17 15:37:47,822 - __main__ - INFO - Received file: Business Case.docx
+2025-07-17 15:37:47,823 - __main__ - INFO - Starting conversion for file: Business Case.docx
+2025-07-17 15:37:47,823 - __main__ - INFO - File size: 285804 bytes
+2025-07-17 15:37:47,824 - __main__ - INFO - Processing DOCX file
+2025-07-17 15:37:47,856 - __main__ - INFO - Extracted text length: 1673, Number of images: 4
+2025-07-17 15:37:49,983 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-17 15:37:49,986 - __main__ - INFO - Document processing completed successfully
+2025-07-17 15:37:49,987 - __main__ - ERROR - Failed to log conversion: name 'POSTGRES_DSN' is not defined
+2025-07-17 15:43:29,765 - __main__ - INFO - Verified/created conversion_logs table
+2025-07-17 15:43:29,766 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-17 15:44:22,778 - __main__ - INFO - Received file: Business Case.pdf
+2025-07-17 15:44:22,779 - __main__ - INFO - Starting conversion for file: Business Case.pdf
+2025-07-17 15:44:22,780 - __main__ - INFO - File size: 338945 bytes
+2025-07-17 15:44:22,780 - __main__ - INFO - Processing PDF file
+2025-07-17 15:44:23,087 - __main__ - INFO - Extracted text length: 1572, Number of images: 4
+2025-07-17 15:44:25,525 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-17 15:44:25,531 - __main__ - INFO - Document processing completed successfully
+2025-07-17 15:44:25,531 - __main__ - INFO - Logging conversion for user: sharvildhumal2023@gmail.com, file: Business Case.pdf
+2025-07-17 15:44:25,582 - __main__ - INFO - Logged conversion with ID: 1
+2025-07-17 15:44:25,633 - __main__ - INFO - Received file: Business Case.pdf
+2025-07-17 15:44:25,634 - __main__ - INFO - Starting conversion for file: Business Case.pdf
+2025-07-17 15:44:25,635 - __main__ - INFO - File size: 338945 bytes
+2025-07-17 15:44:25,635 - __main__ - INFO - Processing PDF file
+2025-07-17 15:44:25,781 - __main__ - INFO - Extracted text length: 1572, Number of images: 4
+2025-07-17 15:44:27,907 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-17 15:44:27,910 - __main__ - INFO - Document processing completed successfully
+2025-07-17 15:44:27,911 - __main__ - INFO - Logging conversion for user: sharvildhumal2023@gmail.com, file: Business Case.pdf
+2025-07-17 15:44:27,963 - __main__ - INFO - Logged conversion with ID: 2

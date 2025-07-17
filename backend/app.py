@@ -49,6 +49,48 @@ logger = logging.getLogger(__name__)
 load_dotenv()
 groq.api_key = os.getenv("GROQ_API_KEY")
 
+# Database connection string
+POSTGRES_DSN = os.getenv("POSTGRES_DSN", "postgresql://postgres:sharvil39@localhost:5432/postgres")
+
+# Ensure the conversion_logs table exists
+def ensure_conversion_logs_table():
+    try:
+        conn = psycopg2.connect(POSTGRES_DSN)
+        cur = conn.cursor()
+        
+        # Create conversion_logs table if it doesn't exist
+        cur.execute("""
+        CREATE TABLE IF NOT EXISTS conversion_logs (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER REFERENCES user1(id) ON DELETE SET NULL,
+            user_email VARCHAR(255) NOT NULL,
+            file_name VARCHAR(255) NOT NULL,
+            original_file_name VARCHAR(255),
+            converted_file_name VARCHAR(255),
+            conversion_type VARCHAR(50),
+            status VARCHAR(50) NOT NULL,
+            created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+        )
+        """)
+        
+        # Create index for faster lookups
+        cur.execute("""
+        CREATE INDEX IF NOT EXISTS idx_conversion_logs_user_email 
+        ON conversion_logs(user_email)
+        """)
+        
+        conn.commit()
+        cur.close()
+        conn.close()
+        logger.info("Verified/created conversion_logs table")
+    except Exception as e:
+        logger.error(f"Error ensuring conversion_logs table exists: {str(e)}")
+        logger.error(traceback.format_exc())
+
+# Initialize database table when the app starts
+ensure_conversion_logs_table()
+
 app = FastAPI(
     title="Document Conversion API",
     description="API for converting documents to Markdown with image extraction",
@@ -772,18 +814,53 @@ async def convert_file(file: UploadFile, request: Request):
             # Create response
             # After successful conversion, log to conversion_logs
             user_email = request.headers.get("x-user-email") or "anonymous"
+            logger.info(f"Logging conversion for user: {user_email}, file: {filename}")
+            
             try:
+                # Use the global POSTGRES_DSN
                 conn = psycopg2.connect(POSTGRES_DSN)
                 cur = conn.cursor()
+                
+                # First, try to get the user_id from the user1 table
+                user_id = None
+                if user_email != "anonymous":
+                    cur.execute(
+                        "SELECT id FROM user1 WHERE email = %s",
+                        (user_email,)
+                    )
+                    user_result = cur.fetchone()
+                    if user_result:
+                        user_id = user_result[0]
+                
+                # Insert into conversion_logs
                 cur.execute(
-                    "INSERT INTO conversion_logs (user_email, file_name) VALUES (%s, %s)",
-                    (user_email, filename)
+                    """
+                    INSERT INTO conversion_logs 
+                    (user_id, user_email, file_name, original_file_name, conversion_type, status)
+                    VALUES (%s, %s, %s, %s, %s, 'completed')
+                    RETURNING id, created_at
+                    """,
+                    (
+                        user_id,
+                        user_email,
+                        filename,
+                        filename,  # Assuming original_file_name is the same as filename
+                        os.path.splitext(filename)[1].lstrip('.').lower()  # Extract file extension as conversion_type
+                    )
                 )
+                
+                # Get the inserted log entry
+                log_entry = cur.fetchone()
+                logger.info(f"Logged conversion with ID: {log_entry[0] if log_entry else 'unknown'}")
+                
                 conn.commit()
                 cur.close()
                 conn.close()
+                
             except Exception as e:
                 logger.error(f"Failed to log conversion: {str(e)}")
+                logger.error(traceback.format_exc())
+            
             return {
                 "status": "success",
                 "markdown": markdown_content,
