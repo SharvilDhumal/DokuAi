@@ -92,3 +92,10 @@ CREATE TABLE IF NOT EXISTS conversion_logs (
 -- Grant necessary permissions (adjust as needed for your setup)
 -- GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO your_app_user;
 -- GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO your_app_user; 
+
+CREATE TABLE IF NOT EXISTS site_visits (
+    id SERIAL PRIMARY KEY,
+    visited_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+ALTER TABLE user1 ADD COLUMN IF NOT EXISTS last_active TIMESTAMP; 

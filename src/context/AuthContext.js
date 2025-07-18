@@ -24,8 +24,8 @@ export const AuthProvider = ({ children }) => {
 
     // Check if user is logged in on app start
     useEffect(() => {
-        const token = localStorage.getItem('authToken');
-        const savedUser = localStorage.getItem('user');
+        const token = sessionStorage.getItem('authToken');
+        const savedUser = sessionStorage.getItem('user');
 
         if (token && savedUser) {
             try {
@@ -67,8 +67,8 @@ export const AuthProvider = ({ children }) => {
     };
 
     const login = (token, userData) => {
-        localStorage.setItem('authToken', token);
-        localStorage.setItem('user', JSON.stringify(userData));
+        sessionStorage.setItem('authToken', token);
+        sessionStorage.setItem('user', JSON.stringify(userData));
         setUser(userData);
         setIsAuthenticated(true);
         // Redirect to home page after successful login
@@ -76,8 +76,8 @@ export const AuthProvider = ({ children }) => {
     };
 
     const logout = () => {
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('user');
+        sessionStorage.removeItem('authToken');
+        sessionStorage.removeItem('user');
         setUser(null);
         setIsAuthenticated(false);
         // Redirect to home page after logout
@@ -86,7 +86,7 @@ export const AuthProvider = ({ children }) => {
 
     const updateUser = (userData) => {
         setUser(userData);
-        localStorage.setItem('user', JSON.stringify(userData));
+        sessionStorage.setItem('user', JSON.stringify(userData));
     };
 
     const value = {

@@ -32,7 +32,7 @@ export const authenticateToken = async (
   try {
     // Verify the token
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
-    
+
     // Get the latest user data from the database
     const userResult = await pool.query(
       "SELECT id, email, role, is_verified FROM user1 WHERE id = $1",
@@ -47,15 +47,20 @@ export const authenticateToken = async (
     }
 
     const user = userResult.rows[0];
-    
+
     // Set the user in the request object
     req.user = {
       userId: user.id,
       email: user.email,
       role: user.role,
-      is_verified: user.is_verified
+      is_verified: user.is_verified,
     };
-    
+
+    // Update last_active timestamp for this user
+    await pool.query("UPDATE user1 SET last_active = NOW() WHERE id = $1", [
+      user.id,
+    ]);
+
     next();
   } catch (error) {
     console.error("Authentication error:", error);

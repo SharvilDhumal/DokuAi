@@ -7032,3 +7032,59 @@ KeyError: 'y0'
 2025-07-17 15:44:27,910 - __main__ - INFO - Document processing completed successfully
 2025-07-17 15:44:27,911 - __main__ - INFO - Logging conversion for user: sharvildhumal2023@gmail.com, file: Business Case.pdf
 2025-07-17 15:44:27,963 - __main__ - INFO - Logged conversion with ID: 2
+2025-07-17 16:08:02,587 - __main__ - INFO - Received file: Business Case.pdf
+2025-07-17 16:08:02,588 - __main__ - INFO - Starting conversion for file: Business Case.pdf
+2025-07-17 16:08:02,588 - __main__ - INFO - File size: 338945 bytes
+2025-07-17 16:08:02,589 - __main__ - INFO - Processing PDF file
+2025-07-17 16:08:02,746 - __main__ - INFO - Extracted text length: 1572, Number of images: 4
+2025-07-17 16:08:05,193 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-17 16:08:05,195 - __main__ - INFO - Document processing completed successfully
+2025-07-17 16:08:05,196 - __main__ - INFO - Logging conversion for user: sharvildhumal2023@gmail.com, file: Business Case.pdf
+2025-07-17 16:08:05,251 - __main__ - INFO - Logged conversion with ID: 3
+2025-07-17 16:08:05,288 - __main__ - INFO - Received file: Business Case.pdf
+2025-07-17 16:08:05,289 - __main__ - INFO - Starting conversion for file: Business Case.pdf
+2025-07-17 16:08:05,291 - __main__ - INFO - File size: 338945 bytes
+2025-07-17 16:08:05,291 - __main__ - INFO - Processing PDF file
+2025-07-17 16:08:05,454 - __main__ - INFO - Extracted text length: 1572, Number of images: 4
+2025-07-17 16:08:07,652 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-17 16:08:07,654 - __main__ - INFO - Document processing completed successfully
+2025-07-17 16:08:07,654 - __main__ - INFO - Logging conversion for user: sharvildhumal2023@gmail.com, file: Business Case.pdf
+2025-07-17 16:08:07,703 - __main__ - INFO - Logged conversion with ID: 4
+2025-07-18 11:35:29,516 - __main__ - INFO - Verified/created conversion_logs table
+2025-07-18 11:35:29,518 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-18 11:58:13,282 - __main__ - INFO - Received file: Business Case.docx
+2025-07-18 11:58:13,283 - __main__ - INFO - Starting conversion for file: Business Case.docx
+2025-07-18 11:58:13,284 - __main__ - INFO - File size: 285804 bytes
+2025-07-18 11:58:13,284 - __main__ - INFO - Processing DOCX file
+2025-07-18 11:58:13,334 - __main__ - INFO - Extracted text length: 1673, Number of images: 4
+2025-07-18 11:58:16,024 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-18 11:58:16,036 - __main__ - INFO - Document processing completed successfully
+2025-07-18 11:58:16,037 - __main__ - INFO - Logging conversion for user: sharvildhumal2023@gmail.com, file: Business Case.docx
+2025-07-18 11:58:16,075 - __main__ - INFO - Logged conversion with ID: 5
+2025-07-18 11:58:16,101 - __main__ - INFO - Received file: Business Case.docx
+2025-07-18 11:58:16,102 - __main__ - INFO - Starting conversion for file: Business Case.docx
+2025-07-18 11:58:16,102 - __main__ - INFO - File size: 285804 bytes
+2025-07-18 11:58:16,102 - __main__ - INFO - Processing DOCX file
+2025-07-18 11:58:16,125 - __main__ - INFO - Extracted text length: 1673, Number of images: 4
+2025-07-18 11:58:17,947 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-18 11:58:17,949 - __main__ - INFO - Document processing completed successfully
+2025-07-18 11:58:17,950 - __main__ - INFO - Logging conversion for user: sharvildhumal2023@gmail.com, file: Business Case.docx
+2025-07-18 11:58:17,990 - __main__ - INFO - Logged conversion with ID: 6
+2025-07-18 12:09:52,639 - __main__ - INFO - Received file: Tenable Nessus documentation 2.docx
+2025-07-18 12:09:52,640 - __main__ - INFO - Starting conversion for file: Tenable Nessus documentation 2.docx
+2025-07-18 12:09:52,642 - __main__ - INFO - File size: 144623 bytes
+2025-07-18 12:09:52,643 - __main__ - INFO - Processing DOCX file
+2025-07-18 12:09:52,705 - __main__ - INFO - Extracted text length: 1655, Number of images: 1
+2025-07-18 12:09:55,928 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-18 12:09:55,934 - __main__ - INFO - Document processing completed successfully
+2025-07-18 12:09:55,940 - __main__ - INFO - Logging conversion for user: sharvildhumal2023@gmail.com, file: Tenable Nessus documentation 2.docx
+2025-07-18 12:09:56,013 - __main__ - INFO - Logged conversion with ID: 7
+2025-07-18 12:09:56,050 - __main__ - INFO - Received file: Tenable Nessus documentation 2.docx
+2025-07-18 12:09:56,051 - __main__ - INFO - Starting conversion for file: Tenable Nessus documentation 2.docx
+2025-07-18 12:09:56,052 - __main__ - INFO - File size: 144623 bytes
+2025-07-18 12:09:56,052 - __main__ - INFO - Processing DOCX file
+2025-07-18 12:09:56,111 - __main__ - INFO - Extracted text length: 1655, Number of images: 1
+2025-07-18 12:09:59,409 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-18 12:09:59,412 - __main__ - INFO - Document processing completed successfully
+2025-07-18 12:09:59,414 - __main__ - INFO - Logging conversion for user: sharvildhumal2023@gmail.com, file: Tenable Nessus documentation 2.docx
+2025-07-18 12:09:59,594 - __main__ - INFO - Logged conversion with ID: 8

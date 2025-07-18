@@ -10,43 +10,43 @@ console.log('Environment variables:', { AUTH_API_URL, ADMIN_API_URL });
 
 // Error boundary component
 class ErrorBoundary extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false };
-  }
-
-  static getDerivedStateFromError(error) {
-    return { hasError: true };
-  }
-
-  componentDidCatch(error, errorInfo) {
-    console.error('Error in admin panel:', error, errorInfo);
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div className="container margin-vert--xl">
-          <div className="row">
-            <div className="col col--6 col--offset-3">
-              <div className="alert alert--danger">
-                <h3>Something went wrong</h3>
-                <p>An error occurred while loading the admin panel. Please try again later.</p>
-                <button 
-                  className="button button--primary" 
-                  onClick={() => window.location.reload()}
-                >
-                  Reload Page
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      );
+    constructor(props) {
+        super(props);
+        this.state = { hasError: false };
     }
 
-    return this.props.children;
-  }
+    static getDerivedStateFromError(error) {
+        return { hasError: true };
+    }
+
+    componentDidCatch(error, errorInfo) {
+        console.error('Error in admin panel:', error, errorInfo);
+    }
+
+    render() {
+        if (this.state.hasError) {
+            return (
+                <div className="container margin-vert--xl">
+                    <div className="row">
+                        <div className="col col--6 col--offset-3">
+                            <div className="alert alert--danger">
+                                <h3>Something went wrong</h3>
+                                <p>An error occurred while loading the admin panel. Please try again later.</p>
+                                <button
+                                    className="button button--primary"
+                                    onClick={() => window.location.reload()}
+                                >
+                                    Reload Page
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        return this.props.children;
+    }
 }
 
 function AdminPanelContent() {
@@ -56,10 +56,11 @@ function AdminPanelContent() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [shouldRedirect, setShouldRedirect] = useState(false);
+    const [activeUsers, setActiveUsers] = useState([]);
 
     useEffect(() => {
         const checkAdminAccess = async () => {
-            const token = localStorage.getItem("authToken");
+            const token = sessionStorage.getItem("authToken");
             if (!token) {
                 setError("No authentication token found. Please log in again.");
                 setShouldRedirect(true);
@@ -70,7 +71,7 @@ function AdminPanelContent() {
                 // Verify token with backend - use the full URL including /api/auth
                 const verifyUrl = `${AUTH_API_URL}/verify-token`;
                 console.log('Verifying token at:', verifyUrl);
-                
+
                 const response = await fetch(verifyUrl, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -81,7 +82,7 @@ function AdminPanelContent() {
 
                 const data = await response.json();
                 console.log('Token verification response:', { status: response.status, data });
-                
+
                 if (!response.ok || !data.success) {
                     throw new Error(data.message || 'Token verification failed');
                 }
@@ -89,15 +90,15 @@ function AdminPanelContent() {
                 // Check if user has admin role
                 const userRole = data.role || (data.user && data.user.role);
                 console.log('User role from token:', userRole);
-                
+
                 if (userRole !== 'admin') {
                     setError("Unauthorized: Admin access only");
                     setLoading(false);
                     return false;
                 }
-                
+
                 return true;
-                
+
             } catch (err) {
                 console.error('Error verifying admin access:', err);
                 setError(`Failed to verify admin access: ${err.message}`);
@@ -107,7 +108,7 @@ function AdminPanelContent() {
         };
 
         const fetchData = async () => {
-            const token = localStorage.getItem("authToken");
+            const token = sessionStorage.getItem("authToken");
             if (!token) {
                 setError("No authentication token found. Please log in again.");
                 setShouldRedirect(true);
@@ -117,8 +118,8 @@ function AdminPanelContent() {
             try {
                 setLoading(true);
                 setError("");
-                
-                const token = localStorage.getItem("authToken");
+
+                const token = sessionStorage.getItem("authToken");
                 if (!token) {
                     setError("No authentication token found. Please log in again.");
                     setShouldRedirect(true);
@@ -130,7 +131,7 @@ function AdminPanelContent() {
                 if (!hasAccess) return;
 
                 // Get fresh token for each request
-                const freshToken = localStorage.getItem("authToken");
+                const freshToken = sessionStorage.getItem("authToken");
                 if (!freshToken) {
                     throw new Error('No authentication token found');
                 }
@@ -138,18 +139,18 @@ function AdminPanelContent() {
                 // Use the correct API endpoints
                 const statsUrl = `${ADMIN_API_URL}/api/admin/stats`;
                 const logsUrl = `${ADMIN_API_URL}/api/admin/logs`;
-                
+
                 console.log('Fetching admin stats from:', statsUrl);
                 console.log('Fetching admin logs from:', logsUrl);
-                
+
                 // Create headers with fresh auth token
                 const headers = new Headers();
                 headers.append('Authorization', `Bearer ${freshToken}`);
                 headers.append('Content-Type', 'application/json');
-                
+
                 // Log the headers for debugging
                 console.log('Request headers:', Object.fromEntries(headers.entries()));
-                
+
                 // Fetch stats and logs in parallel
                 const [statsRes, logsRes] = await Promise.all([
                     fetch(statsUrl, {
@@ -199,6 +200,26 @@ function AdminPanelContent() {
                 setStats(statsData.data || statsData);
                 setLogs(logsData.logs || logsData || []);
 
+                // Fetch active users
+                const activeUsersUrl = `${ADMIN_API_URL}/api/admin/active-users`;
+                const activeUsersRes = await fetch(activeUsersUrl, {
+                    method: 'GET',
+                    headers,
+                    credentials: 'include',
+                    mode: 'cors'
+                });
+                let activeUsersData;
+                try {
+                    activeUsersData = await activeUsersRes.json();
+                    if (!activeUsersRes.ok) {
+                        throw new Error(activeUsersData.message || 'Failed to fetch active users');
+                    }
+                } catch (err) {
+                    console.error('Error parsing active users response:', err);
+                    activeUsersData = { users: [] };
+                }
+                setActiveUsers(activeUsersData.users || []);
+
             } catch (err) {
                 console.error('Error in admin panel:', err);
                 setError(err.message || 'Failed to load admin data');
@@ -243,7 +264,7 @@ function AdminPanelContent() {
                             <div className="alert alert--danger">
                                 <h3>Error</h3>
                                 <p>{error}</p>
-                                <button 
+                                <button
                                     className="button button--primary"
                                     onClick={() => window.location.reload()}
                                 >
@@ -263,7 +284,7 @@ function AdminPanelContent() {
                 <h1>Admin Dashboard</h1>
                 {stats && (
                     <div className="row margin-vert--lg">
-                        <div className="col col--4">
+                        <div className="col col--3">
                             <div className="card">
                                 <div className="card__header">
                                     <h3>Users</h3>
@@ -274,7 +295,18 @@ function AdminPanelContent() {
                                 </div>
                             </div>
                         </div>
-                        <div className="col col--4">
+                        <div className="col col--3">
+                            <div className="card">
+                                <div className="card__header">
+                                    <h3>Active Users</h3>
+                                </div>
+                                <div className="card__body">
+                                    <h2>{stats.activeUsers || 0}</h2>
+                                    <p>Active in last 10 min</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="col col--3">
                             <div className="card">
                                 <div className="card__header">
                                     <h3>Conversions</h3>
@@ -285,7 +317,7 @@ function AdminPanelContent() {
                                 </div>
                             </div>
                         </div>
-                        <div className="col col--4">
+                        <div className="col col--3">
                             <div className="card">
                                 <div className="card__header">
                                     <h3>Visits</h3>
@@ -296,6 +328,27 @@ function AdminPanelContent() {
                                 </div>
                             </div>
                         </div>
+                    </div>
+                )}
+                {activeUsers && activeUsers.length > 0 && (
+                    <div className="margin-vert--lg">
+                        <h3>Currently Active Users</h3>
+                        <ul style={{ listStyle: 'none', padding: 0 }}>
+                            {activeUsers.map((u) => (
+                                <li key={u.id} style={{ marginBottom: 8, display: 'flex', alignItems: 'center' }}>
+                                    <span style={{
+                                        display: 'inline-block',
+                                        width: 10,
+                                        height: 10,
+                                        borderRadius: '50%',
+                                        background: '#25c2a0',
+                                        marginRight: 8
+                                    }}></span>
+                                    <span style={{ fontWeight: 500 }}>{u.name || u.email}</span>
+                                    <span style={{ color: '#888', marginLeft: 8, fontSize: 12 }}>{u.email}</span>
+                                </li>
+                            ))}
+                        </ul>
                     </div>
                 )}
 
@@ -315,13 +368,20 @@ function AdminPanelContent() {
                                     <tbody>
                                         {logs.map((log, index) => {
                                             // Format the timestamp
-                                            const formattedTime = log.created_at 
-                                                ? new Date(log.created_at).toLocaleString() 
+                                            const formattedTime = log.created_at
+                                                ? new Date(log.created_at).toLocaleString()
                                                 : 'N/A';
-                                                
+                                            const isActive = activeUsers.some(u => u.email === log.user_email);
                                             return (
                                                 <tr key={index}>
-                                                    <td>{log.user_email || 'Anonymous'}</td>
+                                                    <td>
+                                                        {log.user_email || 'Anonymous'}
+                                                        {isActive && (
+                                                            <span style={{ color: '#25c2a0', fontWeight: 600, marginLeft: 8, fontSize: 12 }}>
+                                                                ● Active now
+                                                            </span>
+                                                        )}
+                                                    </td>
                                                     <td>
                                                         {log.original_file_name || log.file_name || 'N/A'}
                                                         {log.conversion_type && ` (${log.conversion_type.toUpperCase()})`}

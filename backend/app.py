@@ -853,6 +853,21 @@ async def convert_file(file: UploadFile, request: Request):
                 log_entry = cur.fetchone()
                 logger.info(f"Logged conversion with ID: {log_entry[0] if log_entry else 'unknown'}")
                 
+                # After logging the conversion, also update last_active for the user
+                if user_email != "anonymous":
+                    try:
+                        conn = psycopg2.connect(POSTGRES_DSN)
+                        cur = conn.cursor()
+                        cur.execute(
+                            "UPDATE user1 SET last_active = NOW() WHERE email = %s",
+                            (user_email,)
+                        )
+                        conn.commit()
+                        cur.close()
+                        conn.close()
+                    except Exception as e:
+                        logger.error(f"Failed to update last_active for {user_email}: {str(e)}")
+                
                 conn.commit()
                 cur.close()
                 conn.close()
@@ -940,7 +955,7 @@ async def serve_file(file_path: str):
         with open(file_path, 'rb') as f:
             content = f.read()
         
-        return Response(content=content, media_type=mime_type)
+        return FileResponse(content=content, media_type=mime_type, filename=os.path.basename(file_path))
     except HTTPException:
         raise
     except Exception as e:

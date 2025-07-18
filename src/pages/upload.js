@@ -60,7 +60,7 @@ export default function UploadDashboard() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!file) {
+        if (!file || isProcessing) {
             setMessage({ text: 'Please select a valid file before uploading', type: 'error' });
             return;
         }
@@ -84,7 +84,7 @@ export default function UploadDashboard() {
             // Server is healthy, proceed with conversion
             setMessage({ text: 'Starting conversion...', type: 'info' });
 
-            return new Promise((resolve, reject) => {
+            await new Promise((resolve, reject) => {
                 const formData = new FormData();
                 formData.append('file', file);
 
@@ -132,12 +132,12 @@ export default function UploadDashboard() {
 
                 xhr.open('POST', `${API_URL}/api/convert`);
                 xhr.setRequestHeader('Accept', 'application/json');
-                
+
                 // Add user's email to headers if available
                 if (user && user.email) {
                     xhr.setRequestHeader('x-user-email', user.email);
                 }
-                
+
                 xhr.send(formData);
             })
                 .then(data => {
