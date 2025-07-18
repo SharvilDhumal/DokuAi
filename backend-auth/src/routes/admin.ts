@@ -4,6 +4,7 @@ import {
   getAdminStats,
   getConversionLogs,
   getActiveUsers,
+  getMonthlySiteViews,
 } from "../controllers/adminController";
 
 const router = express.Router();
@@ -19,5 +20,8 @@ router.get("/logs", getConversionLogs);
 
 // GET /api/admin/active-users - List of active users
 router.get("/active-users", getActiveUsers);
+
+// GET /api/admin/monthly-site-views - Monthly site views for chart
+router.get("/monthly-site-views", getMonthlySiteViews);
 
 export default router;

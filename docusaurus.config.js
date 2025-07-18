@@ -44,6 +44,21 @@ const config = {
       },
     ],
   ],
+  
+  // Add custom routes and plugins
+  plugins: [
+    [
+      '@docusaurus/plugin-client-redirects',
+      {
+        redirects: [
+          {
+            to: '/admin-panel',
+            from: ['/admin'],
+          },
+        ],
+      },
+    ],
+  ],
 
   themeConfig: {
     image: 'img/dokuai-social-card.jpg', // Change this
@@ -60,6 +75,7 @@ const config = {
       },
       items: [
         { to: '/upload', label: 'Upload', position: 'left' },
+        { to: '/admin', label: 'Admin Panel', position: 'left' },
         // Custom login/logout button will be handled in Navbar/index.js
       ],
     },
@@ -90,8 +106,7 @@ const config = {
   stylesheets: [
     'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css',
   ],
-  plugins: [
-  ],
+  
 };
 
 export default config;

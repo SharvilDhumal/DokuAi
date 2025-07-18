@@ -26,7 +26,7 @@ app.use(
 // Rate limiting
 const limiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minute
-  max: 1000, // allow 1000 requests per minute for testing
+  max: 10000, // allow 10000 requests per minute for testing
   message: {
     success: false,
     message: "Too many requests from this IP, please try again later.",

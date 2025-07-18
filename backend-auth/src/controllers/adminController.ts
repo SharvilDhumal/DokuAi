@@ -150,3 +150,25 @@ export const getActiveUsers = async (req: AuthRequest, res: Response) => {
       .json({ success: false, message: "Failed to fetch active users" });
   }
 };
+
+export const getMonthlySiteViews = async (req: AuthRequest, res: Response) => {
+  if (!req.user || req.user.role !== "admin") {
+    return res
+      .status(403)
+      .json({ success: false, message: "Unauthorized: Admin access required" });
+  }
+  try {
+    const result = await pool.query(
+      `SELECT TO_CHAR(visited_at, 'YYYY-MM') as month, COUNT(*) as views
+       FROM site_visits
+       WHERE visited_at >= NOW() - INTERVAL '12 months'
+       GROUP BY month
+       ORDER BY month ASC`
+    );
+    res.json({ success: true, data: result.rows });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch monthly site views" });
+  }
+};
