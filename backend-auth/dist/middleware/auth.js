@@ -32,8 +32,12 @@ const authenticateToken = async (req, res, next) => {
             userId: user.id,
             email: user.email,
             role: user.role,
-            is_verified: user.is_verified
+            is_verified: user.is_verified,
         };
+        // Update last_active timestamp for this user
+        await db_1.default.query("UPDATE user1 SET last_active = NOW() WHERE id = $1", [
+            user.id,
+        ]);
         next();
     }
     catch (error) {

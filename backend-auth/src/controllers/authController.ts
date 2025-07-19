@@ -143,6 +143,14 @@ export const login = async (req: Request, res: Response) => {
       });
     }
 
+    // --- NEW: Update last_active on login ---
+    await pool.query("UPDATE user1 SET last_active = NOW() WHERE id = $1", [
+      user.id,
+    ]);
+
+    // --- NEW: Insert a site visit on login ---
+    await pool.query("INSERT INTO site_visits (visited_at) VALUES (NOW())");
+
     const token = jwt.sign(
       {
         userId: user.id,

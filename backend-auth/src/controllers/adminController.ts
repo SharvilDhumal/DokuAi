@@ -38,7 +38,7 @@ export const getAdminStats = async (req: AuthRequest, res: Response) => {
 
     console.log("Fetching active users...");
     const activeUsers = await pool.query(
-      "SELECT COUNT(*) AS count FROM user1 WHERE last_active > NOW() - INTERVAL '10 minutes'"
+      "SELECT COUNT(*) AS count FROM user1 WHERE last_active > NOW() - INTERVAL '10 minutes' AND role != 'admin'"
     );
     console.log("Active users result:", activeUsers.rows);
 
@@ -141,7 +141,7 @@ export const getActiveUsers = async (req: AuthRequest, res: Response) => {
   }
   try {
     const result = await pool.query(
-      "SELECT id, name, email, last_active FROM user1 WHERE last_active > NOW() - INTERVAL '10 minutes' ORDER BY last_active DESC"
+      "SELECT id, name, email, last_active FROM user1 WHERE last_active > NOW() - INTERVAL '10 minutes' AND role != 'admin' ORDER BY last_active DESC"
     );
     res.json({ success: true, users: result.rows });
   } catch (error) {

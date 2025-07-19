@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.verifyToken = exports.verifyEmail = exports.verifyResetToken = exports.resetPassword = exports.forgotPassword = exports.login = exports.register = void 0;
+exports.ping = exports.verifyToken = exports.verifyEmail = exports.verifyResetToken = exports.resetPassword = exports.forgotPassword = exports.login = exports.register = void 0;
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const crypto_1 = __importDefault(require("crypto"));
@@ -152,6 +152,12 @@ const login = async (req, res) => {
                 },
             });
         }
+        // --- NEW: Update last_active on login ---
+        await db_1.default.query("UPDATE user1 SET last_active = NOW() WHERE id = $1", [
+            user.id,
+        ]);
+        // --- NEW: Insert a site visit on login ---
+        await db_1.default.query("INSERT INTO site_visits (visited_at) VALUES (NOW())");
         const token = jsonwebtoken_1.default.sign({
             userId: user.id,
             email: user.email,
@@ -370,6 +376,10 @@ const verifyToken = async (req, res) => {
                 message: "User not found",
             });
         }
+        // Update last_active timestamp
+        await db_1.default.query("UPDATE user1 SET last_active = NOW() WHERE id = $1", [
+            decoded.userId,
+        ]);
         const user = userResult.rows[0];
         res.json({
             success: true,
@@ -378,9 +388,9 @@ const verifyToken = async (req, res) => {
                 id: user.id,
                 email: user.email,
                 role: user.role,
-                is_verified: user.is_verified
+                is_verified: user.is_verified,
             },
-            role: user.role // Include role at the root level for easier access
+            role: user.role, // Include role at the root level for easier access
         });
     }
     catch (error) {
@@ -392,4 +402,34 @@ const verifyToken = async (req, res) => {
     }
 };
 exports.verifyToken = verifyToken;
+// Add a ping endpoint to update last_active timestamp
+const ping = async (req, res) => {
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
+    if (!token) {
+        return res.status(401).json({
+            success: false,
+            message: "Token is required",
+        });
+    }
+    try {
+        const decoded = jsonwebtoken_1.default.verify(token, JWT_SECRET);
+        // Update last_active timestamp
+        await db_1.default.query("UPDATE user1 SET last_active = NOW() WHERE id = $1", [
+            decoded.userId,
+        ]);
+        res.json({
+            success: true,
+            message: "Activity updated",
+        });
+    }
+    catch (error) {
+        console.error("Ping error:", error);
+        res.status(403).json({
+            success: false,
+            message: "Invalid or expired token",
+        });
+    }
+};
+exports.ping = ping;
 //# sourceMappingURL=authController.js.map

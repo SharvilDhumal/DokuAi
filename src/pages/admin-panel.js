@@ -462,9 +462,6 @@ function AdminPanelContent() {
                                                         <tr key={index} style={{ height: 38 }}>
                                                             <td>
                                                                 {log.user_email || 'Anonymous'}
-                                                                {isActive && (
-                                                                    <Badge bg="success" className="ms-2">Active now</Badge>
-                                                                )}
                                                             </td>
                                                             <td>
                                                                 <span>{fileIcon}</span>

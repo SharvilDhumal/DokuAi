@@ -6,7 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const helmet_1 = __importDefault(require("helmet"));
-const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const auth_1 = __importDefault(require("./routes/auth"));
 const admin_1 = __importDefault(require("./routes/admin"));
@@ -21,16 +20,11 @@ app.use((0, cors_1.default)({
     origin: process.env.FRONTEND_URL || "http://localhost:3000",
     credentials: true,
 }));
-// Rate limiting
-const limiter = (0, express_rate_limit_1.default)({
-    windowMs: Number(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 minutes
-    max: Number(process.env.RATE_LIMIT_MAX_REQUESTS) || 100, // limit each IP to 100 requests per windowMs
-    message: {
-        success: false,
-        message: "Too many requests from this IP, please try again later.",
-    },
-});
-app.use(limiter);
+// Remove or comment out all rate limiting middleware for development
+// const apiLimiter = rateLimit({ ... });
+// app.use(apiLimiter);
+// app.use(limiter);
+// app.use((req, res, next) => { next(); });
 // Body parsing middleware
 app.use(express_1.default.json({ limit: "10mb" }));
 app.use(express_1.default.urlencoded({ extended: true, limit: "10mb" }));

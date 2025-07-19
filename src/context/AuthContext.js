@@ -58,7 +58,7 @@ export const AuthProvider = ({ children }) => {
                 const randomDelay = Math.floor(Math.random() * 1000);
                 await new Promise(resolve => setTimeout(resolve, randomDelay));
 
-                await axios.get(`${AUTH_API_URL}/ping`, {
+                await axios.post(`${AUTH_API_URL}/ping`, null, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
