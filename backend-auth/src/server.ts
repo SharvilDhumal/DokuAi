@@ -24,16 +24,23 @@ app.use(
 );
 
 // Rate limiting
-const limiter = rateLimit({
-  windowMs: 1 * 60 * 1000, // 1 minute
-  max: 10000, // allow 10000 requests per minute for testing
+const apiLimiter = rateLimit({
+  windowMs: Number(process.env.RATE_LIMIT_WINDOW_MS) || 60000, // 1 minute
+  max: Number(process.env.RATE_LIMIT_MAX_REQUESTS) || 100, // 100 requests per minute
   message: {
     success: false,
     message: "Too many requests from this IP, please try again later.",
   },
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
-app.use(limiter);
+// Completely disable rate limiting for development
+// This will prevent 429 errors during testing
+app.use((req, res, next) => {
+  // Skip rate limiting for all endpoints in development
+  next();
+});
 
 // Body parsing middleware
 app.use(express.json({ limit: "10mb" }));

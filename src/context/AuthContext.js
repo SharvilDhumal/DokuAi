@@ -44,6 +44,43 @@ export const AuthProvider = ({ children }) => {
         }
     }, []);
 
+    // Update last_active timestamp periodically for logged-in users
+    useEffect(() => {
+        if (!isAuthenticated || !user) return;
+
+        // Function to ping the auth server to update last_active
+        const updateActivity = async () => {
+            try {
+                const token = sessionStorage.getItem('authToken');
+                if (!token) return;
+
+                // Add a random delay between 0-1000ms to avoid all tabs pinging at once
+                const randomDelay = Math.floor(Math.random() * 1000);
+                await new Promise(resolve => setTimeout(resolve, randomDelay));
+
+                await axios.get(`${AUTH_API_URL}/ping`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                console.log('Activity status updated');
+            } catch (error) {
+                // Only log detailed errors in development
+                if (process.env.NODE_ENV === 'development') {
+                    console.error('Failed to update activity status:', error);
+                }
+            }
+        };
+
+        // Update immediately on login
+        updateActivity();
+
+        // Then update every 5 minutes (reduced frequency to avoid rate limiting)
+        const interval = setInterval(updateActivity, 5 * 60 * 1000);
+
+        return () => clearInterval(interval);
+    }, [isAuthenticated, user]);
+
     const verifyToken = async (token) => {
         try {
             const response = await axios.get(`${AUTH_API_URL}/verify-token`, {

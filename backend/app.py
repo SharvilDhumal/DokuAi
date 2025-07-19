@@ -33,6 +33,7 @@ import groq
 import mimetypes
 from docx.opc.constants import RELATIONSHIP_TYPE as RT
 import psycopg2
+import jwt  # Add this import at the top with other imports
 
 # Configure logging
 logging.basicConfig(
@@ -751,6 +752,36 @@ async def convert_file(file: UploadFile, request: Request):
     """Convert uploaded PDF or DOCX file to Markdown with extracted images."""
     logger.info(f"Received file: {file.filename}")
     temp_path = None
+    user_email = "anonymous"
+    user_id = None
+    # --- Robust user identification using JWT ---
+    auth_header = request.headers.get("authorization")
+    jwt_secret = os.getenv("JWT_SECRET", "your-secret-key")  # Use default if not set
+    
+    # First try to get from Authorization header
+    if auth_header and auth_header.startswith("Bearer ") and jwt_secret:
+        token = auth_header.split(" ")[1]
+        try:
+            payload = jwt.decode(token, jwt_secret, algorithms=["HS256"])
+            user_email = payload.get("email", "anonymous")
+            user_id = payload.get("userId") or payload.get("id")
+            logger.info(f"Decoded JWT payload from Authorization header: {payload}")
+        except Exception as e:
+            logger.warning(f"JWT decode failed from Authorization header: {e}")
+            
+            # Fallback to x-user-email header if JWT fails
+            email_header = request.headers.get("x-user-email")
+            if email_header:
+                user_email = email_header
+                logger.info(f"Using email from x-user-email header: {user_email}")
+    else:
+        # Fallback to x-user-email header if no JWT
+        email_header = request.headers.get("x-user-email")
+        if email_header:
+            user_email = email_header
+            logger.info(f"Using email from x-user-email header: {user_email}")
+            
+    logger.info(f"Final user identification: email={user_email}, id={user_id}")
     
     try:
         # Check if file is provided
@@ -813,7 +844,6 @@ async def convert_file(file: UploadFile, request: Request):
             
             # Create response
             # After successful conversion, log to conversion_logs
-            user_email = request.headers.get("x-user-email") or "anonymous"
             logger.info(f"Logging conversion for user: {user_email}, file: {filename}")
             
             try:
@@ -821,9 +851,8 @@ async def convert_file(file: UploadFile, request: Request):
                 conn = psycopg2.connect(POSTGRES_DSN)
                 cur = conn.cursor()
                 
-                # First, try to get the user_id from the user1 table
-                user_id = None
-                if user_email != "anonymous":
+                # Use user_id and user_email from JWT if available
+                if not user_id and user_email != "anonymous":
                     cur.execute(
                         "SELECT id FROM user1 WHERE email = %s",
                         (user_email,)
@@ -854,13 +883,11 @@ async def convert_file(file: UploadFile, request: Request):
                 logger.info(f"Logged conversion with ID: {log_entry[0] if log_entry else 'unknown'}")
                 
                 # After logging the conversion, also update last_active for the user
-                if user_email != "anonymous":
+                if user_id:
                     try:
-                        conn = psycopg2.connect(POSTGRES_DSN)
-                        cur = conn.cursor()
                         cur.execute(
-                            "UPDATE user1 SET last_active = NOW() WHERE email = %s",
-                            (user_email,)
+                            "UPDATE user1 SET last_active = NOW() WHERE id = %s",
+                            (user_id,)
                         )
                         conn.commit()
                         cur.close()

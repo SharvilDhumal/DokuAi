@@ -133,9 +133,15 @@ export default function UploadDashboard() {
                 xhr.open('POST', `${API_URL}/api/convert`);
                 xhr.setRequestHeader('Accept', 'application/json');
 
-                // Add user's email to headers if available
+                // Add user's email and JWT token to headers if available
                 if (user && user.email) {
                     xhr.setRequestHeader('x-user-email', user.email);
+
+                    // Get JWT token from session storage
+                    const token = sessionStorage.getItem('authToken');
+                    if (token) {
+                        xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+                    }
                 }
 
                 xhr.send(formData);

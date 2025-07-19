@@ -7131,3 +7131,138 @@ psycopg2.InterfaceError: connection already closed
     ~~~~~~~~~~~^^
 psycopg2.InterfaceError: connection already closed
 
+2025-07-18 23:47:32,009 - __main__ - INFO - Verified/created conversion_logs table
+2025-07-18 23:47:32,012 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-18 23:54:02,723 - __main__ - INFO - Received file: Business Case.pdf
+2025-07-18 23:54:02,745 - __main__ - INFO - Starting conversion for file: Business Case.pdf
+2025-07-18 23:54:02,748 - __main__ - INFO - File size: 338945 bytes
+2025-07-18 23:54:02,750 - __main__ - INFO - Processing PDF file
+2025-07-18 23:54:03,244 - __main__ - INFO - Extracted text length: 1572, Number of images: 4
+2025-07-18 23:54:06,709 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-18 23:54:06,738 - __main__ - INFO - Document processing completed successfully
+2025-07-18 23:54:06,740 - __main__ - INFO - Logging conversion for user: bugslayer2025@gmail.com, file: Business Case.pdf
+2025-07-18 23:54:06,847 - __main__ - INFO - Logged conversion with ID: 12
+2025-07-18 23:54:06,925 - __main__ - ERROR - Failed to log conversion: connection already closed
+2025-07-18 23:54:06,929 - __main__ - ERROR - Traceback (most recent call last):
+  File "C:\Users\sharv\Intern_project\backend\app.py", line 871, in convert_file
+    conn.commit()
+    ~~~~~~~~~~~^^
+psycopg2.InterfaceError: connection already closed
+
+2025-07-18 23:54:07,752 - __main__ - INFO - Received file: Business Case.pdf
+2025-07-18 23:54:07,753 - __main__ - INFO - Starting conversion for file: Business Case.pdf
+2025-07-18 23:54:07,755 - __main__ - INFO - File size: 338945 bytes
+2025-07-18 23:54:07,755 - __main__ - INFO - Processing PDF file
+2025-07-18 23:54:08,035 - __main__ - INFO - Extracted text length: 1572, Number of images: 4
+2025-07-18 23:54:11,635 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-18 23:54:11,639 - __main__ - INFO - Document processing completed successfully
+2025-07-18 23:54:11,642 - __main__ - INFO - Logging conversion for user: bugslayer2025@gmail.com, file: Business Case.pdf
+2025-07-18 23:54:11,731 - __main__ - INFO - Logged conversion with ID: 13
+2025-07-18 23:54:11,812 - __main__ - ERROR - Failed to log conversion: connection already closed
+2025-07-18 23:54:11,814 - __main__ - ERROR - Traceback (most recent call last):
+  File "C:\Users\sharv\Intern_project\backend\app.py", line 871, in convert_file
+    conn.commit()
+    ~~~~~~~~~~~^^
+psycopg2.InterfaceError: connection already closed
+
+2025-07-18 23:57:42,857 - __main__ - INFO - Received file: Business Case.pdf
+2025-07-18 23:57:42,858 - __main__ - INFO - Starting conversion for file: Business Case.pdf
+2025-07-18 23:57:42,858 - __main__ - INFO - File size: 338945 bytes
+2025-07-18 23:57:42,858 - __main__ - INFO - Processing PDF file
+2025-07-18 23:57:42,949 - __main__ - INFO - Extracted text length: 1572, Number of images: 4
+2025-07-18 23:57:45,891 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-18 23:57:45,893 - __main__ - INFO - Document processing completed successfully
+2025-07-18 23:57:45,894 - __main__ - INFO - Logging conversion for user: bugslayer2025@gmail.com, file: Business Case.pdf
+2025-07-18 23:57:45,937 - __main__ - INFO - Logged conversion with ID: 14
+2025-07-18 23:57:45,976 - __main__ - ERROR - Failed to log conversion: connection already closed
+2025-07-18 23:57:45,977 - __main__ - ERROR - Traceback (most recent call last):
+  File "C:\Users\sharv\Intern_project\backend\app.py", line 871, in convert_file
+    conn.commit()
+    ~~~~~~~~~~~^^
+psycopg2.InterfaceError: connection already closed
+
+2025-07-19 00:01:28,550 - __main__ - INFO - Received file: Business Case.pdf
+2025-07-19 00:01:28,552 - __main__ - INFO - Starting conversion for file: Business Case.pdf
+2025-07-19 00:01:28,554 - __main__ - INFO - File size: 338945 bytes
+2025-07-19 00:01:28,555 - __main__ - INFO - Processing PDF file
+2025-07-19 00:01:28,789 - __main__ - INFO - Extracted text length: 1572, Number of images: 4
+2025-07-19 00:01:31,908 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-19 00:01:31,914 - __main__ - INFO - Document processing completed successfully
+2025-07-19 00:01:31,917 - __main__ - INFO - Logging conversion for user: bugslayer2025@gmail.com, file: Business Case.pdf
+2025-07-19 00:01:31,997 - __main__ - INFO - Logged conversion with ID: 15
+2025-07-19 00:01:32,059 - __main__ - ERROR - Failed to log conversion: connection already closed
+2025-07-19 00:01:32,061 - __main__ - ERROR - Traceback (most recent call last):
+  File "C:\Users\sharv\Intern_project\backend\app.py", line 871, in convert_file
+    cur.execute(
+    ^^^^^
+psycopg2.InterfaceError: connection already closed
+
+2025-07-19 11:38:43,300 - __main__ - INFO - Verified/created conversion_logs table
+2025-07-19 11:38:43,303 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-19 11:40:56,776 - __main__ - INFO - Received file: Business Case.pdf
+2025-07-19 11:40:56,778 - __main__ - INFO - Starting conversion for file: Business Case.pdf
+2025-07-19 11:40:56,778 - __main__ - INFO - File size: 338945 bytes
+2025-07-19 11:40:56,779 - __main__ - INFO - Processing PDF file
+2025-07-19 11:40:56,901 - __main__ - INFO - Extracted text length: 1572, Number of images: 4
+2025-07-19 11:40:59,359 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-19 11:40:59,370 - __main__ - INFO - Document processing completed successfully
+2025-07-19 11:40:59,370 - __main__ - INFO - Logging conversion for user: anonymous, file: Business Case.pdf
+2025-07-19 11:40:59,426 - __main__ - INFO - Logged conversion with ID: 16
+2025-07-19 11:45:18,146 - __main__ - INFO - Received file: Business Case.pdf
+2025-07-19 11:45:18,146 - __main__ - INFO - Starting conversion for file: Business Case.pdf
+2025-07-19 11:45:18,147 - __main__ - INFO - File size: 338945 bytes
+2025-07-19 11:45:18,147 - __main__ - INFO - Processing PDF file
+2025-07-19 11:45:18,342 - __main__ - INFO - Extracted text length: 1572, Number of images: 4
+2025-07-19 11:45:20,439 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-19 11:45:20,442 - __main__ - INFO - Document processing completed successfully
+2025-07-19 11:45:20,443 - __main__ - INFO - Logging conversion for user: anonymous, file: Business Case.pdf
+2025-07-19 11:45:20,499 - __main__ - INFO - Logged conversion with ID: 17
+2025-07-19 11:45:42,170 - __main__ - INFO - Received file: Manage Engine Patch Access document.docx
+2025-07-19 11:45:42,171 - __main__ - INFO - Starting conversion for file: Manage Engine Patch Access document.docx
+2025-07-19 11:45:42,171 - __main__ - INFO - File size: 279324 bytes
+2025-07-19 11:45:42,172 - __main__ - INFO - Processing DOCX file
+2025-07-19 11:45:42,228 - __main__ - INFO - Extracted text length: 1587, Number of images: 4
+2025-07-19 11:45:44,307 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-19 11:45:44,310 - __main__ - INFO - Document processing completed successfully
+2025-07-19 11:45:44,310 - __main__ - INFO - Logging conversion for user: anonymous, file: Manage Engine Patch Access document.docx
+2025-07-19 11:45:44,361 - __main__ - INFO - Logged conversion with ID: 18
+2025-07-19 12:01:51,801 - __main__ - INFO - Verified/created conversion_logs table
+2025-07-19 12:01:51,803 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-19 12:05:17,345 - __main__ - INFO - Received file: Business Case.docx
+2025-07-19 12:05:17,346 - __main__ - WARNING - JWT decode failed from Authorization header: Signature verification failed
+2025-07-19 12:05:17,347 - __main__ - INFO - Using email from x-user-email header: sharvildhumal2023@gmail.com
+2025-07-19 12:05:17,347 - __main__ - INFO - Final user identification: email=sharvildhumal2023@gmail.com, id=None
+2025-07-19 12:05:17,347 - __main__ - INFO - Starting conversion for file: Business Case.docx
+2025-07-19 12:05:17,348 - __main__ - INFO - File size: 285804 bytes
+2025-07-19 12:05:17,348 - __main__ - INFO - Processing DOCX file
+2025-07-19 12:05:17,402 - __main__ - INFO - Extracted text length: 1673, Number of images: 4
+2025-07-19 12:05:19,641 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-19 12:05:19,654 - __main__ - INFO - Document processing completed successfully
+2025-07-19 12:05:19,655 - __main__ - INFO - Logging conversion for user: sharvildhumal2023@gmail.com, file: Business Case.docx
+2025-07-19 12:05:19,707 - __main__ - INFO - Logged conversion with ID: 19
+2025-07-19 12:05:19,720 - __main__ - ERROR - Failed to log conversion: connection already closed
+2025-07-19 12:05:19,722 - __main__ - ERROR - Traceback (most recent call last):
+  File "C:\Users\sharv\Intern_project\backend\app.py", line 898, in convert_file
+    conn.commit()
+    ~~~~~~~~~~~^^
+psycopg2.InterfaceError: connection already closed
+
+2025-07-19 12:05:58,202 - __main__ - INFO - Received file: Tenable Nessus documentation 2.docx
+2025-07-19 12:05:58,203 - __main__ - WARNING - JWT decode failed from Authorization header: Signature verification failed
+2025-07-19 12:05:58,204 - __main__ - INFO - Using email from x-user-email header: bugslayer2025@gmail.com
+2025-07-19 12:05:58,204 - __main__ - INFO - Final user identification: email=bugslayer2025@gmail.com, id=None
+2025-07-19 12:05:58,205 - __main__ - INFO - Starting conversion for file: Tenable Nessus documentation 2.docx
+2025-07-19 12:05:58,205 - __main__ - INFO - File size: 144623 bytes
+2025-07-19 12:05:58,206 - __main__ - INFO - Processing DOCX file
+2025-07-19 12:05:58,357 - __main__ - INFO - Extracted text length: 1655, Number of images: 1
+2025-07-19 12:06:00,463 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-19 12:06:00,466 - __main__ - INFO - Document processing completed successfully
+2025-07-19 12:06:00,467 - __main__ - INFO - Logging conversion for user: bugslayer2025@gmail.com, file: Tenable Nessus documentation 2.docx
+2025-07-19 12:06:00,511 - __main__ - INFO - Logged conversion with ID: 20
+2025-07-19 12:06:00,516 - __main__ - ERROR - Failed to log conversion: connection already closed
+2025-07-19 12:06:00,517 - __main__ - ERROR - Traceback (most recent call last):
+  File "C:\Users\sharv\Intern_project\backend\app.py", line 898, in convert_file
+    conn.commit()
+    ~~~~~~~~~~~^^
+psycopg2.InterfaceError: connection already closed
+

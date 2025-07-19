@@ -9,6 +9,7 @@ import {
   sendResetEmail,
   sendPasswordChangedEmail,
 } from "../utils/emailService";
+import { AuthRequest } from "../middleware/auth";
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 
@@ -380,7 +381,7 @@ export const verifyToken = async (req: Request, res: Response) => {
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as any;
-    
+
     // Get the latest user data from the database
     const userResult = await pool.query(
       "SELECT id, email, role, is_verified FROM user1 WHERE id = $1",
@@ -394,8 +395,13 @@ export const verifyToken = async (req: Request, res: Response) => {
       });
     }
 
+    // Update last_active timestamp
+    await pool.query("UPDATE user1 SET last_active = NOW() WHERE id = $1", [
+      decoded.userId,
+    ]);
+
     const user = userResult.rows[0];
-    
+
     res.json({
       success: true,
       message: "Token is valid",
@@ -403,12 +409,45 @@ export const verifyToken = async (req: Request, res: Response) => {
         id: user.id,
         email: user.email,
         role: user.role,
-        is_verified: user.is_verified
+        is_verified: user.is_verified,
       },
-      role: user.role // Include role at the root level for easier access
+      role: user.role, // Include role at the root level for easier access
     });
   } catch (error) {
     console.error("Token verification error:", error);
+    res.status(403).json({
+      success: false,
+      message: "Invalid or expired token",
+    });
+  }
+};
+
+// Add a ping endpoint to update last_active timestamp
+export const ping = async (req: Request, res: Response) => {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+
+  if (!token) {
+    return res.status(401).json({
+      success: false,
+      message: "Token is required",
+    });
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET) as any;
+
+    // Update last_active timestamp
+    await pool.query("UPDATE user1 SET last_active = NOW() WHERE id = $1", [
+      decoded.userId,
+    ]);
+
+    res.json({
+      success: true,
+      message: "Activity updated",
+    });
+  } catch (error) {
+    console.error("Ping error:", error);
     res.status(403).json({
       success: false,
       message: "Invalid or expired token",

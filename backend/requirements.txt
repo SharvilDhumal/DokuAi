@@ -61,3 +61,4 @@ typing_extensions==4.14.0
 uritemplate==4.2.0
 python-multipart
 uvicorn
+psycopg2-binary==2.9.9
