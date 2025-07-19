@@ -308,20 +308,35 @@ function AdminPanelContent() {
     }
 
     // Chart data
-    const chartLabels = monthlyViews.map(row => getMonthName(row.month));
+    // --- Monthly Site Views Chart Data ---
+    // Define all months for the x-axis
+    const allMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul']; // Add more if you want a full year
+    // Map backend data to a {month: count} object
+    const monthDataMap = {};
+    monthlyViews.forEach(row => {
+        const [year, month] = row.month.split('-');
+        const monthIdx = parseInt(month, 10) - 1;
+        if (monthIdx >= 0 && monthIdx < allMonths.length) {
+            monthDataMap[allMonths[monthIdx]] = Number(row.views);
+        }
+    });
+    // Fill missing months with zero
+    const chartLabels = allMonths;
+    const chartDataArr = allMonths.map(m => monthDataMap[m] || 0);
     const chartData = {
         labels: chartLabels,
         datasets: [
             {
                 label: 'Site Visits',
-                data: monthlyViews.map(row => Number(row.views)),
-                backgroundColor: METRIC_COLORS.Visits,
+                data: chartDataArr,
+                backgroundColor: '#FFD600',
                 borderRadius: 6,
-                hoverBackgroundColor: '#fbbf24',
+                hoverBackgroundColor: '#FFB300',
                 borderSkipped: false,
             },
         ],
     };
+    const maxVisits = Math.max(...chartDataArr, 100);
     const chartOptions = {
         responsive: true,
         plugins: {
@@ -344,11 +359,19 @@ function AdminPanelContent() {
             x: {
                 grid: { display: false },
                 title: { display: true, text: 'Month', font: { size: 14, weight: 'bold' } },
+                ticks: { color: '#fff', font: { weight: 'bold' } },
             },
             y: {
                 beginAtZero: true,
                 grid: { color: 'rgba(200,200,200,0.08)' },
                 title: { display: true, text: 'Site Visits', font: { size: 14, weight: 'bold' } },
+                ticks: {
+                    color: '#fff',
+                    font: { weight: 'bold' },
+                    stepSize: 100,
+                },
+                min: 0,
+                max: Math.ceil(maxVisits / 100) * 100,
             },
         },
     };
@@ -412,10 +435,10 @@ function AdminPanelContent() {
                                 <Card.Body>
                                     <Card.Title className="mb-3 fw-bold" style={{ fontSize: '1.5rem', color: METRIC_COLORS.Visits, letterSpacing: '0.01em' }}>Monthly Site Views</Card.Title>
                                     <div style={{ height: 320 }}>
-                                        {monthlyViews.length === 0 ? (
+                                        {allMonths.length === 0 ? (
                                             <div className="d-flex flex-column align-items-center justify-content-center h-100 text-muted fw-semibold" style={{ fontSize: 18 }}>
                                                 <NoDataSVG />
-                                                <div style={{ marginTop: 8, color: '#b3b3b3', fontWeight: 500 }}>No Data Available</div>
+                                                <div style={{ marginTop: 8, color: '#b3b3b3', fontWeight: 500 }}>No data available</div>
                                             </div>
                                         ) : (
                                             <Bar data={chartData} options={chartOptions} />
