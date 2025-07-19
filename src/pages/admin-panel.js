@@ -78,6 +78,13 @@ const METRIC_COLORS = {
     Visits: '#fbbf24',
 };
 
+const METRIC_ICONS = {
+    Users: '👤',
+    'Active Users': '🟦',
+    Conversions: '🔥',
+    Visits: '👁',
+};
+
 const FILE_ICONS = {
     pdf: <i className="bi bi-file-earmark-pdf" style={{ color: '#e63946', marginRight: 6 }}></i>,
     docx: <i className="bi bi-file-earmark-word" style={{ color: '#457b9d', marginRight: 6 }}></i>,
@@ -410,14 +417,15 @@ function AdminPanelContent() {
         <Layout title="Admin Panel" description="Admin Dashboard">
             <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #181c2f 0%, #232946 100%)', paddingBottom: 40 }}>
                 <Container fluid className="py-4">
-                    <h1 className="mb-4 fw-bold" style={{ fontSize: '2.5rem', letterSpacing: '0.01em' }}>Admin Dashboard</h1>
+                    <h1 className="mb-4 fw-bold" style={{ fontSize: '2.5rem', letterSpacing: '0.01em', color: '#fff', textShadow: '0 2px 8px #181c2f, 0 1px 0 #2e8555' }}>Admin Dashboard</h1>
                     {/* Stats Cards */}
                     <Row className="g-4 mb-4">
                         {[{ title: 'Users', value: stats?.users || 0, tip: 'Total registered users', color: METRIC_COLORS.Users }, { title: 'Active Users', value: stats?.activeUsers || 0, tip: 'Active in last 10 min', color: METRIC_COLORS['Active Users'] }, { title: 'Conversions', value: stats?.conversions || 0, tip: 'Total document conversions', color: METRIC_COLORS.Conversions }, { title: 'Visits', value: stats?.visits || 0, tip: 'Total site visits', color: METRIC_COLORS.Visits }].map((card, i) => (
                             <Col xs={12} sm={6} md={3} key={card.title}>
                                 <OverlayTrigger placement="top" overlay={<Tooltip>{card.tip}</Tooltip>}>
-                                    <Card className="text-center shadow-sm border-0 h-100 metric-card" style={{ background: 'rgba(36,40,62,0.98)', transition: 'transform 0.2s, box-shadow 0.2s', boxShadow: '0 2px 12px rgba(36,40,62,0.10)' }}>
+                                    <Card className="text-center shadow-sm border-0 h-100 metric-card metric-card-ux" style={{ background: 'linear-gradient(135deg, #232946 60%, #181c2f 100%)', transition: 'transform 0.2s, box-shadow 0.2s', boxShadow: '0 2px 16px rgba(36,40,62,0.18)' }}>
                                         <Card.Body className="py-4">
+                                            <div style={{ fontSize: '2.2rem', marginBottom: 6, color: card.color, filter: 'drop-shadow(0 2px 4px #0002)' }} aria-label={card.title + ' icon'}>{METRIC_ICONS[card.title]}</div>
                                             <Card.Title className="mb-2" style={{ color: card.color, fontWeight: 700, fontSize: '1.2rem', letterSpacing: '0.01em' }}>{card.title}</Card.Title>
                                             <h2 className="fw-bold" style={{ fontSize: '2.1rem', color: '#fff' }}>{card.value}</h2>
                                         </Card.Body>
@@ -431,7 +439,7 @@ function AdminPanelContent() {
                     {/* Monthly Site Views Chart */}
                     <Row className="mb-4">
                         <Col>
-                            <Card className="shadow-sm border-0" style={{ background: 'rgba(36,40,62,0.98)' }}>
+                            <Card className="shadow-sm border-0" style={{ background: 'rgba(44,48,70,0.98)', border: '1.5px solid #2e8555', borderRadius: 18, boxShadow: '0 4px 24px rgba(36,40,62,0.18)' }}>
                                 <Card.Body>
                                     <Card.Title className="mb-3 fw-bold" style={{ fontSize: '1.5rem', color: METRIC_COLORS.Visits, letterSpacing: '0.01em' }}>Monthly Site Views</Card.Title>
                                     <div style={{ height: 320 }}>
@@ -452,8 +460,8 @@ function AdminPanelContent() {
                     <div style={{ height: 2, background: 'linear-gradient(90deg, #2e8555 0%, #232946 100%)', opacity: 0.12, margin: '32px 0 24px 0', borderRadius: 2 }} />
                     {/* Recent Activity Table */}
                     <Row>
-                        <Col>
-                            <Card className="shadow-sm border-0" style={{ background: 'rgba(36,40,62,0.98)' }}>
+                        <Col xs={12} style={{ maxWidth: 1100, margin: '0 auto' }}>
+                            <Card className="shadow-sm border-0" style={{ background: 'rgba(44,48,70,0.98)', border: '1.5px solid #e63946', borderRadius: 18, boxShadow: '0 4px 24px rgba(36,40,62,0.18)' }}>
                                 <Card.Body>
                                     <Card.Title className="mb-3 fw-bold" style={{ fontSize: '1.5rem', color: METRIC_COLORS.Conversions, letterSpacing: '0.01em' }}>Recent Activity</Card.Title>
                                     <div className="table-responsive">
@@ -528,14 +536,6 @@ function AdminPanelContent() {
                             </Card>
                         </Col>
                     </Row>
-                    {/* Footer */}
-                    <footer className="mt-5 pt-4 pb-2 text-center" style={{ borderTop: '1px solid #2e2e3e', color: '#b3b3b3', fontSize: 15 }}>
-                        <div>DokuAI Admin Dashboard &copy; {new Date().getFullYear()} &mdash; <span style={{ color: '#25c2a0', fontWeight: 600 }}>AI-powered Markdown Conversion</span></div>
-                        <div className="mt-2">
-                            <a href="https://github.com/SharvilDhumal" target="_blank" rel="noopener noreferrer" style={{ color: '#b3b3b3', margin: '0 10px', fontSize: 20 }}><i className="bi bi-github"></i></a>
-                            <a href="https://www.linkedin.com/in/sharvil-dhumal/" target="_blank" rel="noopener noreferrer" style={{ color: '#b3b3b3', margin: '0 10px', fontSize: 20 }}><i className="bi bi-linkedin"></i></a>
-                        </div>
-                    </footer>
                 </Container>
             </div>
         </Layout>
@@ -550,12 +550,18 @@ export default function AdminPanel() {
     );
 }
 
-// Add hover effect for metric cards
+// Add improved hover effect for metric cards
 const style = document.createElement('style');
 style.innerHTML = `
-.metric-card:hover {
-  transform: scale(1.03);
-  box-shadow: 0 6px 24px rgba(36,40,62,0.18);
+.metric-card-ux {
+  box-shadow: 0 2px 16px rgba(36,40,62,0.18), 0 1.5px 8px rgba(36,40,62,0.10);
+  background: linear-gradient(135deg, #232946 60%, #181c2f 100%);
+  border-radius: 18px;
+}
+.metric-card-ux:hover {
+  transform: scale(1.045);
+  box-shadow: 0 8px 32px rgba(36,40,62,0.28), 0 2px 12px rgba(36,40,62,0.18);
+  z-index: 2;
 }
 .pagination {
   display: flex;
