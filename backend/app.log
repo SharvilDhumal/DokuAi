@@ -7268,3 +7268,62 @@ psycopg2.InterfaceError: connection already closed
 
 2025-07-19 14:29:45,568 - __main__ - INFO - Verified/created conversion_logs table
 2025-07-19 14:29:45,570 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-19 16:58:19,084 - __main__ - INFO - Received file: Veritas NetBackup -Cybervisible (1).docx
+2025-07-19 16:58:19,095 - __main__ - WARNING - JWT decode failed from Authorization header: Signature verification failed
+2025-07-19 16:58:19,096 - __main__ - INFO - Using email from x-user-email header: sharvildhumal2023@gmail.com
+2025-07-19 16:58:19,097 - __main__ - INFO - Final user identification: email=sharvildhumal2023@gmail.com, id=None
+2025-07-19 16:58:19,098 - __main__ - INFO - Starting conversion for file: Veritas NetBackup -Cybervisible (1).docx
+2025-07-19 16:58:19,098 - __main__ - INFO - File size: 46952 bytes
+2025-07-19 16:58:19,099 - __main__ - INFO - Processing DOCX file
+2025-07-19 16:58:19,186 - __main__ - INFO - Extracted text length: 1023, Number of images: 0
+2025-07-19 16:58:22,639 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-19 16:58:22,659 - __main__ - INFO - Document processing completed successfully
+2025-07-19 16:58:22,660 - __main__ - INFO - Logging conversion for user: sharvildhumal2023@gmail.com, file: Veritas NetBackup -Cybervisible (1).docx
+2025-07-19 16:58:22,758 - __main__ - INFO - Logged conversion with ID: 21
+2025-07-19 16:58:22,767 - __main__ - ERROR - Failed to log conversion: connection already closed
+2025-07-19 16:58:22,773 - __main__ - ERROR - Traceback (most recent call last):
+  File "C:\Users\sharv\Intern_project\backend\app.py", line 898, in convert_file
+    conn.commit()
+    ~~~~~~~~~~~^^
+psycopg2.InterfaceError: connection already closed
+
+2025-07-19 16:58:47,169 - __main__ - INFO - Received file: Business Case.docx
+2025-07-19 16:58:47,170 - __main__ - WARNING - JWT decode failed from Authorization header: Signature verification failed
+2025-07-19 16:58:47,171 - __main__ - INFO - Using email from x-user-email header: sharvildhumal2023@gmail.com
+2025-07-19 16:58:47,172 - __main__ - INFO - Final user identification: email=sharvildhumal2023@gmail.com, id=None
+2025-07-19 16:58:47,173 - __main__ - INFO - Starting conversion for file: Business Case.docx
+2025-07-19 16:58:47,174 - __main__ - INFO - File size: 285804 bytes
+2025-07-19 16:58:47,175 - __main__ - INFO - Processing DOCX file
+2025-07-19 16:58:47,226 - __main__ - INFO - Extracted text length: 1673, Number of images: 4
+2025-07-19 16:58:49,803 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-19 16:58:49,808 - __main__ - INFO - Document processing completed successfully
+2025-07-19 16:58:49,811 - __main__ - INFO - Logging conversion for user: sharvildhumal2023@gmail.com, file: Business Case.docx
+2025-07-19 16:58:49,865 - __main__ - INFO - Logged conversion with ID: 22
+2025-07-19 16:58:49,871 - __main__ - ERROR - Failed to log conversion: connection already closed
+2025-07-19 16:58:49,873 - __main__ - ERROR - Traceback (most recent call last):
+  File "C:\Users\sharv\Intern_project\backend\app.py", line 898, in convert_file
+    conn.commit()
+    ~~~~~~~~~~~^^
+psycopg2.InterfaceError: connection already closed
+
+2025-07-20 15:28:39,620 - __main__ - INFO - Verified/created conversion_logs table
+2025-07-20 15:28:39,623 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-07-20 16:12:15,906 - __main__ - INFO - Received file: Veritas NetBackup -Cybervisible (1).docx
+2025-07-20 16:12:15,914 - __main__ - WARNING - JWT decode failed from Authorization header: Signature verification failed
+2025-07-20 16:12:15,914 - __main__ - INFO - Using email from x-user-email header: bugslayer2025@gmail.com
+2025-07-20 16:12:15,915 - __main__ - INFO - Final user identification: email=bugslayer2025@gmail.com, id=None
+2025-07-20 16:12:15,915 - __main__ - INFO - Starting conversion for file: Veritas NetBackup -Cybervisible (1).docx
+2025-07-20 16:12:15,916 - __main__ - INFO - File size: 46952 bytes
+2025-07-20 16:12:15,917 - __main__ - INFO - Processing DOCX file
+2025-07-20 16:12:15,993 - __main__ - INFO - Extracted text length: 1023, Number of images: 0
+2025-07-20 16:12:19,356 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-20 16:12:19,384 - __main__ - INFO - Document processing completed successfully
+2025-07-20 16:12:19,385 - __main__ - INFO - Logging conversion for user: bugslayer2025@gmail.com, file: Veritas NetBackup -Cybervisible (1).docx
+2025-07-20 16:12:19,462 - __main__ - INFO - Logged conversion with ID: 23
+2025-07-20 16:12:19,468 - __main__ - ERROR - Failed to log conversion: connection already closed
+2025-07-20 16:12:19,474 - __main__ - ERROR - Traceback (most recent call last):
+  File "C:\Users\sharv\Intern_project\backend\app.py", line 898, in convert_file
+    conn.commit()
+    ~~~~~~~~~~~^^
+psycopg2.InterfaceError: connection already closed
+

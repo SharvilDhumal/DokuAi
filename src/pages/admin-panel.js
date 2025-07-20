@@ -1,8 +1,11 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Table, Badge, OverlayTrigger, Tooltip, Button } from 'react-bootstrap';
-import { Bar } from 'react-chartjs-2';
+import { Bar, Line } from 'react-chartjs-2';
 import ReactPaginate from 'react-paginate';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+dayjs.extend(relativeTime);
 
 import {
     Chart as ChartJS,
@@ -102,6 +105,16 @@ function NoDataSVG() {
     );
 }
 
+function getUserInitials(email) {
+    if (!email) return '?';
+    const [name] = email.split('@');
+    return name
+        .split(/[._-]/)
+        .map(part => part[0]?.toUpperCase() || '')
+        .join('')
+        .slice(0, 2);
+}
+
 function AdminPanelContent() {
     const { user, isAuthenticated } = useAuth();
     const [stats, setStats] = useState(null);
@@ -114,6 +127,11 @@ function AdminPanelContent() {
     const [sortConfig, setSortConfig] = useState({ key: 'created_at', direction: 'desc' });
     const [currentPage, setCurrentPage] = useState(0);
     const rowsPerPage = 10;
+    const [timeRange, setTimeRange] = useState('month');
+    const [search, setSearch] = useState('');
+    const [fileTypeFilter, setFileTypeFilter] = useState('all');
+    const [userFilter, setUserFilter] = useState('all');
+    const [dateFilter, setDateFilter] = useState('all');
 
     useEffect(() => {
         const checkAdminAccess = async () => {
@@ -314,7 +332,6 @@ function AdminPanelContent() {
         );
     }
 
-    // Chart data
     // --- Monthly Site Views Chart Data ---
     // Define all months for the x-axis
     const allMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul']; // Add more if you want a full year
@@ -330,58 +347,98 @@ function AdminPanelContent() {
     // Fill missing months with zero
     const chartLabels = allMonths;
     const chartDataArr = allMonths.map(m => monthDataMap[m] || 0);
-    const chartData = {
-        labels: chartLabels,
-        datasets: [
-            {
-                label: 'Site Visits',
-                data: chartDataArr,
-                backgroundColor: '#FFD600',
-                borderRadius: 6,
-                hoverBackgroundColor: '#FFB300',
-                borderSkipped: false,
-            },
-        ],
+    const isAllZero = chartDataArr.every(v => v === 0);
+    // Data labels plugin for Chart.js
+    const dataLabelsPlugin = {
+        id: 'dataLabels',
+        afterDatasetsDraw(chart) {
+            const { ctx, data, chartArea } = chart;
+            ctx.save();
+            data.datasets.forEach((dataset, i) => {
+                chart.getDatasetMeta(i).data.forEach((bar, j) => {
+                    const value = dataset.data[j];
+                    if (value > 0) {
+                        ctx.font = 'bold 14px Inter, sans-serif';
+                        ctx.fillStyle = '#fff';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'bottom';
+                        ctx.fillText(value, bar.x, bar.y - 6);
+                    }
+                });
+            });
+            ctx.restore();
+        },
     };
-    const maxVisits = Math.max(...chartDataArr, 100);
+    // Chart.js options
     const chartOptions = {
         responsive: true,
+        maintainAspectRatio: false,
         plugins: {
             legend: { display: false },
             title: { display: false },
             tooltip: {
                 enabled: true,
                 callbacks: {
-                    label: function (context) {
-                        return `Site Visits: ${context.parsed.y}`;
-                    }
-                }
-            }
+                    title: ctx => ctx[0].label,
+                    label: ctx => `Visits: ${ctx.parsed.y}`,
+                },
+                backgroundColor: '#232946',
+                titleColor: '#25c2a0',
+                bodyColor: '#fff',
+                borderColor: '#25c2a0',
+                borderWidth: 1,
+            },
         },
         animation: {
-            duration: 900,
+            duration: 1200,
             easing: 'easeOutQuart',
         },
         scales: {
             x: {
-                grid: { display: false },
-                title: { display: true, text: 'Month', font: { size: 14, weight: 'bold' } },
-                ticks: { color: '#fff', font: { weight: 'bold' } },
+                grid: { display: true, color: 'rgba(200,200,200,0.10)' },
+                title: { display: true, text: 'Month', font: { size: 18, weight: 'bold' }, color: '#fff' },
+                ticks: { color: '#fff', font: { weight: 'bold', size: 16 } },
             },
             y: {
                 beginAtZero: true,
-                grid: { color: 'rgba(200,200,200,0.08)' },
-                title: { display: true, text: 'Site Visits', font: { size: 14, weight: 'bold' } },
+                grid: { color: 'rgba(200,200,200,0.18)' },
+                title: { display: true, text: 'Site Visits', font: { size: 18, weight: 'bold' }, color: '#fff' },
                 ticks: {
                     color: '#fff',
-                    font: { weight: 'bold' },
+                    font: { weight: 'bold', size: 16 },
                     stepSize: 100,
                 },
                 min: 0,
-                max: Math.ceil(maxVisits / 100) * 100,
+                max: Math.ceil(Math.max(...chartDataArr, 100) / 100) * 100,
             },
         },
     };
+    // Chart.js data
+    const chartData = {
+        labels: chartLabels,
+        datasets: [
+            {
+                label: 'Site Visits',
+                data: chartDataArr,
+                backgroundColor: ctx => {
+                    const gradient = ctx.chart.ctx.createLinearGradient(0, 0, 0, 320);
+                    gradient.addColorStop(0, '#25c2a0');
+                    gradient.addColorStop(1, '#457b9d');
+                    return gradient;
+                },
+                borderRadius: 12,
+                borderSkipped: false,
+                barPercentage: 0.6,
+                categoryPercentage: 0.7,
+                shadowOffsetX: 0,
+                shadowOffsetY: 2,
+                shadowBlur: 8,
+                shadowColor: 'rgba(36,40,62,0.18)',
+            },
+        ],
+    };
+    // --- Chart Type Toggle and Filters ---
+    // Remove chartType, set chartType to 'bar' always, and remove chartTypeToggle
     // Table sorting
     function sortTable(rows) {
         if (!sortConfig.key) return rows;
@@ -406,12 +463,36 @@ function AdminPanelContent() {
         });
     }
     // Pagination
-    const sortedLogs = sortTable(logs);
+    const filteredLogs = logs.filter(log => {
+        const searchLower = search.toLowerCase();
+        const email = (log.user_email || '').toLowerCase();
+        const file = (log.original_file_name || log.file_name || '').toLowerCase();
+        return (
+            searchLower === '' ||
+            email.includes(searchLower) ||
+            file.includes(searchLower)
+        );
+    });
+    const sortedLogs = sortTable(filteredLogs);
     const pageCount = Math.ceil(sortedLogs.length / rowsPerPage);
     const paginatedLogs = sortedLogs.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
     function handlePageClick({ selected }) {
         setCurrentPage(selected);
     }
+
+    // --- Recent Activity Table Filters ---
+    const uniqueUsers = Array.from(new Set(logs.map(l => l.user_email).filter(Boolean)));
+    // In the Recent Activity Table Filters section, remove the dropdowns and only keep the search bar.
+    // const filteredLogs = logs.filter(log => {
+    //     const searchLower = search.toLowerCase();
+    //     const email = (log.user_email || '').toLowerCase();
+    //     const file = (log.original_file_name || log.file_name || '').toLowerCase();
+    //     return (
+    //         searchLower === '' ||
+    //         email.includes(searchLower) ||
+    //         file.includes(searchLower)
+    //     );
+    // });
 
     return (
         <Layout title="Admin Panel" description="Admin Dashboard">
@@ -439,11 +520,11 @@ function AdminPanelContent() {
                     {/* Monthly Site Views Chart */}
                     <Row className="mb-4">
                         <Col>
-                            <Card className="shadow-sm border-0" style={{ background: 'rgba(44,48,70,0.98)', border: '1.5px solid #2e8555', borderRadius: 18, boxShadow: '0 4px 24px rgba(36,40,62,0.18)' }}>
+                            <Card className="shadow-sm border-0" style={{ background: 'linear-gradient(135deg, #232946 60%, #232946 100%)', border: '1.5px solid #2e8555', borderRadius: 18, boxShadow: '0 4px 24px rgba(36,40,62,0.18)' }}>
                                 <Card.Body>
                                     <Card.Title className="mb-3 fw-bold" style={{ fontSize: '1.5rem', color: METRIC_COLORS.Visits, letterSpacing: '0.01em' }}>Monthly Site Views</Card.Title>
-                                    <div style={{ height: 320 }}>
-                                        {allMonths.length === 0 ? (
+                                    <div style={{ height: 320, minHeight: 220 }}>
+                                        {isAllZero ? (
                                             <div className="d-flex flex-column align-items-center justify-content-center h-100 text-muted fw-semibold" style={{ fontSize: 18 }}>
                                                 <NoDataSVG />
                                                 <div style={{ marginTop: 8, color: '#b3b3b3', fontWeight: 500 }}>No data available</div>
@@ -464,49 +545,52 @@ function AdminPanelContent() {
                             <Card className="shadow-sm border-0" style={{ background: 'rgba(44,48,70,0.98)', border: '1.5px solid #e63946', borderRadius: 18, boxShadow: '0 4px 24px rgba(36,40,62,0.18)' }}>
                                 <Card.Body>
                                     <Card.Title className="mb-3 fw-bold" style={{ fontSize: '1.5rem', color: METRIC_COLORS.Conversions, letterSpacing: '0.01em' }}>Recent Activity</Card.Title>
-                                    <div className="table-responsive">
-                                        <Table striped bordered hover variant="dark" className="align-middle mb-0" style={{ fontSize: 14 }}>
-                                            <thead>
-                                                <tr style={{ fontSize: 15, cursor: 'pointer' }}>
-                                                    <th onClick={() => handleSort('user_email')}>User {sortConfig.key === 'user_email' && (sortConfig.direction === 'asc' ? '▲' : '▼')}</th>
-                                                    <th onClick={() => handleSort('original_file_name')}>Action {sortConfig.key === 'original_file_name' && (sortConfig.direction === 'asc' ? '▲' : '▼')}</th>
-                                                    <th onClick={() => handleSort('created_at')}>Time {sortConfig.key === 'created_at' && (sortConfig.direction === 'asc' ? '▲' : '▼')}</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {paginatedLogs.map((log, index) => {
-                                                    const formattedTime = log.created_at
-                                                        ? new Date(log.created_at).toLocaleString()
-                                                        : 'N/A';
-                                                    const isActive = activeUsers.some(u => u.email === log.user_email);
-                                                    let fileIcon = null;
-                                                    let badgeVariant = 'secondary';
-                                                    const fileType = (log.original_file_name || log.file_name || '').split('.').pop()?.toLowerCase();
-                                                    if (fileType === 'pdf') {
-                                                        fileIcon = FILE_ICONS.pdf;
-                                                        badgeVariant = 'danger';
-                                                    } else if (fileType === 'docx') {
-                                                        fileIcon = FILE_ICONS.docx;
-                                                        badgeVariant = 'primary';
-                                                    }
-                                                    return (
-                                                        <tr key={index} style={{ height: 38 }}>
-                                                            <td>
-                                                                {log.user_email || 'Anonymous'}
-                                                            </td>
-                                                            <td>
-                                                                <span>{fileIcon}</span>
-                                                                <Badge bg={badgeVariant} className="me-2">
-                                                                    {fileType?.toUpperCase()}
-                                                                </Badge>
-                                                                {log.original_file_name || log.file_name || 'N/A'}
-                                                            </td>
-                                                            <td>{formattedTime}</td>
-                                                        </tr>
-                                                    );
-                                                })}
-                                            </tbody>
-                                        </Table>
+                                    {/* --- Table Filters --- */}
+                                    <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap', alignItems: 'center' }}>
+                                        <input type="text" placeholder="Search by email or file..." value={search} onChange={e => setSearch(e.target.value)} style={{ borderRadius: 8, padding: '4px 12px', border: '1px solid #2e8555', background: '#232946', color: '#fff', fontWeight: 600, minWidth: 220, width: 320 }} />
+                                    </div>
+                                    <div className="table-responsive" style={{ maxHeight: 480, overflowY: 'auto' }}>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                            {paginatedLogs.map((log, index) => {
+                                                const formattedTime = log.created_at
+                                                    ? new Date(log.created_at).toLocaleString()
+                                                    : 'N/A';
+                                                const relativeTime = log.created_at ? dayjs(log.created_at).fromNow() : '';
+                                                const isToday = dayjs(log.created_at).isSame(dayjs(), 'day');
+                                                let fileIcon = null;
+                                                let fileType = (log.original_file_name || log.file_name || '').split('.').pop()?.toLowerCase();
+                                                if (fileType === 'pdf') fileIcon = <span style={{ display: 'inline-block', background: '#e63946', color: '#fff', borderRadius: 6, padding: '2px 8px', fontWeight: 700, fontSize: 15, marginRight: 6 }}>PDF</span>;
+                                                else if (fileType === 'docx') fileIcon = <span style={{ display: 'inline-block', background: '#457b9d', color: '#fff', borderRadius: 6, padding: '2px 8px', fontWeight: 700, fontSize: 15, marginRight: 6 }}>DOCX</span>;
+                                                // User avatar/initials
+                                                const userInitials = getUserInitials(log.user_email);
+                                                return (
+                                                    <div key={index} className="activity-row-card" style={{
+                                                        background: isToday ? 'rgba(255,214,0,0.10)' : (index % 2 === 0 ? 'rgba(36,40,62,0.98)' : 'rgba(44,48,70,0.98)'),
+                                                        borderRadius: 14,
+                                                        boxShadow: '0 2px 8px rgba(36,40,62,0.10)',
+                                                        padding: 16,
+                                                        marginBottom: 8,
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: 16,
+                                                        border: isToday ? '1.5px solid #FFD600' : '1.5px solid #232946',
+                                                        transition: 'background 0.2s, border 0.2s',
+                                                    }}>
+                                                        <span style={{ display: 'inline-block', width: 40, height: 40, borderRadius: '50%', background: '#232946', color: '#25c2a0', textAlign: 'center', lineHeight: '40px', fontWeight: 700, fontSize: 18, border: '2px solid #25c2a0' }}>{userInitials}</span>
+                                                        <div style={{ flex: 2, fontWeight: 600, color: '#fff' }}>{log.user_email || 'Anonymous'}</div>
+                                                        <div style={{ flex: 2, display: 'flex', alignItems: 'center', gap: 8 }}>
+                                                            {fileIcon}
+                                                            <span style={{ color: '#fff', textDecoration: 'underline', cursor: 'pointer', marginLeft: 8 }} title="Preview/Download (coming soon)">{log.original_file_name || log.file_name || 'N/A'}</span>
+                                                            {isToday && <Badge bg="warning" text="dark" style={{ marginLeft: 8 }}>New</Badge>}
+                                                        </div>
+                                                        <div style={{ flex: 2, color: '#b3b3b3', fontWeight: 500, fontSize: 15, textAlign: 'right' }}>
+                                                            <span>{relativeTime}</span>
+                                                            <span style={{ marginLeft: 8, color: '#888', fontSize: 13 }}>({formattedTime})</span>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
                                         {pageCount > 1 && (
                                             <div className="d-flex justify-content-center mt-3">
                                                 <ReactPaginate
@@ -550,7 +634,7 @@ export default function AdminPanel() {
     );
 }
 
-// Add improved hover effect for metric cards
+// Add improved hover effect for metric cards and activity row cards
 const style = document.createElement('style');
 style.innerHTML = `
 .metric-card-ux {
@@ -563,6 +647,11 @@ style.innerHTML = `
   box-shadow: 0 8px 32px rgba(36,40,62,0.28), 0 2px 12px rgba(36,40,62,0.18);
   z-index: 2;
 }
+.activity-row-card:hover {
+  background: rgba(37,194,160,0.10) !important;
+  border: 1.5px solid #25c2a0 !important;
+  transition: background 0.2s, border 0.2s;
+}
 .pagination {
   display: flex;
   list-style: none;
@@ -574,19 +663,23 @@ style.innerHTML = `
   color: #25c2a0;
   background: #232946;
   border: 1px solid #2e8555;
-  border-radius: 6px;
-  padding: 4px 12px;
-  font-size: 15px;
-  transition: background 0.2s, color 0.2s;
+  border-radius: 12px;
+  padding: 6px 16px;
+  font-size: 16px;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(36,40,62,0.10);
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
 }
 .pagination .page-item.active .page-link {
   background: #25c2a0;
   color: #fff;
   border-color: #25c2a0;
+  box-shadow: 0 4px 16px rgba(37,194,160,0.18);
 }
 .pagination .page-item .page-link:hover {
   background: #2e8555;
   color: #fff;
+  box-shadow: 0 4px 16px rgba(46,136,85,0.18);
 }
 `;
 document.head.appendChild(style);
