@@ -24,10 +24,13 @@
 
 DokuAI is an AI-powered document to Markdown converter that transforms PDF and DOCX documents into clean, professional Markdown with embedded images. This guide will walk you through all the features and functionalities of the application.
 
-![DokuAI Homepage](./images/homepage.png)
-![DokuAI Homepage](./images/homepage1.png)
-![DokuAI Homepage](./images/homepage2.png)
-![DokuAI Homepage](./images/homepage3.png)
+<p style="text-align:center; margin: 16px 0;"><img src="./images/homepage.png" alt="DokuAI Homepage" width="60%"/></p>
+
+<p style="text-align:center; margin: 16px 0;"><img src="./images/homepage1.png" alt="DokuAI Homepage" width="60%"/></p>
+
+<p style="text-align:center; margin: 16px 0;"><img src="./images/homepage2.png" alt="DokuAI Homepage" width="60%"/></p>
+
+<p style="text-align:center; margin: 16px 0;"><img src="./images/homepage3.png" alt="DokuAI Homepage" width="60%"/></p>
 
 ## Getting Started
 
@@ -36,42 +39,54 @@ DokuAI is an AI-powered document to Markdown converter that transforms PDF and D
 To use DokuAI, you need to create an account:
 
 1. Navigate to the DokuAI homepage
-2. Click on the "Sign Up" button in the navigation bar
+2. Click on the **Sign Up** button in the navigation bar
 3. Fill in your details (email, password, name)
-4. Click "Register"
+4. Click **Register**
 5. Check your email for a verification link
-6. Click the verification link to activate your account
+6. Click the **verification link** to activate your account
 
-![Registration Form](./images/register.png)
-![Registration Form](./images/mail.png)
-![Registration Form](./images/verified.png)
+<p style="text-align:center; margin: 16px 0;"><img src="./images/register.png" alt="Registration Form" width="60%"/></p>
+
+<p style="text-align:center; margin: 16px 0;"><img src="./images/mail.png" alt="Verification Email" width="60%"/></p>
+
+<p style="text-align:center; margin: 16px 0;"><img src="./images/verified.png" alt="Email Verified" width="60%"/></p>
+
+> Note: If you don't see the verification email, check your **Spam** or **Promotions** folder.
 
 ### Login
 
 Once your account is created and verified, you can log in:
 
 1. Navigate to the DokuAI homepage
-2. Click on the "Login" button in the navigation bar
+2. Click on the **Login** button in the navigation bar
 3. Enter your email and password
-4. Click "Login"
+4. Click **Login**
 
-![Login Form](./images/login.png)
-![Login Form](./images/login1.png)
+<p style="text-align:center; margin: 16px 0;"><img src="./images/login.png" alt="Login Form" width="60%"/></p>
+
+<p style="text-align:center; margin: 16px 0;"><img src="./images/login1.png" alt="Login Success" width="60%"/></p>
+
+> Tip: If you can't log in, use **Forgot Password?** to reset your credentials.
 
 ### Password Reset
 
 If you forget your password:
 
-1. Click on the "Forgot Password?" link on the login form
+1. Click on the **Forgot Password?** link on the login form
 2. Enter your email address
 3. Check your email for a password reset link
 4. Click the link and enter a new password
-5. Click "Reset Password"
+5. Click **Reset Password**
 
-![Password Reset Form](./images/forgotPassword.png)
-![Password Reset Form](./images/resetLink.png)
-![Password Reset Form](./images/resetPass1.png)
-![Password Reset Form](./images/reset2.png)
+<p style="text-align:center; margin: 16px 0;"><img src="./images/forgotPassword.png" alt="Forgot Password Form" width="60%"/></p>
+
+<p style="text-align:center; margin: 16px 0;"><img src="./images/resetLink.png" alt="Password Reset Link Email" width="60%"/></p>
+
+<p style="text-align:center; margin: 16px 0;"><img src="./images/resetPass1.png" alt="Enter New Password" width="60%"/></p>
+
+<p style="text-align:center; margin: 16px 0;"><img src="./images/reset2.png" alt="Password Reset Success" width="60%"/></p>
+
+> Important: For security, password reset links may expire. Use them soon after receiving the email.
 
 ## Document Upload
 
@@ -92,9 +107,11 @@ To convert a document to Markdown:
 4. Wait for the file to upload and process
 5. The system will convert your document to Markdown using AI
 
-![Upload Page](./images/upload.png)
+<p style="text-align:center; margin: 16px 0;"><img src="./images/upload.png" alt="Upload Page" width="60%"/></p>
 
-![Upload Process](./images/upload1.png)
+<p style="text-align:center; margin: 16px 0;"><img src="./images/upload1.png" alt="Upload Progress" width="60%"/></p>
+
+> Tip: Supported formats are **PDF (.pdf)** and **Microsoft Word (.docx)**.
 
 ## Markdown Preview
 
@@ -102,8 +119,8 @@ To convert a document to Markdown:
 
 After your document is converted:
 
-1. The converted Markdown will be displayed in the preview pane
-2. Images from your document will be embedded in the Markdown
+1. The converted Markdown will be displayed in the **preview pane**
+2. Images from your document will be **embedded** in the Markdown
 3. The preview shows how the Markdown will look when rendered
 
 ### Syntax Highlighting
@@ -113,33 +130,35 @@ Code blocks in your document will be automatically detected and highlighted:
 1. Different programming languages are recognized and highlighted accordingly
 2. Syntax highlighting makes code more readable
 
-![Syntax Highlighting](./images/syntax-highlighting.png)
-
 ## Download and Copy
 
 ### Downloading Markdown
 
 To save your converted Markdown:
 
-1. Click the "Download" button below the preview
+1. Click the **Download** button below the preview
 2. Choose a location to save the .md file
 3. The file will include references to the extracted images
-
-![Download Button](./images/download-button.png)
 
 ### Copying to Clipboard
 
 To copy the Markdown to your clipboard:
 
-1. Click the "Copy" button below the preview
+1. Click the **Copy** button below the preview
 2. The Markdown content is now in your clipboard, ready to paste elsewhere
 
-![Copy Button](./images/preview1.png)
-![Copy Button](./images/preview2.png)
-![Copy Button](./images/preview3.png)
-![Copy Button](./images/preview4.png)
-![Copy Button](./images/preview5.png)
-![Copy Button](./images/preview6.png)
+<p style="text-align:center; margin: 16px 0;"><img src="./images/preview1.png" alt="Preview and Copy" width="60%"/></p>
+
+<p style="text-align:center; margin: 16px 0;"><img src="./images/preview2.png" alt="Preview Options" width="60%"/></p>
+
+<p style="text-align:center; margin: 16px 0;"><img src="./images/preview3.png" alt="Preview Example" width="60%"/></p>
+
+<p style="text-align:center; margin: 16px 0;"><img src="./images/preview4.png" alt="Preview Example 2" width="60%"/></p>
+
+<p style="text-align:center; margin: 16px 0;"><img src="./images/preview5.png" alt="Preview Example 3" width="60%"/></p>
+
+<p style="text-align:center; margin: 16px 0;"><img src="./images/preview6.png" alt="Preview Example 4" width="60%"/></p>
+
 
 ## Admin Panel
 
@@ -152,8 +171,6 @@ Administrators can manage users:
 3. Change user roles (Admin, Editor, Viewer)
 4. Disable or enable user accounts
 
-![User Management](./images/user-management.png)
-
 ### Conversion Logs
 
 Administrators can view conversion logs:
@@ -162,4 +179,14 @@ Administrators can view conversion logs:
 2. Filter by user, date, or file type
 3. View conversion status and details
 
-![Conversion Logs](./images/conversion-logs.png)
+<p style="text-align:center; margin: 16px 0;"><img src="./images/admin1.png" alt="Admin User Management" width="60%"/></p>
+
+<p style="text-align:center; margin: 16px 0;"><img src="./images/admin2.png" alt="Admin Roles" width="60%"/></p>
+
+<p style="text-align:center; margin: 16px 0;"><img src="./images/admin3.png" alt="Admin Actions" width="60%"/></p>
+
+<p style="text-align:center; margin: 16px 0;"><img src="./images/admin4.png" alt="Admin Conversion Logs" width="60%"/></p>
+
+> Caution: Changing **roles** or disabling accounts immediately affects user access.
+
+
