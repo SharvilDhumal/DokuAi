@@ -68,7 +68,10 @@ If you forget your password:
 4. Click the link and enter a new password
 5. Click "Reset Password"
 
-![Password Reset Form](./images/password-reset.png)
+![Password Reset Form](./images/forgotPassword.png)
+![Password Reset Form](./images/resetLink.png)
+![Password Reset Form](./images/resetPass1.png)
+![Password Reset Form](./images/reset2.png)
 
 ## Document Upload
 
@@ -103,8 +106,6 @@ After your document is converted:
 2. Images from your document will be embedded in the Markdown
 3. The preview shows how the Markdown will look when rendered
 
-![Markdown Preview](./images/markdown-preview.png)
-
 ### Syntax Highlighting
 
 Code blocks in your document will be automatically detected and highlighted:
@@ -133,7 +134,12 @@ To copy the Markdown to your clipboard:
 1. Click the "Copy" button below the preview
 2. The Markdown content is now in your clipboard, ready to paste elsewhere
 
-![Copy Button](./images/copy-button.png)
+![Copy Button](./images/preview1.png)
+![Copy Button](./images/preview2.png)
+![Copy Button](./images/preview3.png)
+![Copy Button](./images/preview4.png)
+![Copy Button](./images/preview5.png)
+![Copy Button](./images/preview6.png)
 
 ## Admin Panel
 
