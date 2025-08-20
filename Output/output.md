@@ -24,13 +24,19 @@
 
 DokuAI is an AI-powered document to Markdown converter that transforms PDF and DOCX documents into clean, professional Markdown with embedded images. This guide will walk you through all the features and functionalities of the application.
 
-<p style="text-align:center; margin: 16px 0;"><img src="./images/homepage.png" alt="DokuAI Homepage" width="60%"/></p>
+<p align="center"><img src="./images/homepage.png" alt="DokuAI Homepage" width="60%"/></p>
 
-<p style="text-align:center; margin: 16px 0;"><img src="./images/homepage1.png" alt="DokuAI Homepage" width="60%"/></p>
+<br/>
 
-<p style="text-align:center; margin: 16px 0;"><img src="./images/homepage2.png" alt="DokuAI Homepage" width="60%"/></p>
+<p align="center"><img src="./images/homepage1.png" alt="DokuAI Homepage" width="60%"/></p>
 
-<p style="text-align:center; margin: 16px 0;"><img src="./images/homepage3.png" alt="DokuAI Homepage" width="60%"/></p>
+<br/>
+
+<p align="center"><img src="./images/homepage2.png" alt="DokuAI Homepage" width="60%"/></p>
+
+<br/>
+
+<p align="center"><img src="./images/homepage3.png" alt="DokuAI Homepage" width="60%"/></p>
 
 ## Getting Started
 
@@ -45,11 +51,15 @@ To use DokuAI, you need to create an account:
 5. Check your email for a verification link
 6. Click the **verification link** to activate your account
 
-<p style="text-align:center; margin: 16px 0;"><img src="./images/register.png" alt="Registration Form" width="60%"/></p>
+<p align="center"><img src="./images/register.png" alt="Registration Form" width="60%"/></p>
 
-<p style="text-align:center; margin: 16px 0;"><img src="./images/mail.png" alt="Verification Email" width="60%"/></p>
+<br/>
 
-<p style="text-align:center; margin: 16px 0;"><img src="./images/verified.png" alt="Email Verified" width="60%"/></p>
+<p align="center"><img src="./images/mail.png" alt="Verification Email" width="60%"/></p>
+
+<br/>
+
+<p align="center"><img src="./images/verified.png" alt="Email Verified" width="60%"/></p>
 
 > Note: If you don't see the verification email, check your **Spam** or **Promotions** folder.
 
@@ -62,9 +72,11 @@ Once your account is created and verified, you can log in:
 3. Enter your email and password
 4. Click **Login**
 
-<p style="text-align:center; margin: 16px 0;"><img src="./images/login.png" alt="Login Form" width="60%"/></p>
+<p align="center"><img src="./images/login.png" alt="Login Form" width="60%"/></p>
 
-<p style="text-align:center; margin: 16px 0;"><img src="./images/login1.png" alt="Login Success" width="60%"/></p>
+<br/>
+
+<p align="center"><img src="./images/login1.png" alt="Login Success" width="60%"/></p>
 
 > Tip: If you can't log in, use **Forgot Password?** to reset your credentials.
 
@@ -78,13 +90,19 @@ If you forget your password:
 4. Click the link and enter a new password
 5. Click **Reset Password**
 
-<p style="text-align:center; margin: 16px 0;"><img src="./images/forgotPassword.png" alt="Forgot Password Form" width="60%"/></p>
+<p align="center"><img src="./images/forgotPassword.png" alt="Forgot Password Form" width="60%"/></p>
 
-<p style="text-align:center; margin: 16px 0;"><img src="./images/resetLink.png" alt="Password Reset Link Email" width="60%"/></p>
+<br/>
 
-<p style="text-align:center; margin: 16px 0;"><img src="./images/resetPass1.png" alt="Enter New Password" width="60%"/></p>
+<p align="center"><img src="./images/resetLink.png" alt="Password Reset Link Email" width="60%"/></p>
 
-<p style="text-align:center; margin: 16px 0;"><img src="./images/reset2.png" alt="Password Reset Success" width="60%"/></p>
+<br/>
+
+<p align="center"><img src="./images/resetPass1.png" alt="Enter New Password" width="60%"/></p>
+
+<br/>
+
+<p align="center"><img src="./images/reset2.png" alt="Password Reset Success" width="60%"/></p>
 
 > Important: For security, password reset links may expire. Use them soon after receiving the email.
 
@@ -107,9 +125,11 @@ To convert a document to Markdown:
 4. Wait for the file to upload and process
 5. The system will convert your document to Markdown using AI
 
-<p style="text-align:center; margin: 16px 0;"><img src="./images/upload.png" alt="Upload Page" width="60%"/></p>
+<p align="center"><img src="./images/upload.png" alt="Upload Page" width="60%"/></p>
 
-<p style="text-align:center; margin: 16px 0;"><img src="./images/upload1.png" alt="Upload Progress" width="60%"/></p>
+<br/>
+
+<p align="center"><img src="./images/upload1.png" alt="Upload Progress" width="60%"/></p>
 
 > Tip: Supported formats are **PDF (.pdf)** and **Microsoft Word (.docx)**.
 
@@ -147,17 +167,27 @@ To copy the Markdown to your clipboard:
 1. Click the **Copy** button below the preview
 2. The Markdown content is now in your clipboard, ready to paste elsewhere
 
-<p style="text-align:center; margin: 16px 0;"><img src="./images/preview1.png" alt="Preview and Copy" width="60%"/></p>
+<p align="center"><img src="./images/preview1.png" alt="Preview and Copy" width="60%"/></p>
 
-<p style="text-align:center; margin: 16px 0;"><img src="./images/preview2.png" alt="Preview Options" width="60%"/></p>
+<br/>
 
-<p style="text-align:center; margin: 16px 0;"><img src="./images/preview3.png" alt="Preview Example" width="60%"/></p>
+<p align="center"><img src="./images/preview2.png" alt="Preview Options" width="60%"/></p>
 
-<p style="text-align:center; margin: 16px 0;"><img src="./images/preview4.png" alt="Preview Example 2" width="60%"/></p>
+<br/>
 
-<p style="text-align:center; margin: 16px 0;"><img src="./images/preview5.png" alt="Preview Example 3" width="60%"/></p>
+<p align="center"><img src="./images/preview3.png" alt="Preview Example" width="60%"/></p>
 
-<p style="text-align:center; margin: 16px 0;"><img src="./images/preview6.png" alt="Preview Example 4" width="60%"/></p>
+<br/>
+
+<p align="center"><img src="./images/preview4.png" alt="Preview Example 2" width="60%"/></p>
+
+<br/>
+
+<p align="center"><img src="./images/preview5.png" alt="Preview Example 3" width="60%"/></p>
+
+<br/>
+
+<p align="center"><img src="./images/preview6.png" alt="Preview Example 4" width="60%"/></p>
 
 
 ## Admin Panel
@@ -179,13 +209,19 @@ Administrators can view conversion logs:
 2. Filter by user, date, or file type
 3. View conversion status and details
 
-<p style="text-align:center; margin: 16px 0;"><img src="./images/admin1.png" alt="Admin User Management" width="60%"/></p>
+<p align="center"><img src="./images/admin1.png" alt="Admin User Management" width="60%"/></p>
 
-<p style="text-align:center; margin: 16px 0;"><img src="./images/admin2.png" alt="Admin Roles" width="60%"/></p>
+<br/>
 
-<p style="text-align:center; margin: 16px 0;"><img src="./images/admin3.png" alt="Admin Actions" width="60%"/></p>
+<p align="center"><img src="./images/admin2.png" alt="Admin Roles" width="60%"/></p>
 
-<p style="text-align:center; margin: 16px 0;"><img src="./images/admin4.png" alt="Admin Conversion Logs" width="60%"/></p>
+<br/>
+
+<p align="center"><img src="./images/admin3.png" alt="Admin Actions" width="60%"/></p>
+
+<br/>
+
+<p align="center"><img src="./images/admin4.png" alt="Admin Conversion Logs" width="60%"/></p>
 
 > Caution: Changing **roles** or disabling accounts immediately affects user access.
 
