@@ -25,6 +25,9 @@
 DokuAI is an AI-powered document to Markdown converter that transforms PDF and DOCX documents into clean, professional Markdown with embedded images. This guide will walk you through all the features and functionalities of the application.
 
 ![DokuAI Homepage](./images/homepage.png)
+![DokuAI Homepage](./images/homepage1.png)
+![DokuAI Homepage](./images/homepage2.png)
+![DokuAI Homepage](./images/homepage3.png)
 
 ## Getting Started
 
@@ -39,7 +42,9 @@ To use DokuAI, you need to create an account:
 5. Check your email for a verification link
 6. Click the verification link to activate your account
 
-![Registration Form](./images/registration.png)
+![Registration Form](./images/register.png)
+![Registration Form](./images/mail.png)
+![Registration Form](./images/verified.png)
 
 ### Login
 
@@ -51,6 +56,7 @@ Once your account is created and verified, you can log in:
 4. Click "Login"
 
 ![Login Form](./images/login.png)
+![Login Form](./images/login1.png)
 
 ### Password Reset
 
@@ -83,9 +89,9 @@ To convert a document to Markdown:
 4. Wait for the file to upload and process
 5. The system will convert your document to Markdown using AI
 
-![Upload Page](./images/upload-page.png)
+![Upload Page](./images/upload.png)
 
-![Upload Process](./images/upload-process.png)
+![Upload Process](./images/upload1.png)
 
 ## Markdown Preview
 

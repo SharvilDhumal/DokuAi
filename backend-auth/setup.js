@@ -72,7 +72,7 @@ PORT=5001
 NODE_ENV=development
 
 # Frontend URL
-FRONTEND_URL=http://localhost:3000
+FRONTEND_URL=http://localhost:3001
     `);
     }
 } else {
@@ -106,4 +106,4 @@ console.log('   - Create database: CREATE DATABASE dokuai_auth;');
 console.log('   - Run schema: psql -d dokuai_auth -f database/schema.sql');
 console.log('3. Start the server: npm run dev');
 console.log('4. Test the API: curl http://localhost:5001/health');
-console.log('\n📚 For more information, see README.md'); 
+console.log('\n📚 For more information, see README.md');

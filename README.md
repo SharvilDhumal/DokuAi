@@ -69,7 +69,7 @@ npm install
 npm start
 ```
 
-- The frontend runs on [http://localhost:3000](http://localhost:3000)
+- The frontend runs on [http://localhost:3001](http://localhost:3001)
 - The document conversion backend runs on [http://localhost:5000](http://localhost:5000)
 - The authentication backend runs on [http://localhost:5001](http://localhost:5001)
 

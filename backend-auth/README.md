@@ -63,7 +63,7 @@ A complete authentication system built with Node.js, Express, and PostgreSQL for
    NODE_ENV=development
 
    # Frontend URL
-   FRONTEND_URL=http://localhost:3000
+   FRONTEND_URL=http://localhost:3001
    ```
 
 4. **Set up PostgreSQL database:**
@@ -246,7 +246,7 @@ The authentication system is designed to work with the DokuAI frontend. The fron
 | SMTP_PASS    | SMTP password       | Yes      | -                     |
 | PORT         | Server port         | No       | 5001                  |
 | NODE_ENV     | Environment         | No       | development           |
-| FRONTEND_URL | Frontend URL        | No       | http://localhost:3000 |
+| FRONTEND_URL | Frontend URL        | No       | http://localhost:3001 |
 
 ## Troubleshooting
 

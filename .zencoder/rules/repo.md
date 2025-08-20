@@ -147,7 +147,7 @@ npm start
 
 - **Document Conversion**: http://localhost:5000
 - **Authentication**: http://localhost:5001/api/auth
-- **Frontend**: http://localhost:3000
+- **Frontend**: http://localhost:3001
 
 ### Authentication Flow
 

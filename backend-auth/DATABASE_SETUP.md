@@ -175,7 +175,7 @@ PORT=5001
 NODE_ENV=development
 
 # Frontend URL
-FRONTEND_URL=http://localhost:3000
+FRONTEND_URL=http://localhost:3001
 
 # Rate Limiting
 RATE_LIMIT_WINDOW_MS=900000

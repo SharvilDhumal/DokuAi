@@ -38,7 +38,7 @@ const config = {
   IS_PRODUCTION: getEnvVar('NODE_ENV', 'development') === 'production',
 
   // Frontend URL
-  FRONTEND_URL: getEnvVar('FRONTEND_URL', 'http://localhost:3000'),
+  FRONTEND_URL: getEnvVar('FRONTEND_URL', 'http://localhost:3001'),
 };
 
 // Export individual variables for easier imports

@@ -87,7 +87,7 @@ PORT=5001
 NODE_ENV=development
 
 # Frontend URL
-FRONTEND_URL=http://localhost:3000
+FRONTEND_URL=http://localhost:3001
 ```
 
 ### 4. Start the Authentication Server
