@@ -1,5 +1,7 @@
 // Frontend environment configuration
 // This file handles environment variables for the browser environment
+// Frontend env/config (e.g., API base URLs).
+
 
 const getEnvVar = (key, defaultValue = '') => {
   // Try to get from environment variables first

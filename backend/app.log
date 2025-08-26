@@ -7376,3 +7376,38 @@ psycopg2.InterfaceError: connection already closed
 
 2025-08-20 22:47:16,741 - __main__ - INFO - Verified/created conversion_logs table
 2025-08-20 22:47:16,743 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-08-22 15:33:03,335 - __main__ - INFO - Verified/created conversion_logs table
+2025-08-22 15:33:03,336 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-08-22 16:02:59,309 - __main__ - INFO - Received file: Business Case.pdf
+2025-08-22 16:02:59,311 - __main__ - INFO - Final user identification: email=anonymous, id=None
+2025-08-22 16:02:59,312 - __main__ - INFO - Starting conversion for file: Business Case.pdf
+2025-08-22 16:02:59,312 - __main__ - INFO - File size: 338945 bytes
+2025-08-22 16:02:59,313 - __main__ - INFO - Processing PDF file
+2025-08-22 16:02:59,582 - __main__ - INFO - Extracted text length: 1572, Number of images: 4
+2025-08-22 16:03:00,529 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2025-08-22 16:03:00,530 - __main__ - ERROR - Error processing document with Groq: Error code: 401 - {'error': {'message': 'Invalid API Key', 'type': 'invalid_request_error', 'code': 'invalid_api_key'}}
+2025-08-22 16:03:00,531 - __main__ - INFO - Document processing completed successfully
+2025-08-22 16:03:00,531 - __main__ - INFO - Logging conversion for user: anonymous, file: Business Case.pdf
+2025-08-22 16:03:00,587 - __main__ - INFO - Logged conversion with ID: 26
+2025-08-22 16:35:11,333 - __main__ - INFO - Received file: Business Case.pdf
+2025-08-22 16:35:11,335 - __main__ - WARNING - JWT decode failed from Authorization header: Signature verification failed
+2025-08-22 16:35:11,336 - __main__ - INFO - Using email from x-user-email header: sharvildhumal2023@gmail.com
+2025-08-22 16:35:11,337 - __main__ - INFO - Final user identification: email=sharvildhumal2023@gmail.com, id=None
+2025-08-22 16:35:11,337 - __main__ - INFO - Starting conversion for file: Business Case.pdf
+2025-08-22 16:35:11,338 - __main__ - INFO - File size: 338945 bytes
+2025-08-22 16:35:11,338 - __main__ - INFO - Processing PDF file
+2025-08-22 16:35:11,492 - __main__ - INFO - Extracted text length: 1572, Number of images: 4
+2025-08-22 16:35:12,306 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2025-08-22 16:35:12,308 - __main__ - ERROR - Error processing document with Groq: Error code: 401 - {'error': {'message': 'Invalid API Key', 'type': 'invalid_request_error', 'code': 'invalid_api_key'}}
+2025-08-22 16:35:12,309 - __main__ - INFO - Document processing completed successfully
+2025-08-22 16:35:12,310 - __main__ - INFO - Logging conversion for user: sharvildhumal2023@gmail.com, file: Business Case.pdf
+2025-08-22 16:35:12,369 - __main__ - INFO - Logged conversion with ID: 27
+2025-08-22 16:35:12,375 - __main__ - ERROR - Failed to log conversion: connection already closed
+2025-08-22 16:35:12,380 - __main__ - ERROR - Traceback (most recent call last):
+  File "C:\Users\sharv\Intern_project\backend\app.py", line 898, in convert_file
+    conn.commit()
+    ~~~~~~~~~~~^^
+psycopg2.InterfaceError: connection already closed
+
+2025-08-26 15:56:59,236 - __main__ - INFO - Verified/created conversion_logs table
+2025-08-26 15:56:59,239 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
