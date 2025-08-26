@@ -1,10 +1,11 @@
 // upload.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '@theme/Layout';
 import styles from './index.module.css';
 import Head from '@docusaurus/Head';
 import { useHistory } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { toast } from 'react-toastify';
 
 // Use the environment variable if set, otherwise default to localhost:5000
 const API_URL = (typeof process !== 'undefined' && process.env.REACT_APP_API_URL) ||
@@ -21,6 +22,15 @@ export default function UploadDashboard() {
     const [uploadProgress, setUploadProgress] = useState(0);
     const history = useHistory();
     const { user } = useAuth();
+
+    // Guard: require authentication to access this page
+    useEffect(() => {
+        if (!user) {
+            // Show toast on home page (ToastContainer is mounted there)
+            toast.error('Login to get started');
+            history.replace('/');
+        }
+    }, [user, history]);
 
     // Use environment variable for API URL with fallback to localhost
     const API_URL = 'http://localhost:5000';
@@ -195,6 +205,9 @@ export default function UploadDashboard() {
             setUploadProgress(0);
         }
     };
+
+    // If not authenticated, render nothing while redirecting
+    if (!user) return null;
 
     return (
         <Layout title="Upload Document | DokuAI" description="Upload and convert documents with AI">
