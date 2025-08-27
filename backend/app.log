@@ -7411,3 +7411,5 @@ psycopg2.InterfaceError: connection already closed
 
 2025-08-26 15:56:59,236 - __main__ - INFO - Verified/created conversion_logs table
 2025-08-26 15:56:59,239 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
+2025-08-27 11:21:55,199 - __main__ - INFO - Verified/created conversion_logs table
+2025-08-27 11:21:55,201 - __main__ - INFO - Using upload directory: C:\Users\sharv\Intern_project\backend\uploads
